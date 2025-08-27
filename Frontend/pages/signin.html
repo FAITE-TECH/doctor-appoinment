@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../public/css/styles.css">
+    <title>Document</title>
+</head>
+<body class="bg-gray-100">
+  <header class="mb-6 p-6">
+    <nav class="flex items-center justify-between bg-white rounded-md p-4 shadow">
+      <a href="./index.html" class="text-xl font-semibold">Doctor Appointment</a>
+      <ul class="flex items-center gap-4" id="nav-links">
+        <li><a href="./signin.html" class="text-blue-600 hover:underline" data-auth="guest">Sign in</a></li>
+        <li><a href="./signup.html" class="text-blue-600 hover:underline" data-auth="guest">Sign up</a></li>
+        <li class="hidden" data-auth="user"><span id="nav-user-email" class="text-gray-700"></span></li>
+        <li class="hidden" data-auth="user"><button id="signoutBtn" class="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700">Sign out</button></li>
+      </ul>
+    </nav>
+  </header>
+    <section class="relative py-12 bg-gray-900 sm:py-16 lg:py-20">
+      <div class="absolute inset-0 overflow-hidden">
+        <img
+          class="object-cover object-bottom w-full h-full transform rotate-180 opacity-10"
+          src="https://cdn.rareblocks.xyz/collection/clarity/images/features/6/background-pattern.png"
+          alt=""
+        />
+      </div>
+
+      <div class="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="relative max-w-md mx-auto mt-10 lg:max-w-xl">
+          <div class="absolute inset-x-1.5 top-8 -inset-y-4">
+            <div
+              class="w-full h-full mx-auto rotate-180 rounded-3xl opacity-90 blur-xl filter"
+              
+            ></div>
+          </div>
+
+          <div class="relative overflow-hidden bg-white rounded-2xl lg:rounded-3xl">
+            <div class="px-6 py-7 sm:px-12 sm:py-10">
+              <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-900 font-pj sm:text-4xl xl:text-5xl">
+                  Welcome to Your Account!
+                </h1>
+                <p class="mt-6 text-lg font-normal text-gray-600 font-pj">
+                  Sign in to access your account and explore new opportunities
+                </p>
+
+                <OAuth />
+
+                <p class="mt-8 text-sm font-normal text-center text-gray-600">
+                  or sign in with email
+                </p>
+              </div>
+
+              <form id="signinForm" class="space-y-4 mt-6">
+                <div>
+                  <label
+                    htmlFor="email"
+                    class="text-base font-medium text-gray-900 font-pj"
+                  >
+                    Email
+                  </label>
+                  <div class="mt-2.5">
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      placeholder="Email address"
+                      required
+                      class="block w-full px-4 py-4 text-gray-900 placeholder-gray-600 bg-white border border-gray-400 rounded-xl focus:border-gray-900 focus:ring-gray-900 caret-gray-900"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between">
+                    <label
+                      htmlFor="password"
+                      class="text-base font-medium text-gray-900 font-pj"
+                    >
+                      Password
+                    </label>
+                    <a
+                      href="/forgot-password"
+                      class="text-base font-medium text-gray-500 rounded font-pj hover:text-gray-900 hover:underline focus:outline-none focus:ring-1 focus:ring-gray-900 focus:ring-offset-2"
+                    >
+                      Forgot Password?
+                    </a>
+                  </div>
+                  <div class="mt-2.5">
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      placeholder="Password (min. 8 characters)"
+                      required
+                      class="block w-full px-4 py-4 text-gray-900 placeholder-gray-600 bg-white border border-gray-400 rounded-xl focus:border-gray-900 focus:ring-gray-900 caret-gray-900"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+
+                  class= "flex items-center justify-center w-full px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-gray-900 border border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 font-pj hover:bg-gray-600 cursor-not-allowed"
+                >
+                  Sign in
+                </button>
+              </form>
+
+              <p class="mt-5 text-base font-normal text-center text-gray-900 font-pj">
+                Don't have an account?
+                <a
+                  href="./signup.html"
+                  class="font-bold rounded hover:underline focus:outline-none focus:ring-1 focus:ring-gray-900 focus:ring-offset-2"
+                >
+                  Sign Up for Free
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+      <script src="../public/js/script.js"></script>
+
+</body>
+</html>
