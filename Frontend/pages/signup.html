@@ -8,7 +8,18 @@
 
     <title>Document</title>
 </head>
-<body>
+<body class="bg-gray-100">
+  <header class="mb-6 p-6">
+    <nav class="flex items-center justify-between bg-white rounded-md p-4 shadow">
+      <a href="./index.html" class="text-xl font-semibold">Doctor Appointment</a>
+      <ul class="flex items-center gap-4" id="nav-links">
+        <li><a href="./signin.html" class="text-blue-600 hover:underline" data-auth="guest">Sign in</a></li>
+        <li><a href="./signup.html" class="text-blue-600 hover:underline" data-auth="guest">Sign up</a></li>
+        <li class="hidden" data-auth="user"><span id="nav-user-email" class="text-gray-700"></span></li>
+        <li class="hidden" data-auth="user"><button id="signoutBtn" class="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700">Sign out</button></li>
+      </ul>
+    </nav>
+  </header>
      <section class="relative py-12 bg-gray-900 sm:py-16 lg:py-20">
       <div class="absolute inset-0 overflow-hidden">
         <img
@@ -44,7 +55,7 @@
                 </p>
               </div>
 
-              <form  class="space-y-4 mt-6">
+              <form id="signupForm" class="space-y-4 mt-6">
                 <div>
                   <label class="text-base font-medium text-gray-900 font-pj">
                     UserName
@@ -52,8 +63,8 @@
                   <div class="mt-2.5">
                     <input
                       type="text"
-                      id="username"
-                      name="username"
+                      id="name"
+                      name="name"
                       placeholder="UserName"
                       required
                       class="block w-full px-4 py-4 text-gray-900 placeholder-gray-600 bg-white border border-gray-400 rounded-xl focus:border-gray-900 focus:ring-gray-900 caret-gray-900"
