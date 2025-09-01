@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <title>About Us - Doctor Appointment System</title>
+</head>
+<body class="bg-gray-100">
+      <!-- Navigation Header -->
+  <header class="bg-white shadow-lg sticky top-0 z-50">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <a href="./index.html" class="text-2xl font-bold text-blue-600">🏥 MedCare</a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-8">
+            <a href="./index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+            <a href="./doctors.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Doctors</a>
+            <a href="./departments.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Departments</a>
+            <a href="./gallery.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Gallery</a>
+            <a href="./services.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</a>
+            <a href="./events.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Events</a>
+            <div class="relative group">
+              <button class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
+                Pages
+                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div class="py-1">
+                  <a href="./about.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">About Us</a>
+                  <a href="./team.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Our Team</a>
+                  <a href="./testimonials.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Testimonials</a>
+                  <a href="./faq.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">FAQ</a>
+                </div>
+              </div>
+            </div>
+            <a href="./contact.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
+          </div>
+        </div>
+
+        <!-- Auth Buttons -->
+        <div class="flex items-center space-x-4" id="nav-links">
+          <a href="./signin.html" class="text-blue-600 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign in</a>
+          <a href="./signup.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign up</a>
+          <span id="nav-user-email" class="text-gray-700 text-sm hidden" data-auth="user"></span>
+          <button id="signoutBtn" class="bg-gray-900 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors hidden" data-auth="user">Sign out</button>
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:text-gray-900">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2">
+          <a href="./index.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">Home</a>
+          <a href="./doctors.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">Doctors</a>
+          <a href="./departments.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">Departments</a>
+          <a href="./gallery.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">Gallery</a>
+          <a href="./services.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">Services</a>
+          <a href="./events.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">Events</a>
+          <a href="./about.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">About</a>
+          <a href="./contact.html" class="text-gray-600 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">Contact</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">About Our Doctor Appointment System</h1>
+            
+            <div class="prose max-w-none">
+                <p class="text-lg text-gray-700 mb-6">
+                    Welcome to our modern Doctor Appointment System, designed to make healthcare access easier and more convenient for everyone.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Mission</h2>
+                <p class="text-gray-700 mb-6">
+                    We believe that quality healthcare should be accessible to everyone. Our platform connects patients with qualified healthcare professionals, making it simple to schedule appointments and manage your healthcare journey.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Key Features</h2>
+                <ul class="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                    <li>Easy online appointment booking</li>
+                    <li>Access to qualified specialists</li>
+                    <li>Secure user authentication</li>
+                    <li>Appointment history tracking</li>
+                    <li>Mobile-friendly interface</li>
+                    <li>Real-time availability checking</li>
+                </ul>
+
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Team</h2>
+                <p class="text-gray-700 mb-6">
+                    Our team consists of healthcare professionals, developers, and designers who are passionate about improving healthcare accessibility through technology.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Technology</h2>
+                <p class="text-gray-700 mb-6">
+                    Built with modern web technologies including PHP, MySQL, and Tailwind CSS, our platform ensures security, reliability, and a great user experience.
+                </p>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
+                    <h3 class="text-xl font-semibold text-blue-900 mb-2">Get Started Today</h3>
+                    <p class="text-blue-800 mb-4">
+                        Join thousands of patients who have already simplified their healthcare journey with our platform.
+                    </p>
+                    <a href="./signup.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../public/js/script.js"></script>
+    <script>
+      // Mobile menu toggle
+      document.getElementById('mobile-menu-button').addEventListener('click', function() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenu.classList.toggle('hidden');
+      });
+    </script>
+</body>
+</html>
