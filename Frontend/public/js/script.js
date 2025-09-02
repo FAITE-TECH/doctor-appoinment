@@ -1,6 +1,6 @@
 // Basic frontend auth and navigation wiring
 (function () {
-  const apiBase = '/doctor-appoinment/Backend/api/auth.php';
+  const apiBase = 'http://localhost:8000/doctor-appoinment/Backend/api/auth.php';
 
   function byId(id) {
     return document.getElementById(id);

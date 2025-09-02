@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../public/css/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Document</title>
+  </head>
+  <body class="justify-center items-center min-h-screen">
+    <!--  Import Header -->
+
+    <div id="header"></div>
+    <script>
+      fetch("header.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("header").innerHTML = data;
+        });
+    </script>
+    <!-- Hero Image -->
+    <div
+      class="relative md:w-full md:h-[600px] h-[400px] mb-6 shadow-lg rounded-2xl flex justify-center align-center"
+    >
+      <!-- Image -->
+      <img
+        id="slider-image"
+        class="w-full h-full object-cover transition duration-500"
+        src="../public/assets/doctor1.jpg"
+        alt="Hero Image"
+      />
+
+      <!-- Left Arrow -->
+      <button
+        id="prev"
+        class="absolute top-1/2 left-3 -translate-y-1/2 bg-black bg-opacity-40 text-white p-3 rounded-full hover:bg-opacity-70 transition"
+      >
+        &#10094;
+      </button>
+
+      <!-- Right Arrow -->
+      <button
+        id="next"
+        class="absolute top-1/2 right-3 -translate-y-1/2 bg-black bg-opacity-40 text-white p-3 rounded-full hover:bg-opacity-70 transition"
+      >
+        &#10095;
+      </button>
+
+      <!-- Dots -->
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        <span
+          class="dot w-3 h-3 bg-white rounded-full cursor-pointer opacity-70"
+        ></span>
+        <span
+          class="dot w-3 h-3 bg-white rounded-full cursor-pointer opacity-70"
+        ></span>
+        <span
+          class="dot w-3 h-3 bg-white rounded-full cursor-pointer opacity-70"
+        ></span>
+        <span
+          class="dot w-3 h-3 bg-white rounded-full cursor-pointer opacity-70"
+        ></span>
+      </div>
+    </div>
+
+    <script>
+      const images = [
+        "../public/assets/doctor1.jpg",
+        "../public/assets/doctor2.jpg",
+        "../public/assets/doctor3.jpg",
+        "../public/assets/doctor4.jpg",
+      ];
+
+      let index = 0;
+      const sliderImage = document.getElementById("slider-image");
+      const prevBtn = document.getElementById("prev");
+      const nextBtn = document.getElementById("next");
+      const dots = document.querySelectorAll(".dot");
+
+      function showImage(i) {
+        index = (i + images.length) % images.length;
+        sliderImage.src = images[index];
+
+        // Update dots
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle("bg-blue-500", idx === index);
+          dot.classList.toggle("opacity-70", idx !== index);
+        });
+      }
+
+      prevBtn.addEventListener("click", () => {
+        showImage(index - 1);
+      });
+
+      nextBtn.addEventListener("click", () => {
+        showImage(index + 1);
+      });
+
+      dots.forEach((dot, idx) => {
+        dot.addEventListener("click", () => showImage(idx));
+      });
+
+      // Initialize
+      showImage(index);
+    </script>
+
+    <!-- form -->
+
+    <div
+      class="flex flex-col md:flex-row gap-8 px-6 py-10 max-w-6xl mx-auto bg-blue-500"
+    >
+      <!-- Check Schedule -->
+      <div class="flex-1 p-6">
+        <h1 class="text-xl font-bold text-white mb-4">Check Schedule</h1>
+        <div class="w-20 h-0.5 bg-red-400 mb-6"></div>
+
+        <form action="#" class="flex flex-col gap-4">
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-white mb-1"
+              >Department</label
+            >
+            <select
+              id="specialFilter"
+              class="border h-15 px-3 py-2 focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="">Select one</option>
+              <option value="Pulmonary">Pulmonary</option>
+              <option value="Dental">Dental</option>
+              <option value="Neurologist">Neurologist</option>
+              <option value="Pediatrics">Pediatrics</option>
+            </select>
+          </div>
+          <div id="doctorCtn" class="my-10"></div>
+        </form>
+      </div>
+
+      <!-- filter for doctors dropdown -->
+      <script>
+        const doctorCtn = document.getElementById("doctorCtn");
+        const specialFilter = document.getElementById("specialFilter");
+
+        // Render doctors dynamically
+        function renderDoctors(list) {
+          doctorCtn.innerHTML = ""; // clear old data
+          if (list.length === 0) {
+            doctorCtn.innerHTML = `<p class="text-white">No doctors found</p>`;
+            return;
+          }
+
+          list.forEach((doctor) => {
+            const doctorCard = document.createElement("div");
+            doctorCard.className =
+              "bg-white border my-7 rounded-lg shadow p-6 flex flex-col md:flex-row items-center gap-4 transition hover:shadow-lg ";
+
+            doctorCard.innerHTML = `
+              <img src="${doctor.img}" alt="${doctor.name}" 
+                class="w-32 h-32 md:w-10 md:h-10 rounded-full object-cover mb-3 md:mb-0">
+
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between w-full">
+                <div>
+                  <h3 class="text-lg font-semibold">${doctor.name}</h3>
+                  <p class="text-sm text-gray-500">${doctor.special}</p>
+                </div>
+
+                <button
+                  type="button"
+                  class="mt-3 md:mt-0 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition"
+                >
+                  View Schedule
+                </button>
+              </div>
+            `;
+            doctorCtn.appendChild(doctorCard);
+          });
+        }
+
+        // Only filter when selection changes (no default rendering)
+        specialFilter.addEventListener("change", (e) => {
+          const selected = e.target.value;
+          if (selected === "") {
+            doctorCtn.innerHTML = `<p class="text-gray-500">Please select a specialization</p>`;
+          } else {
+            const filtered = doctors.filter((doc) => doc.special === selected);
+            renderDoctors(filtered);
+          }
+        });
+      </script>
+
+      <!--  Book Appointment -->
+      <div class="flex-1 p-6">
+        <h1 class="text-xl font-bold text-white mb-4">Book Appointment</h1>
+        <div class="w-24 h-0.5 bg-red-400 mb-6"></div>
+
+        <form action="#" class="flex flex-col gap-6">
+          <!-- Patient Info -->
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-white mb-1"
+                >Patient Name</label
+              >
+              <input
+                type="text"
+                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                required
+              />
+            </div>
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-white mb-1"
+                >Phone No</label
+              >
+              <input
+                type="text"
+                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                required
+              />
+            </div>
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-white mb-1">Email</label>
+              <input
+                type="email"
+                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Date & Department -->
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-white mb-1"
+                >Choose Date</label
+              >
+              <input
+                type="date"
+                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                required
+              />
+            </div>
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-white mb-1"
+                >Department</label
+              >
+              <select
+                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                required
+              >
+                <option value="">Select one</option>
+                <option value="dentals">Dental</option>
+                <option value="cardiology">Cardiology</option>
+                <option value="neurology">Neurology</option>
+                <option value="pediatrics">Pediatrics</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition"
+          >
+            Book Now
+          </button>
+        </form>
+        <p class="p-5 text-white">Please fill out all of the fields</p>
+      </div>
+    </div>
+    <!-- Best Hospital -->
+    <div>
+      <div class="text-center my-10">
+        <h2 class="text-3xl text-flourish-500 font-bold">
+          Best Hospitals in Town
+        </h2>
+        <p class="text-gray-400">When it comes to health</p>
+      </div>
+      <div class="max-w-6xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <!-- Feature 1 -->
+          <div
+            class="p-6 bg-white rounded-2xl hover:shadow-xl transition duration-300"
+          >
+            <i class="fa-solid fa-desktop text-red-500 text-5xl mb-4"></i>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">
+              Powerful Theme Options
+            </h2>
+            <p class="text-gray-600">
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div
+            class="p-6 bg-white rounded-2xl hover:shadow-xl transition duration-300"
+          >
+            <i class="fa-solid fa-bolt text-red-500 text-5xl mb-4"></i>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">
+              Fast Performance
+            </h2>
+            <p class="text-gray-600">
+              Experience blazing fast load times and smooth interactions with
+              optimized code and design.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div
+            class="p-6 bg-white rounded-2xl hover:shadow-xl transition duration-300"
+          >
+            <i class="fa-solid fa-mobile-screen text-red-500 text-5xl mb-4"></i>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">
+              Fully Responsive
+            </h2>
+            <p class="text-gray-600">
+              Works seamlessly across all devices, ensuring the best user
+              experience no matter the screen size.
+            </p>
+          </div>
+        </div>
+
+        <!-- Second row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mt-8">
+          <div
+            class="p-6 bg-white rounded-2xl hover:shadow-xl transition duration-300"
+          >
+            <i class="fa-solid fa-lock text-red-500 text-5xl mb-4"></i>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">
+              Secure & Reliable
+            </h2>
+            <p class="text-gray-600">
+              Built with top-notch security practices to keep your data safe and
+              reliable at all times.
+            </p>
+          </div>
+
+          <div
+            class="p-6 bg-white rounded-2xl hover:shadow-xl transition duration-300"
+          >
+            <i
+              class="fa-solid fa-wand-magic-sparkles text-red-500 text-5xl mb-4"
+            ></i>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">
+              Easy Customization
+            </h2>
+            <p class="text-gray-600">
+              Customize everything with simple options, no coding skills
+              required to make it yours.
+            </p>
+          </div>
+
+          <div
+            class="p-6 bg-white rounded-2xl hover:shadow-xl transition duration-300"
+          >
+            <i class="fa-solid fa-headset text-red-500 text-5xl mb-4"></i>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">
+              24/7 Support
+            </h2>
+            <p class="text-gray-600">
+              Get instant help from our dedicated support team, anytime you need
+              assistance.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctors -->
+
+    <section id="doctors" data-animate="fade-up">
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+        <h2 class="text-3xl text-flourish-500 font-bold">Our Doctors</h2>
+        <p class="text-gray-400 mt-2">
+          Our doctors are specialized in their field and have more than 10 years
+          of experiences.
+        </p>
+        <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
+
+        <!-- Doctor Cards Grid -->
+        <div
+          id="doctorContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+
+        <div class="mt-8">
+          <a
+            href="./doctors.html"
+            class="text-blue-600 font-semibold hover:underline"
+          >
+            View All Doctors →
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <script src="doctors-data.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const doctorContainer = document.getElementById("doctorContainer");
+
+        doctors.forEach((doctor) => {
+          const doctorCard = document.createElement("div");
+          doctorCard.className =
+            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          doctorCard.innerHTML = `
+        <!-- Doctor Image Wrapper -->
+          <div class="relative h-56 w-full overflow-hidden group">
+            <!-- Main clickable image -->
+            <a href="doctor-details.html?id=${
+              doctor.id
+            }" class="block h-full w-full">
+              <img src="${doctor.img}" alt="${doctor.name}"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+            </a>
+
+            <!-- Social Icons Overlay -->
+            <div
+              class="absolute inset-0 flex items-center justify-center space-x-4 
+                    bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 
+                    transition-opacity duration-500 ease-in-out">
+              <a href="#" class="text-white text-2xl hover:text-blue-400 transform hover:scale-110 transition">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="text-white text-2xl hover:text-blue-400 transform hover:scale-110 transition">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="text-white text-2xl hover:text-blue-400 transform hover:scale-110 transition">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="#" class="text-white text-2xl hover:text-blue-400 transform hover:scale-110 transition">
+                <i class="fab fa-instagram"></i>
+              </a>
+            </div>
+          </div>
+
+       
+        <!-- Doctor Content -->
+        <div class="p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-xl  font-sans-serif text-blue-800 mb-2 text-start">${
+            doctor.name
+          }</h3>
+          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto]  px-3 py-1 rounded-full uppercase w-fit mb-3">
+            ${doctor.special}
+          </p>
+          
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start">${
+            doctor.description
+          }</p>
+
+          <div class="flex justify-between items-center text-gray-400 text-sm">
+            <p>${doctor.experience || "10+ years"} experience</p>
+            <button onclick="window.location.href='doctor-details.html?id=${
+              doctor.id
+            }'" 
+              class="text-black font-sans-serif px-4 py-2 rounded-md hover:text-blue-500  transition">
+              View →
+            </button>
+          </div>
+        </div>
+      `;
+
+          doctorContainer.appendChild(doctorCard);
+        });
+      });
+    </script>
+
+    <!-- TESTIMONIALS -->
+
+    <section>
+      <div class="text-center my-10">
+        <h2 class="text-3xl text-flourish-500 font-bold section-title">
+          TESTIMONIALS
+        </h2>
+
+        <div class="w-40 h-0.5 bg-red-400 mt-4 flex mx-auto"></div>
+      </div>
+    </section>
+
+    <!-- Our services -->
+
+    <section>
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+        <h2 class="text-3xl text-flourish-500 font-bold">Our Services</h2>
+
+        <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
+
+        <!-- Services Cards Grid -->
+        <div
+          id="serviceContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+
+        <div class="mt-8">
+          <a
+            href="./services.html"
+            class="text-blue-600 font-semibold hover:underline"
+          >
+            View All Services →
+          </a>
+        </div>
+      </div>
+    </section>
+    <script src="services-data.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const serviceContainer = document.getElementById("serviceContainer");
+
+        services.forEach((service) => {
+          const serviceCard = document.createElement("div");
+          serviceCard.className =
+            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          serviceCard.innerHTML = `
+        <!-- Service Image Wrapper -->
+        <a  href="service-details.html?id=${service.id}">
+        <div class="relative h-56 w-full overflow-hidden group">
+          <img src="${service.img}" alt="${service.type}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          
+        </div>
+        </a>
+
+        <!-- Service Content -->
+        <div class="p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${service.type}</h3>
+          
+
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${service.description}</p>
+
+      
+        </div>
+      `;
+
+          serviceContainer.appendChild(serviceCard);
+        });
+      });
+    </script>
+
+    <!-- LATEST NEWS -->
+
+    <section>
+      <div class="text-center my-10 container max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl text-flourish-500 font-bold">LATEST NEWS</h2>
+        <p class="text-gray-400 mt-2">
+          Our doctors are specialized in their field and have more than 10 years
+          of experiences.
+        </p>
+        <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
+
+        <!-- Services Cards Grid -->
+        <div
+          id="newsContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+
+        <div class="mt-8">
+          <a
+            href="./services.html"
+            class="text-blue-600 font-semibold hover:underline"
+          >
+            View All News →
+          </a>
+        </div>
+      </div>
+    </section>
+    <script src="latestNews-data.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const newsContainer = document.getElementById("newsContainer");
+
+        latestNews.forEach((news) => {
+          const newsCard = document.createElement("div");
+          newsCard.className =
+            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          newsCard.innerHTML = `
+        <!-- Service Image Wrapper -->
+        <div class="relative h-56 w-full overflow-hidden group">
+          <img src="${news.img}" alt="${news.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+        </div>
+
+        <!-- Service Content -->
+        <div class="p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${news.title}</h3>
+          <div class="flex items-center gap-1 mb-2">
+            <i class="fa-solid fa-calendar-days text-gray-300 text-sm"></i>
+            <h4 class="text-md font-semibold text-gray-300 mb-2 text-start">${news.date}</h4>
+          </div>
+
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${news.description}</p>
+
+        </div>
+        </div>
+      `;
+
+          newsContainer.appendChild(newsCard);
+        });
+      });
+    </script>
+
+    <!-- OUR PHILOSOPHY -->
+
+    <!-- HOSPITAL DEPARTMENTS -->
+    <section>
+      <div class="text-center my-10 container max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl text-flourish-500 font-bold">
+          HOSPITAL DEPARTMENTS
+        </h2>
+
+        <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
+
+        <!-- Services Cards Grid -->
+        <div
+          id="departmentsContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+
+        <div class="mt-8">
+          <a
+            href="./services.html"
+            class="text-blue-600 font-semibold hover:underline"
+          >
+            View All Departments →
+          </a>
+        </div>
+      </div>
+    </section>
+    <script src="departments-data.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const departmentsContainer = document.getElementById(
+          "departmentsContainer"
+        );
+
+        departments.forEach((department) => {
+          const departmentCard = document.createElement("div");
+          departmentCard.className =
+            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          departmentCard.innerHTML = `
+        <!-- department Image Wrapper -->
+        <div class="relative h-56 w-full overflow-hidden group">
+          <img src="${department.img}" alt="${department.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+        </div>
+
+        <!-- department Content -->
+        <div class="p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${department.name}</h3>
+          
+
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${department.description}</p>
+
+        </div>
+        </div>
+      `;
+
+          departmentsContainer.appendChild(departmentCard);
+        });
+      });
+    </script>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+    <script>
+      fetch("footer.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("footer").innerHTML = data;
+        });
+    </script>
+
+    <script src="../public/js/script.js"></script>
+  </body>
+</html>
