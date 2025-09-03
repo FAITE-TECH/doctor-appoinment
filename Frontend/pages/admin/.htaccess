@@ -1,0 +1,52 @@
+# Admin Area Security and Session Configuration
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Ensure HTTPS (uncomment if you have SSL)
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Session and Cookie Security
+<IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always append X-Frame-Options SAMEORIGIN
+    
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options nosniff
+    
+    # Enable XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Cache Control for Admin Pages
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType text/css "access plus 0 seconds"
+    ExpiresByType application/javascript "access plus 0 seconds"
+</IfModule>
+
+# Prevent access to sensitive files
+<Files "*.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "*.js">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "*.css">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "*.html">
+    Order Allow,Deny
+    Allow from all
+</Files>

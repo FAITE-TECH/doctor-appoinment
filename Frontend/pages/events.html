@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - MedCare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../public/css/styles.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="./index.html" class="text-2xl font-bold text-blue-600">🏥 MedCare</a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="./index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                        <a href="./doctors.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Doctors</a>
+                        <a href="./departments.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Departments</a>
+                        <a href="./gallery.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Gallery</a>
+                        <a href="./services.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</a>
+                        <a href="./events.html" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Events</a>
+                        <a href="./about.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+                        <a href="./contact.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Auth Buttons -->
+                <div class="flex items-center space-x-4" id="nav-links">
+                    <a href="./signin.html" class="text-blue-600 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign in</a>
+                    <a href="./signup.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign up</a>
+                    <span id="nav-user-email" class="text-gray-700 text-sm hidden" data-auth="user"></span>
+                    <a href="./admin/index.html" id="adminLink" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors hidden" data-auth="admin">Admin Panel</a>
+                    <button id="signoutBtn" class="bg-gray-900 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors hidden" data-auth="user">Sign out</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Upcoming Events</h1>
+            <p class="text-xl text-gray-600">Join us for health awareness and community events</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Health Awareness Seminar -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="p-6">
+                    <div class="w-full h-48 bg-blue-100 rounded-lg mb-4 flex items-center justify-center">
+                        <span class="text-4xl">📚</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Health Awareness Seminar</h3>
+                    <p class="text-gray-600 mb-4">Learn about preventive healthcare and wellness</p>
+                    <div class="space-y-2 text-sm text-gray-500">
+                        <p><strong>Date:</strong> September 10, 2025</p>
+                        <p><strong>Time:</strong> 2:00 PM</p>
+                        <p><strong>Location:</strong> Main Conference Hall</p>
+                    </div>
+                    <button class="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        Register Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Blood Donation Drive -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="p-6">
+                    <div class="w-full h-48 bg-red-100 rounded-lg mb-4 flex items-center justify-center">
+                        <span class="text-4xl">🩸</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Blood Donation Drive</h3>
+                    <p class="text-gray-600 mb-4">Community blood donation event</p>
+                    <div class="space-y-2 text-sm text-gray-500">
+                        <p><strong>Date:</strong> September 15, 2025</p>
+                        <p><strong>Time:</strong> 10:00 AM</p>
+                        <p><strong>Location:</strong> Hospital Lobby</p>
+                    </div>
+                    <button class="w-full mt-4 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                        Donate Blood
+                    </button>
+                </div>
+            </div>
+
+            <!-- Diabetes Management Workshop -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="p-6">
+                    <div class="w-full h-48 bg-green-100 rounded-lg mb-4 flex items-center justify-center">
+                        <span class="text-4xl">💚</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Diabetes Management Workshop</h3>
+                    <p class="text-gray-600 mb-4">Educational workshop for diabetes patients</p>
+                    <div class="space-y-2 text-sm text-gray-500">
+                        <p><strong>Date:</strong> September 20, 2025</p>
+                        <p><strong>Time:</strong> 3:30 PM</p>
+                        <p><strong>Location:</strong> Seminar Room A</p>
+                    </div>
+                    <button class="w-full mt-4 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                        Join Workshop
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../public/js/script.js"></script>
+</body>
+</html>
+
+
+
+
+

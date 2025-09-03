@@ -1,81 +1,92 @@
 <?php
 // Test Database Connection
-// This will help identify the specific connection issue
-
 echo "<h1>Database Connection Test</h1>";
 
-// Test 1: Basic MySQL connection
-echo "<h2>Test 1: Basic MySQL Connection</h2>";
+// Database configuration
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "doctor";
+$socket = "/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock";
+
 try {
-    $conn = new mysqli("localhost", "root", "");
+    // Create connection with socket
+    $conn = new mysqli($servername, $username, $password, $dbname, 3306, $socket);
     
+    // Check connection
     if ($conn->connect_error) {
-        echo "<p style='color: red;'>❌ Connection failed: " . $conn->connect_error . "</p>";
-    } else {
-        echo "<p style='color: green;'>✅ Basic MySQL connection successful</p>";
-        $conn->close();
+        throw new Exception("Connection failed: " . $conn->connect_error);
     }
-} catch (Exception $e) {
-    echo "<p style='color: red;'>❌ Exception: " . $e->getMessage() . "</p>";
-}
-
-// Test 2: Try with different ports
-echo "<h2>Test 2: Port Testing</h2>";
-$ports = [3306, 3305, 3307];
-
-foreach ($ports as $port) {
-    try {
-        $conn = new mysqli("localhost", "root", "", "", $port);
-        
-        if ($conn->connect_error) {
-            echo "<p>Port $port: ❌ " . $conn->connect_error . "</p>";
-        } else {
-            echo "<p style='color: green;'>Port $port: ✅ Connected successfully</p>";
-            $conn->close();
-        }
-    } catch (Exception $e) {
-        echo "<p>Port $port: ❌ Exception: " . $e->getMessage() . "</p>";
-    }
-}
-
-// Test 3: Check if doctor database exists
-echo "<h2>Test 3: Database Check</h2>";
-try {
-    $conn = new mysqli("localhost", "root", "");
     
-    if ($conn->connect_error) {
-        echo "<p style='color: red;'>❌ Cannot test database - connection failed</p>";
+    echo "<p style='color: green;'>✅ Database connection successful!</p>";
+    
+    // Test query
+    $sql = "SELECT COUNT(*) as user_count FROM users";
+    $result = $conn->query($sql);
+    
+    if ($result) {
+        $row = $result->fetch_assoc();
+        echo "<p>✅ Users table accessible: " . $row['user_count'] . " users found</p>";
     } else {
-        $result = $conn->query("SHOW DATABASES LIKE 'doctor'");
-        
-        if ($result && $result->num_rows > 0) {
-            echo "<p style='color: green;'>✅ Database 'doctor' exists</p>";
-        } else {
-            echo "<p style='color: orange;'>⚠️ Database 'doctor' does not exist</p>";
-        }
-        $conn->close();
+        echo "<p style='color: red;'>❌ Error querying users table: " . $conn->error . "</p>";
     }
+    
+    // Test roles query
+    $sql = "SELECT role_name, COUNT(*) as count FROM users u JOIN roles r ON u.role_id = r.id GROUP BY role_name";
+    $result = $conn->query($sql);
+    
+    if ($result) {
+        echo "<p>✅ User roles breakdown:</p>";
+        echo "<ul>";
+        while ($row = $result->fetch_assoc()) {
+            echo "<li>" . $row['role_name'] . ": " . $row['count'] . "</li>";
+        }
+        echo "</ul>";
+    } else {
+        echo "<p style='color: red;'>❌ Error querying roles: " . $conn->error . "</p>";
+    }
+    
+    // Show all users with their details
+    echo "<h3>📋 All Users in Database:</h3>";
+    $sql = "SELECT u.id, u.name, u.email, r.role_name, u.created_at FROM users u JOIN roles r ON u.role_id = r.id ORDER BY u.id";
+    $result = $conn->query($sql);
+    
+    if ($result && $result->num_rows > 0) {
+        echo "<table border='1' style='border-collapse: collapse; width: 100%; margin: 10px 0;'>";
+        echo "<tr style='background: #f3f4f6;'><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Created</th></tr>";
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>";
+            echo "<td>" . $row['id'] . "</td>";
+            echo "<td>" . $row['name'] . "</td>";
+            echo "<td>" . $row['email'] . "</td>";
+            echo "<td>" . $row['role_name'] . "</td>";
+            echo "<td>" . $row['created_at'] . "</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "<p style='color: red;'>❌ Error querying users or no users found</p>";
+    }
+    
+    // Check available roles
+    echo "<h3>🔍 Available Roles in System:</h3>";
+    $sql = "SELECT * FROM roles ORDER BY id";
+    $result = $conn->query($sql);
+    
+    if ($result && $result->num_rows > 0) {
+        echo "<ul>";
+        while ($row = $result->fetch_assoc()) {
+            echo "<li><strong>" . $row['role_name'] . "</strong> (ID: " . $row['id'] . ")</li>";
+        }
+        echo "</ul>";
+    }
+    
+    $conn->close();
+    
 } catch (Exception $e) {
-    echo "<p style='color: red;'>❌ Exception: " . $e->getMessage() . "</p>";
+    echo "<p style='color: red;'>❌ Error: " . $e->getMessage() . "</p>";
 }
 
-// Test 4: XAMPP Status Check
-echo "<h2>Test 4: XAMPP Status</h2>";
-echo "<p>Please check if XAMPP is running:</p>";
-echo "<ul>";
-echo "<li>Open XAMPP Control Panel</li>";
-echo "<li>Make sure Apache is started (green)</li>";
-echo "<li>Make sure MySQL is started (green)</li>";
-echo "<li>Check MySQL port in XAMPP (usually 3306)</li>";
-echo "</ul>";
-
-echo "<h2>Next Steps:</h2>";
-echo "<p>If the connection tests fail, try these solutions:</p>";
-echo "<ol>";
-echo "<li>Start XAMPP MySQL service</li>";
-echo "<li>Check MySQL port in XAMPP configuration</li>";
-echo "<li>Try accessing phpMyAdmin: <a href='http://localhost/phpmyadmin' target='_blank'>http://localhost/phpmyadmin</a></li>";
-echo "<li>If phpMyAdmin works, create the 'doctor' database manually</li>";
-echo "<li>Run the setup script: <a href='setup_database.php'>setup_database.php</a></li>";
-echo "</ol>";
+echo "<hr>";
+echo "<p><a href='Frontend/pages/index.html' style='background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Go to Application</a></p>";
 ?>

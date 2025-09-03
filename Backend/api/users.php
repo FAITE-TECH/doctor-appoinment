@@ -10,7 +10,12 @@ if (!isset($_SESSION['user_id'])) {
     json_response(['error' => 'Unauthorized access'], 401);
 }
 
-$sql = "SELECT id, name, email FROM users";
+// Check if user is admin
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    json_response(['error' => 'Forbidden: Admins only'], 403);
+}
+
+$sql = "SELECT id, name, email, role FROM users ORDER BY name";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -24,5 +29,5 @@ if ($result->num_rows > 0) {
     }
 }
 
-json_response($users);
+json_response(['success' => true, 'users' => $users]);
 ?>

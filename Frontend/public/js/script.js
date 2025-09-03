@@ -9,15 +9,33 @@
   function setAuthUI(user) {
     const guestLinks = document.querySelectorAll('[data-auth="guest"]');
     const userItems = document.querySelectorAll('[data-auth="user"]');
+    const adminItems = document.querySelectorAll('[data-auth="admin"]');
     const emailSpan = byId('nav-user-email');
+    const adminLink = byId('adminLink');
+    
     if (user && user.email) {
       guestLinks.forEach(el => el.classList.add('hidden'));
       userItems.forEach(el => el.classList.remove('hidden'));
+      
+      // Show admin panel link for admin users
+      if (user.role === 'admin') {
+        adminItems.forEach(el => el.classList.remove('hidden'));
+        if (adminLink) {
+          adminLink.classList.remove('hidden');
+          console.log('Admin panel link shown for:', user.email);
+        }
+      } else {
+        adminItems.forEach(el => el.classList.add('hidden'));
+        if (adminLink) adminLink.classList.add('hidden');
+      }
+      
       if (emailSpan) emailSpan.textContent = user.email;
     } else {
       guestLinks.forEach(el => el.classList.remove('hidden'));
       userItems.forEach(el => el.classList.add('hidden'));
+      adminItems.forEach(el => el.classList.add('hidden'));
       if (emailSpan) emailSpan.textContent = '';
+      if (adminLink) adminLink.classList.add('hidden');
     }
   }
 
@@ -50,7 +68,14 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Signin failed');
-      window.location.href = './index.html';
+      
+      // Check if user is admin and redirect accordingly
+      if (data.user.role === 'admin') {
+        // Always redirect admin users to admin dashboard
+        window.location.href = './admin/index.html';
+      } else {
+        window.location.href = './index.html';
+      }
     } catch (err) {
       alert(err.message);
     }
@@ -71,7 +96,14 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Signup failed');
-      window.location.href = './index.html';
+      
+      // Check if user is admin and redirect accordingly
+      if (data.user.role === 'admin') {
+        // Always redirect admin users to admin dashboard
+        window.location.href = './admin/index.html';
+      } else {
+        window.location.href = './index.html';
+      }
     } catch (err) {
       alert(err.message);
     }

@@ -34,9 +34,11 @@ function require_fields($body, $fields) {
 }
 
 /**
- * Start session safely
+ * Start session safely (deprecated - use session_config.php instead)
  */
 function ensure_session_started() {
+    // This function is deprecated, sessions are now handled by session_config.php
+    // Keeping for backward compatibility
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
