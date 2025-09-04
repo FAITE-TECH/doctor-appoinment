@@ -10,42 +10,242 @@
   <body>
     <!--  Top-Header -->
 
-     <div
-      class="flex justify-between items-center px-32 py-4 bg-blue-500 shadow-md text-black sm:text-center relative"
+    <div
       id="top-header"
+      class="flex justify-between items-center px-32 py-4 bg-blue-500 shadow-md text-white"
     >
       <div class="font-semibold text-lg text-white">Contact-1234567890</div>
 
-      <!-- Desktop Nav -->
-      <div class="hidden md:block ">
+      <!-- Desktop Top Nav -->
+      <div class="hidden md:block">
         <ul class="flex space-x-6 font-medium text-white">
-          <li class="fa-brands fa-facebook cursor-pointer hover:text-blue-100"> </li>
-          <li class="fa-brands fa-twitter cursor-pointer hover:text-blue-100"></li>
-          <li class="fa-brands fa-google-plus-g cursor-pointer hover:text-blue-100"></li>
-          <li class="fa-brands fa-instagram cursor-pointer hover:text-blue-100"></li>
-          <li class="fa-brands fa-linkedin cursor-pointer hover:text-blue-100"></li>
-          <li class="fa-brands fa-youtube cursor-pointer hover:text-blue-100"></li>
+          <li
+            class="fa-brands fa-facebook cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-twitter cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-google-plus-g cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-instagram cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-linkedin cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-youtube cursor-pointer hover:text-blue-100"
+          ></li>
         </ul>
       </div>
     </div>
 
     <!-- Header -->
     <div
-      class="flex justify-between items-center px-32 w-[90%] mx-auto py-4 shadow-md text-black relative sticky top-0 z-50" id="header"
+      id="header"
+      class="sticky top-0 flex justify-between items-center px-6 md:px-32 w-full mx-auto py-4 shadow-md bg-white text-black z-50"
     >
       <div class="font-semibold text-lg">Logo</div>
 
       <!-- Desktop Nav -->
-      <div class="hidden md:block ">
-        <ul class="flex space-x-6 font-medium">
-          <li class="cursor-pointer hover:text-blue-600">Home <i class="fa-duotone fa-solid fa-caret-down text-gray-400"></i></li>
-          <li class="cursor-pointer hover:text-blue-600">Doctor <i class="fa-duotone fa-solid fa-caret-down text-gray-400"></i></li>
-          <li class="cursor-pointer hover:text-blue-600">Department <i class="fa-duotone fa-solid fa-caret-down text-gray-400"></i></li>
-          <li class="cursor-pointer hover:text-blue-600">Gallery</li>
-          <li class="cursor-pointer hover:text-blue-600">Services</li>
-          <li class="cursor-pointer hover:text-blue-600">Event</li>
-          <li class="cursor-pointer hover:text-blue-600">Pages</li>
-          <li class="cursor-pointer hover:text-blue-600">Contact</li>
+      <div class="hidden md:block">
+        <ul class="flex space-x-6 font-medium relative">
+          <!-- Home -->
+          <li>
+            <a href="home.html" class="hover:text-blue-600 flex items-center">
+              Home
+            </a>
+          </li>
+
+          <!-- Doctor Dropdown -->
+          <li class="group relative">
+            <a
+              href="doctors.html"
+              class="hover:text-blue-600 flex items-center"
+            >
+              Doctor
+              <i class="fa-solid fa-caret-down text-gray-400 ml-1"></i>
+            </a>
+
+            <!-- Dropdown Menu -->
+            <ul
+              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-all duration-200 z-50"
+            >
+              <!-- Cardiology -->
+              <li class="relative group">
+                <a
+                  href="departments.html"
+                  class="block px-4 py-2 text-gray-700 hover:bg-blue-50 flex justify-between items-center rounded-md"
+                >
+                  Cardiology
+                  <i class="fa-solid fa-caret-right text-gray-400"></i>
+                </a>
+                <!-- Submenu -->
+                <ul
+                  class="absolute top-0 left-full ml-1 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+                >
+                  <li>
+                    <a
+                      href="doctors.html"
+                      class="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-md"
+                    >
+                      Doctor 1
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="doctors.html"
+                      class="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-md"
+                    >
+                      Doctor 2
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="doctors.html"
+                      class="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-md"
+                    >
+                      Doctor 3
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+              <!-- Neurology -->
+              <li class="relative group">
+                <a
+                  href="doctors.html"
+                  class="block px-4 py-2 text-gray-700 hover:bg-blue-50 flex justify-between items-center rounded-md"
+                >
+                  Neurology
+                  <i class="fa-solid fa-caret-right text-gray-400"></i>
+                </a>
+                <!-- Submenu -->
+                <ul
+                  class="absolute top-0 left-full ml-1 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+                >
+                  <li>
+                    <a
+                      href="doctors.html"
+                      class="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-md"
+                      >Doctor 4</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="doctors.html"
+                      class="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-md"
+                      >Doctor 5</a
+                    >
+                  </li>
+                </ul>
+              </li>
+
+              <!-- Pediatrics -->
+              <li>
+                <a
+                  href="doctors.html"
+                  class="block px-4 py-2 text-gray-700 hover:bg-blue-50 flex justify-between items-center rounded-md"
+                >
+                  Pediatrics
+                </a>
+              </li>
+
+              <!-- Orthopedics -->
+              <li>
+                <a
+                  href="doctors.html"
+                  class="block px-4 py-2 text-gray-700 hover:bg-blue-50 flex justify-between items-center rounded-md"
+                >
+                  Orthopedics
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Department (also dropdown if needed) -->
+          <li class="group relative">
+            <a
+              href="departments.html"
+              class="hover:text-blue-600 flex items-center"
+            >
+              Department
+              <i class="fa-solid fa-caret-down text-gray-400 ml-1"></i>
+            </a>
+            <ul
+              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-all duration-200 z-50"
+            >
+              <li>
+                <a
+                  href="departments.html"
+                  class="block px-4 py-2 hover:bg-gray-100"
+                  >Cardiology</a
+                >
+              </li>
+              <li>
+                <a
+                  href="departments.html"
+                  class="block px-4 py-2 hover:bg-gray-100"
+                  >Neurology</a
+                >
+              </li>
+              <li>
+                <a
+                  href="departments.html"
+                  class="block px-4 py-2 hover:bg-gray-100"
+                  >Pediatrics</a
+                >
+              </li>
+              <li>
+                <a
+                  href="departments.html"
+                  class="block px-4 py-2 hover:bg-gray-100"
+                  >Orthopedics</a
+                >
+              </li>
+            </ul>
+          </li>
+
+          <!-- Other static links -->
+          <li>
+            <a href="gallery.html" class="hover:text-blue-600">Gallery</a>
+          </li>
+          <li>
+            <a href="services.html" class="hover:text-blue-600">Services</a>
+          </li>
+          <li><a href="events.html" class="hover:text-blue-600">Event</a></li>
+
+          <!-- Pages Dropdown -->
+          <li class="group relative">
+            <a href="pages.html" class="hover:text-blue-600 flex items-center">
+              Pages
+              <i class="fa-solid fa-caret-down text-gray-400 ml-1"></i>
+            </a>
+            <ul
+              class="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-all"
+            >
+              <li>
+                <a href="about.html" class="block px-4 py-2 hover:bg-gray-100"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a href="faq.html" class="block px-4 py-2 hover:bg-gray-100"
+                  >FAQ</a
+                >
+              </li>
+              <li>
+                <a href="pricing.html" class="block px-4 py-2 hover:bg-gray-100"
+                  >Pricing</a
+                >
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="contact.html" class="hover:text-blue-600">Contact</a>
+          </li>
         </ul>
       </div>
 
@@ -124,25 +324,55 @@
 
     <!-- JS Logic -->
     <script>
-      const menuBtn = document.getElementById("menuBtn");
-      const closeBtn = document.getElementById("closeBtn");
-      const mobileMenu = document.getElementById("mobileMenu");
-      const openIcon = document.getElementById("openIcon");
-      const closeIcon = document.getElementById("closeIcon");
+      const header = document.getElementById("header");
 
-      menuBtn.addEventListener("click", () => {
-        mobileMenu.classList.toggle("translate-x-full");
-        openIcon.classList.toggle("hidden");
-        closeIcon.classList.toggle("hidden");
-      });
-
-      closeBtn.addEventListener("click", () => {
-        mobileMenu.classList.add("translate-x-full");
-        openIcon.classList.remove("hidden");
-        closeIcon.classList.add("hidden");
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+          header.classList.add("shadow-lg");
+        } else {
+          header.classList.remove("shadow-lg");
+        }
       });
     </script>
-  
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const topHeader = document.getElementById("top-header");
+        const root = document.documentElement;
+
+        function setOffset() {
+          const h = topHeader ? topHeader.offsetHeight : 0;
+          root.style.setProperty("--topH", h + "px");
+        }
+
+        setOffset();
+        window.addEventListener("resize", setOffset);
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.getElementById("menuBtn");
+        const mobileMenu = document.getElementById("mobileMenu");
+        const openIcon = document.getElementById("openIcon");
+        const closeIcon = document.getElementById("closeIcon");
+        const closeBtn = document.getElementById("closeBtn");
+
+        // Open/close menu with hamburger
+        menuBtn.addEventListener("click", () => {
+          mobileMenu.classList.toggle("translate-x-full");
+          openIcon.classList.toggle("hidden");
+          closeIcon.classList.toggle("hidden");
+        });
+
+        // Close menu with red button inside
+        closeBtn.addEventListener("click", () => {
+          mobileMenu.classList.add("translate-x-full");
+          openIcon.classList.remove("hidden");
+          closeIcon.classList.add("hidden");
+        });
+      });
+    </script>
+
     <script src="../public/js/script.js"></script>
   </body>
 </html>

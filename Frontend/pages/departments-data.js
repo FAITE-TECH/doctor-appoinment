@@ -3,7 +3,7 @@ const departments=[
         id:1,
         name:"Cardiology",
         description:"Here's the story of a lovely lady, who was bringing up three very lovely girls. All of them had hair of gold, like their mother, the youngest one in curls. Here's the store, of a man named Brady, who was busy with three boys of his own. They were four men, living all together, yet they were all alone. 'Til the one day when the lady met this fellow. And they knew it was much more than a hunch, that this group would somehow form a family.",
-        img:"../public/assets/cardiology.jpg",
+        img:"../public/assets/nephrology.jpg",
         email:"cardiology@example.com",
         phone:"123-456-7890"
 
@@ -11,7 +11,7 @@ const departments=[
         id:2,
         name:"Neurology",
         description:"Here's the story of a lovely lady, who was bringing up three very lovely girls. All of them had hair of gold, like their mother, the youngest one in curls. Here's the store, of a man named Brady, who was busy with three boys of his own. They were four men, living all together, yet they were all alone. 'Til the one day when the lady met this fellow. And they knew it was much more than a hunch, that this group would somehow form a family.",
-        img:"../public/assets/neurology.jpg",
+        img:"../public/assets/nephrology.jpg",
         email:"neurology@example.com",
         phone:"123-456-7890"
     },
@@ -19,7 +19,7 @@ const departments=[
         id:3,
         name:"Pediatrics",
         description:"Here's the story of a lovely lady, who was bringing up three very lovely girls. All of them had hair of gold, like their mother, the youngest one in curls. Here's the store, of a man named Brady, who was busy with three boys of his own. They were four men, living all together, yet they were all alone. 'Til the one day when the lady met this fellow. And they knew it was much more than a hunch, that this group would somehow form a family.",
-        img:"../public/assets/pediatrics.jpg",
+        img:"../public/assets/nephrology.jpg",
         email:"pediatrics@example.com",
         phone:"123-456-7890"
     },
@@ -27,7 +27,7 @@ const departments=[
         id:4,
         name:"Orthopedics",
         description:"Here's the story of a lovely lady, who was bringing up three very lovely girls. All of them had hair of gold, like their mother, the youngest one in curls. Here's the store, of a man named Brady, who was busy with three boys of his own. They were four men, living all together, yet they were all alone. 'Til the one day when the lady met this fellow. And they knew it was much more than a hunch, that this group would somehow form a family.",
-        img:"../public/assets/orthopedics.jpg",
+        img:"../public/assets/nephrology.jpg",
         email:"orthopedics@example.com",
         phone:"123-456-7890"
     }

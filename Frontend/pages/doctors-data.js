@@ -1,7 +1,7 @@
 const doctors = [
   {
     id: 1,
-    name: "Doctor1",
+    name: "Dr.K.Arulanandem",
     special: "Pulmonary",
     img: "../public/assets/doctor1.jpg",
     description:
@@ -20,7 +20,7 @@ const doctors = [
   },
   {
     id: 2,
-    name: "Doctor2",
+    name: "Dr.S.Sivschelvan",
     special: "Dental",
     img: "../public/assets/doctor4.jpg",
     description:
@@ -39,7 +39,7 @@ const doctors = [
   },
   {
     id: 3,
-    name: "Doctor3",
+    name: "Dr.G.Madhivannan",
     special: "Neurologist",
     img: "../public/assets/doctor1.jpg",
     description:
@@ -58,7 +58,7 @@ const doctors = [
   },
   {
     id: 4,
-    name: "Doctor4",
+    name: "Dr.N.Shobana",
     special: "Dental",
     img: "../public/assets/doctor4.jpg",
     description:
@@ -77,7 +77,7 @@ const doctors = [
   },
   {
     id: 5,
-    name: "Doctor5",
+    name: "Dr.(Mrs)S.Annet Jothy Luxmi",
     special: "Neurologist",
     img: "../public/assets/doctor1.jpg",
     description:
@@ -96,7 +96,7 @@ const doctors = [
   },
   {
     id: 6,
-    name: "Doctor6",
+    name: "Dr.(Mrs)M.Midhuna",
     special: "Dental",
     img: "../public/assets/doctor4.jpg",
     description:

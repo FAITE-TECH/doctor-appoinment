@@ -69,18 +69,15 @@
         <span
           class="dot w-3 h-3 bg-white rounded-full cursor-pointer opacity-70"
         ></span>
-        <span
-          class="dot w-3 h-3 bg-white rounded-full cursor-pointer opacity-70"
-        ></span>
+       
       </div>
     </div>
 
     <script>
       const images = [
-        "../public/assets/doctor1.jpg",
-        "../public/assets/doctor2.jpg",
-        "../public/assets/doctor3.jpg",
-        "../public/assets/doctor4.jpg",
+        "../public/assets/hero1.jpg",
+        "../public/assets/hero2.jpg",
+        "../public/assets/hero3.jpg",
       ];
 
       let index = 0;
@@ -142,6 +139,8 @@
               <option value="Pediatrics">Pediatrics</option>
             </select>
           </div>
+
+          <!-- will show filtered doctors  -->
           <div id="doctorCtn" class="my-10"></div>
         </form>
       </div>
@@ -174,12 +173,11 @@
                   <p class="text-sm text-gray-500">${doctor.special}</p>
                 </div>
 
-                <button
-                  type="button"
-                  class="mt-3 md:mt-0 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition"
+                <a onclick="window.location.href='doctor-details.html?id=${doctor.id}'" 
+                  class="mt-3 md:mt-0 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 cursor-pointer transition"
                 >
                   View Schedule
-                </button>
+                </a>
               </div>
             `;
             doctorCtn.appendChild(doctorCard);
@@ -196,8 +194,11 @@
             renderDoctors(filtered);
           }
         });
-      </script>
 
+        //
+ 
+
+      </script>
       <!--  Book Appointment -->
       <div class="flex-1 p-6">
         <h1 class="text-xl font-bold text-white mb-4">Book Appointment</h1>
@@ -236,7 +237,38 @@
             </div>
           </div>
 
-          <!-- Date & Department -->
+          <!-- Doctor & Department -->
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-white mb-1"
+                >Department</label
+              >
+              <select
+                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                id="deptSelect"
+                required
+              >
+                <option value="">Select one</option>
+                <option value="Pulmonary">Pulmonary</option>
+                <option value="Dental">Dental</option>
+                <option value="Neurologist">Neurologist</option>
+                <option value="Pediatrics">Pediatrics</option>
+              </select>
+            </div>
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-white mb-1">Doctor</label>
+              <select
+                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                id="doctorSelect"
+                required
+              >
+                <option value="">Select one</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Date & Time -->
+
           <div class="flex flex-col md:flex-row gap-4">
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1"
@@ -250,31 +282,50 @@
             </div>
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1"
-                >Department</label
+                >Choose Time</label
               >
-              <select
+              <input
+                type="time"
                 class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
                 required
-              >
-                <option value="">Select one</option>
-                <option value="dentals">Dental</option>
-                <option value="cardiology">Cardiology</option>
-                <option value="neurology">Neurology</option>
-                <option value="pediatrics">Pediatrics</option>
-              </select>
+              />
             </div>
           </div>
-
+          <div
+            id="toast"
+            class="hidden fixed top-5 right-5 bg-black text-white px-4 py-3 rounded-lg shadow-lg transition-opacity duration-500"
+          >
+            ✅ Booking successful!
+          </div>
           <button
             type="submit"
+            onclick="showToast()"
             class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition"
           >
             Book Now
           </button>
+          <!-- Toast container -->
         </form>
-        <p class="p-5 text-white">Please fill out all of the fields</p>
+        <p class="p-5 text-white">
+          Please fill out all of the fields correctly. Your records will be
+          saved in our database securely.
+        </p>
       </div>
     </div>
+
+    <script>
+      function showToast() {
+        const toast = document.getElementById("toast");
+        toast.classList.remove("hidden");
+        toast.style.opacity = "1";
+
+        // Hide after 3 seconds
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          setTimeout(() => toast.classList.add("hidden"), 500); // wait for fade-out
+        }, 3000);
+      }
+    </script>
     <!-- Best Hospital -->
     <div>
       <div class="text-center my-10">
@@ -388,7 +439,7 @@
         <!-- Doctor Cards Grid -->
         <div
           id="doctorContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -409,10 +460,10 @@
       document.addEventListener("DOMContentLoaded", () => {
         const doctorContainer = document.getElementById("doctorContainer");
 
-        doctors.forEach((doctor) => {
+        doctors.slice(0, 4).forEach((doctor) => {
           const doctorCard = document.createElement("div");
           doctorCard.className =
-            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           doctorCard.innerHTML = `
         <!-- Doctor Image Wrapper -->
@@ -490,7 +541,7 @@
 
     <!-- Our services -->
 
-    <section>
+    <section id="services">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
         <h2 class="text-3xl text-flourish-500 font-bold">Our Services</h2>
 
@@ -499,7 +550,7 @@
         <!-- Services Cards Grid -->
         <div
           id="serviceContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -522,7 +573,7 @@
         services.forEach((service) => {
           const serviceCard = document.createElement("div");
           serviceCard.className =
-            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           serviceCard.innerHTML = `
         <!-- Service Image Wrapper -->
@@ -563,7 +614,7 @@
         <!-- Services Cards Grid -->
         <div
           id="newsContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -586,7 +637,7 @@
         latestNews.forEach((news) => {
           const newsCard = document.createElement("div");
           newsCard.className =
-            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           newsCard.innerHTML = `
         <!-- Service Image Wrapper -->
@@ -624,10 +675,10 @@
 
         <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
 
-        <!-- Services Cards Grid -->
+        <!--  Cards Grid -->
         <div
           id="departmentsContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -652,7 +703,7 @@
         departments.forEach((department) => {
           const departmentCard = document.createElement("div");
           departmentCard.className =
-            "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           departmentCard.innerHTML = `
         <!-- department Image Wrapper -->

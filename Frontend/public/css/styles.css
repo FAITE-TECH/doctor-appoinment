@@ -5,3 +5,21 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+ /* .sticky {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            animation: slideDown 0.5s ease-out;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        } */
