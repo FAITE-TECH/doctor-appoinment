@@ -2,47 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../public/css/styles.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
   <body>
-    <!--  Top-Header -->
-
-    <div
-      id="top-header"
-      class="flex justify-between items-center px-32 py-4 bg-blue-500 shadow-md text-white"
-    >
-      <div class="font-semibold text-lg text-white">Contact-1234567890</div>
-
-      <!-- Desktop Top Nav -->
-      <div class="hidden md:block">
-        <ul class="flex space-x-6 font-medium text-white">
-          <li
-            class="fa-brands fa-facebook cursor-pointer hover:text-blue-100"
-          ></li>
-          <li
-            class="fa-brands fa-twitter cursor-pointer hover:text-blue-100"
-          ></li>
-          <li
-            class="fa-brands fa-google-plus-g cursor-pointer hover:text-blue-100"
-          ></li>
-          <li
-            class="fa-brands fa-instagram cursor-pointer hover:text-blue-100"
-          ></li>
-          <li
-            class="fa-brands fa-linkedin cursor-pointer hover:text-blue-100"
-          ></li>
-          <li
-            class="fa-brands fa-youtube cursor-pointer hover:text-blue-100"
-          ></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Header -->
-    <header class="bg-white shadow-md fixed w-full top-0 z-50" id="header">
+    <header class="bg-white shadow-md fixed w-full top-0 z-50">
       <div
         class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4"
       >
@@ -52,7 +23,7 @@
         </a>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex space-x-8 items-center font-thin text-gray-500">
+        <nav class="hidden md:flex space-x-8 items-center font-medium">
           <!-- Home -->
           <a href="./index.php" class="hover:text-blue-600">Home</a>
 
@@ -177,42 +148,9 @@
 
           <!-- Other Links -->
 
-          <a href="./gallery.html" class="hover:text-blue-600">Gallery</a>
-          <a href="./services.html" class="hover:text-blue-600">Services</a>
-          <a href="./events.html" class="hover:text-blue-600">Event</a>
-          <!-- Department Dropdown -->
-          <div class="relative group">
-            <button
-              class="flex items-center hover:text-blue-600 focus:outline-none"
-            >
-              Pages <i class="fas fa-chevron-down ml-1 text-sm"></i>
-            </button>
-
-            <!-- Dropdown Menu -->
-            <div
-              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
-            >
-              <a
-                href="./"
-                class="block px-4 py-2 hover:bg-gray-100"
-              >
-                Blog
-              </a>
-              <a
-                href="./"
-                class="block px-4 py-2 hover:bg-gray-100"
-              >
-                Book Appointment
-              </a>
-              <a
-                href="./"
-                class="block px-4 py-2 hover:bg-gray-100"
-              >
-                404 PAGE
-              </a>
-            </div>
-          </div>
-          <a href="./contact.html" class="hover:text-blue-600">Contact</a>
+          <a href="./carrer.php" class="hover:text-blue-600">Careers</a>
+          <a href="./blogs.php" class="hover:text-blue-600">Blogs</a>
+          <a href="./aboutUs.php" class="hover:text-blue-600">About</a>
         </nav>
 
         <!-- Mobile Menu Toggle -->
@@ -223,7 +161,7 @@
           <i class="fas fa-bars"></i>
         </button>
       </div>
-        
+
       <!-- Mobile Menu -->
       <nav
         id="mobileMenu"
@@ -232,7 +170,7 @@
         <a href="./index.php" class="block hover:text-blue-600 mx-auto">Home</a>
 
         <!-- Doctor Dropdown -->
-        <div class="mx-auto">
+        <div class=" mx-auto">
           <button
             class="flex items-center w-full justify-between hover:text-blue-600"
             data-dropdown
@@ -319,68 +257,49 @@
           </div>
         </div>
 
+
+
         <!-- Department Dropdown -->
 
-        <div class="mx-auto">
-          <button
+        <div class=" mx-auto">
+           <button
             class="flex items-center w-full justify-between hover:text-blue-600"
             data-dropdown
           >
             Department <i class="fas fa-chevron-down ml-1 text-sm"></i>
           </button>
-          <div class="hidden flex-col pl-4 mt-2 space-y-1" data-submenu-menu>
-            <a href="./doctor-dr-smith.php" class="block hover:text-blue-600"
-              >Cardiology</a
-            >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
-              >Neurology</a
-            >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
-              >Pediatrics</a
-            >
-          </div>
+          <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-smith.php"
+                  class="block hover:text-blue-600"
+                  >Cardiology</a
+                >
+                <a
+                  href="./doctor-dr-jones.php"
+                  class="block hover:text-blue-600"
+                  >Neurology</a
+                >
+                <a
+                  href="./doctor-dr-jones.php"
+                  class="block hover:text-blue-600"
+                  >Pediatrics</a
+                >
+              </div>
+         
         </div>
 
         <!-- Other Links -->
-        <a href="./portfolio" class="block hover:text-blue-600 mx-auto"
-          >GALLERY</a
+        <a href="./portfolio.php" class="block hover:text-blue-600  mx-auto"
+          >Portfolio</a
         >
-        <a href="./services.html" class="block hover:text-blue-600 mx-auto"
-          >SERVICES</a
-        >
-        <a href="./events.html" class="block hover:text-blue-600 mx-auto"
-          >EVENT</a
-        >
-            <!-- PAGE Dropdown -->
-
-         <div class="mx-auto">
-          <button
-            class="flex items-center w-full justify-between hover:text-blue-600"
-            data-dropdown
-          >
-            PAGE <i class="fas fa-chevron-down ml-1 text-sm"></i>
-          </button>
-          <div class="hidden flex-col pl-4 mt-2 space-y-1" data-submenu-menu>
-            <a href="./" class="block hover:text-blue-600"
-              >BLOG</a
-            >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
-              >Book Appointment</a
-            >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
-              >404 Page</a
-            >
-          </div>
-        </div>
-       
-        >
-        <a href="./aboutUs.php" class="block hover:text-blue-600 mx-auto"
-          >CONTACT</a
-        ></nav>
-
-    <!-- Toggle Script -->
-   
-    <script>
+        <a href="./carrer.php" class="block hover:text-blue-600  mx-auto">Careers</a>
+        <a href="./blogs.php" class="block hover:text-blue-600  mx-auto">Blogs</a>
+        <a href="./aboutUs.php" class="block hover:text-blue-600  mx-auto">About</a>
+      </nav>
+<script>
       // Mobile menu toggle
       const mobileMenuToggle = document.getElementById("mobileMenuToggle");
       const mobileMenu = document.getElementById("mobileMenu");
@@ -419,6 +338,6 @@
     
     </header>
 
-    <script src="../public/js/script.js"></script>
+    
   </body>
 </html>

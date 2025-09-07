@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doctor Details</title>
+      <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       src="https://kit.fontawesome.com/a076d05399.js"
@@ -93,8 +95,8 @@
             <p class="text-gray-600 leading-relaxed mb-4">${doctor.description}</p>
             <p class="text-gray-600 mb-1"><i class="fa-solid fa-envelope"></i>  <a href="mailto:${doctor.email}" class="text-gray-500">${doctor.email}</a></p>
             <p class="text-gray-600 mb-1"><i class="fa-solid fa-phone"></i> <a href="tel:${doctor.phone}" class="text-gray-500">${doctor.phone}</a></p>
-            
-            <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">View Schedule</button>
+
+            <button onclick="window.location.href='./home.html#appointment-form'" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Book Schedule</button>
           </div>
 
           <div class="mt-4 md:w-1/3 ">

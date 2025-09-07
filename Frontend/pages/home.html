@@ -16,10 +16,11 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
-    <title>Document</title>
+    <title>HPC Hospital</title>
   </head>
-  <body class="justify-center items-center min-h-screen">
+  <body>
     <!--  Import Header -->
 
     <div id="header"></div>
@@ -69,7 +70,6 @@
         <span
           class="dot w-3 h-3 bg-white rounded-full cursor-pointer opacity-70"
         ></span>
-       
       </div>
     </div>
 
@@ -119,11 +119,11 @@
       class="flex flex-col md:flex-row gap-8 px-6 py-10 max-w-6xl mx-auto bg-blue-500"
     >
       <!-- Check Schedule -->
-      <div class="flex-1 p-6">
+      <div class="flex-1 p-6" id="appointment-form">
         <h1 class="text-xl font-bold text-white mb-4">Check Schedule</h1>
         <div class="w-20 h-0.5 bg-red-400 mb-6"></div>
 
-        <form action="#" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4">
           <div class="flex flex-col">
             <label class="text-sm font-medium text-white mb-1"
               >Department</label
@@ -142,7 +142,7 @@
 
           <!-- will show filtered doctors  -->
           <div id="doctorCtn" class="my-10"></div>
-        </form>
+        </div>
       </div>
 
       <!-- filter for doctors dropdown -->
@@ -196,15 +196,13 @@
         });
 
         //
- 
-
       </script>
       <!--  Book Appointment -->
-      <div class="flex-1 p-6">
+      <div class="flex-1 w-full mx-auto px-6 py-10 ">
         <h1 class="text-xl font-bold text-white mb-4">Book Appointment</h1>
         <div class="w-24 h-0.5 bg-red-400 mb-6"></div>
 
-        <form action="#" class="flex flex-col gap-6">
+        <div  class="flex flex-col gap-6">
           <!-- Patient Info -->
           <div class="flex flex-col md:flex-row gap-4">
             <div class="flex-1 flex flex-col">
@@ -305,7 +303,7 @@
             Book Now
           </button>
           <!-- Toast container -->
-        </form>
+        </div>
         <p class="p-5 text-white">
           Please fill out all of the fields correctly. Your records will be
           saved in our database securely.
@@ -327,7 +325,7 @@
       }
     </script>
     <!-- Best Hospital -->
-    <div>
+    <div >
       <div class="text-center my-10">
         <h2 class="text-3xl text-flourish-500 font-bold">
           Best Hospitals in Town
@@ -427,9 +425,9 @@
 
     <!-- Doctors -->
 
-    <section id="doctors" data-animate="fade-up">
+    <section id="doctors" data-animate="fade-up" class="mx-auto  ">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
-        <h2 class="text-3xl text-flourish-500 font-bold">Our Doctors</h2>
+        <h2 class="text-3xl text-flourish-500 font-bold">OUR DOCTORS</h2>
         <p class="text-gray-400 mt-2">
           Our doctors are specialized in their field and have more than 10 years
           of experiences.
@@ -488,10 +486,10 @@
                 <i class="fab fa-twitter"></i>
               </a>
               <a href="#" class="text-white text-2xl hover:text-blue-400 transform hover:scale-110 transition">
-                <i class="fab fa-linkedin-in"></i>
+               <i class="fa-solid fa-phone"></i>
               </a>
               <a href="#" class="text-white text-2xl hover:text-blue-400 transform hover:scale-110 transition">
-                <i class="fab fa-instagram"></i>
+                <i class="fa-solid fa-envelope"></i>
               </a>
             </div>
           </div>
@@ -537,13 +535,90 @@
 
         <div class="w-40 h-0.5 bg-red-400 mt-4 flex mx-auto"></div>
       </div>
+      <div class="relative max-w-6xl mx-auto px-6 py-8 text-center ">
+        <!-- Testimonials -->
+        <div class="testimonial hidden">
+          <h2 class="text-lg font-thin text-gray-500">
+             I really
+            appreciate all your kindness and good care you have provided me
+            with. Thank you so much!
+          </h2>
+          <img
+            src="../public/assets/doctor1.jpg"
+            alt="doctor"
+            class="w-12 h-12 rounded-full flex mx-auto mt-4"
+          />
+          <p class="mt-2 font-semibold text-red-500">Martha Stewart</p>
+        </div>
+
+        <div class="testimonial hidden">
+          <h2 class="text-lg font-medium font-thin text-gray-500">
+            Amazing staff, they took care of me like family. Couldn’t have asked
+            for better service!
+          </h2>
+          <img
+            src="../public/assets/doctor2.jpg"
+            alt="doctor"
+            class="w-12 h-12 rounded-full flex mx-auto mt-4"
+          />
+          <p class="mt-2 font-semibold text-red-500">John Doe</p>
+        </div>
+
+        <div class="testimonial hidden">
+          <h2 class="text-lg font-medium font-thin text-gray-500">
+            From start to finish, I felt supported and safe. I highly recommend
+            this hospital!
+          </h2>
+          <img
+            src="../public/assets/doctor3.jpg"
+            alt="doctor"
+            class="w-12 h-12 rounded-full flex mx-auto mt-4"
+          />
+          <p class="mt-2 font-semibold text-red-500">Sarah Lee</p>
+        </div>
+
+        <!-- Dots -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          <span
+            class="round w-3 h-3 bg-gray-400 rounded-full cursor-pointer"
+            onclick="showTestimonial(0)"
+          ></span>
+          <span
+            class="round w-3 h-3 bg-gray-400 rounded-full cursor-pointer"
+            onclick="showTestimonial(1)"
+          ></span>
+          <span
+            class="round w-3 h-3 bg-gray-400 rounded-full cursor-pointer"
+            onclick="showTestimonial(2)"
+          ></span>
+        </div>
+      </div>
+
+      <script>
+        let currentIndex = 0;
+        const testimonials = document.querySelectorAll(".testimonial");
+        const rounds = document.querySelectorAll(".round");
+
+        function showTestimonial(index) {
+          testimonials[currentIndex].classList.add("hidden");
+          rounds[currentIndex].classList.remove("bg-blue-500");
+
+          testimonials[index].classList.remove("hidden");
+          rounds[index].classList.add("bg-blue-500");
+
+          currentIndex = index;
+        }
+
+        // Show first testimonial by default
+        showTestimonial(0);
+      </script>
     </section>
 
     <!-- Our services -->
 
-    <section id="services">
-      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
-        <h2 class="text-3xl text-flourish-500 font-bold">Our Services</h2>
+    <section>
+      <div  id="services" class="text-center my-10 container mx-auto w-full  md:justify-center md:place-items-center px-4">
+        <h2 class="text-3xl text-flourish-500 font-bold">OUR SERVICES</h2>
 
         <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
 
@@ -570,7 +645,7 @@
       document.addEventListener("DOMContentLoaded", () => {
         const serviceContainer = document.getElementById("serviceContainer");
 
-        services.forEach((service) => {
+        services.slice(0, 4).forEach((service) => {
           const serviceCard = document.createElement("div");
           serviceCard.className =
             "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";

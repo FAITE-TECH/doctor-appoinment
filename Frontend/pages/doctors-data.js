@@ -22,7 +22,7 @@ const doctors = [
     id: 2,
     name: "Dr.S.Sivschelvan",
     special: "Dental",
-    img: "../public/assets/doctor4.jpg",
+    img: "../public/assets/doctor1.jpg",
     description:
       "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
     email: "doc1@example.com",
@@ -79,7 +79,7 @@ const doctors = [
     id: 5,
     name: "Dr.(Mrs)S.Annet Jothy Luxmi",
     special: "Neurologist",
-    img: "../public/assets/doctor1.jpg",
+    img: "../public/assets/doctor4.jpg",
     description:
       "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
     email: "doc1@example.com",
@@ -113,24 +113,6 @@ const doctors = [
       Saturday: "",
     },
   },
-  {
-    id: 7,
-    name: "Doctor7",
-    special: "Dental",
-    img: "../public/assets/doctor4.jpg",
-    description:
-      "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
-    email: "doc1@example.com",
-    phone: "123-456-7890",
-    schedule: {
-      Sunday: "09:00 - 12:00",
-      Monday: "",
-      Tuesday: "10:00 - 14:00",
-      Wednesday: "",
-      Thursday: "11:00 - 15:00",
-      Friday: "",
-      Saturday: "08:00 - 11:00",
-    },
-  },
+  
 ];
 window.doctors = doctors;
