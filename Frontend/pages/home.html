@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+
+    <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
     />
 
     <link rel="stylesheet" href="../public/css/styles.css" />
@@ -113,13 +122,10 @@
       showImage(index);
     </script>
 
-    <!-- form -->
-
-    <div
-      class="flex flex-col md:flex-row gap-8 px-6 py-10 max-w-6xl mx-auto bg-blue-500"
-    >
+    <!-- Form Section -->
+    <div class="flex flex-col lg:flex-row gap-8 px-6 py-10 max-w-6xl mx-auto">
       <!-- Check Schedule -->
-      <div class="flex-1 p-6" id="appointment-form">
+      <div class="flex-1 p-6 bg-blue-500 rounded-lg" id="appointment-form">
         <h1 class="text-xl font-bold text-white mb-4">Check Schedule</h1>
         <div class="w-20 h-0.5 bg-red-400 mb-6"></div>
 
@@ -130,7 +136,7 @@
             >
             <select
               id="specialFilter"
-              class="border h-15 px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              class="border h-12 px-3 py-2 focus:ring-2 focus:ring-blue-400 rounded-md"
             >
               <option value="">Select one</option>
               <option value="Pulmonary">Pulmonary</option>
@@ -140,78 +146,26 @@
             </select>
           </div>
 
-          <!-- will show filtered doctors  -->
-          <div id="doctorCtn" class="my-10"></div>
+          <!-- Filtered Doctors -->
+          <div id="doctorCtn" class="my-6"></div>
         </div>
       </div>
 
-      <!-- filter for doctors dropdown -->
-      <script>
-        const doctorCtn = document.getElementById("doctorCtn");
-        const specialFilter = document.getElementById("specialFilter");
-
-        // Render doctors dynamically
-        function renderDoctors(list) {
-          doctorCtn.innerHTML = ""; // clear old data
-          if (list.length === 0) {
-            doctorCtn.innerHTML = `<p class="text-white">No doctors found</p>`;
-            return;
-          }
-
-          list.forEach((doctor) => {
-            const doctorCard = document.createElement("div");
-            doctorCard.className =
-              "bg-white border my-7 rounded-lg shadow p-6 flex flex-col md:flex-row items-center gap-4 transition hover:shadow-lg ";
-
-            doctorCard.innerHTML = `
-              <img src="${doctor.img}" alt="${doctor.name}" 
-                class="w-32 h-32 md:w-10 md:h-10 rounded-full object-cover mb-3 md:mb-0">
-
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between w-full">
-                <div>
-                  <h3 class="text-lg font-semibold">${doctor.name}</h3>
-                  <p class="text-sm text-gray-500">${doctor.special}</p>
-                </div>
-
-                <a onclick="window.location.href='doctor-details.html?id=${doctor.id}'" 
-                  class="mt-3 md:mt-0 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 cursor-pointer transition"
-                >
-                  View Schedule
-                </a>
-              </div>
-            `;
-            doctorCtn.appendChild(doctorCard);
-          });
-        }
-
-        // Only filter when selection changes (no default rendering)
-        specialFilter.addEventListener("change", (e) => {
-          const selected = e.target.value;
-          if (selected === "") {
-            doctorCtn.innerHTML = `<p class="text-gray-500">Please select a specialization</p>`;
-          } else {
-            const filtered = doctors.filter((doc) => doc.special === selected);
-            renderDoctors(filtered);
-          }
-        });
-
-        //
-      </script>
-      <!--  Book Appointment -->
-      <div class="flex-1 w-full mx-auto px-6 py-10 ">
+      <!-- Book Appointment -->
+      <div class="flex-1 bg-blue-500 rounded-lg px-6 py-8">
         <h1 class="text-xl font-bold text-white mb-4">Book Appointment</h1>
         <div class="w-24 h-0.5 bg-red-400 mb-6"></div>
 
-        <div  class="flex flex-col gap-6">
+        <form class="flex flex-col gap-6">
           <!-- Patient Info -->
-          <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1"
                 >Patient Name</label
               >
               <input
                 type="text"
-                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
             </div>
@@ -221,7 +175,7 @@
               >
               <input
                 type="text"
-                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
             </div>
@@ -229,21 +183,21 @@
               <label class="text-sm font-medium text-white mb-1">Email</label>
               <input
                 type="email"
-                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
             </div>
           </div>
 
-          <!-- Doctor & Department -->
-          <div class="flex flex-col md:flex-row gap-4">
+          <!-- Department & Doctor -->
+          <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1"
                 >Department</label
               >
               <select
-                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
                 id="deptSelect"
+                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               >
                 <option value="">Select one</option>
@@ -256,8 +210,8 @@
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1">Doctor</label>
               <select
-                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
                 id="doctorSelect"
+                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               >
                 <option value="">Select one</option>
@@ -266,15 +220,15 @@
           </div>
 
           <!-- Date & Time -->
-
-          <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1"
                 >Choose Date</label
               >
               <input
-                type="date"
-                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                id="datePicker"
+                type="text"
+                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
             </div>
@@ -283,33 +237,106 @@
                 >Choose Time</label
               >
               <input
-                type="time"
-                class="border h-15 px-3 py-2 focus:ring-2 focus:ring-green-400"
+                id="timePicker"
+                type="text"
+                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
             </div>
           </div>
+          <!-- Flatpickr JS -->
+          <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+          <script>
+            // Initialize Date Picker
+            flatpickr("#datePicker", {
+              dateFormat: "Y-m-d",
+              minDate: "today", // Disable past dates
+            });
+
+            // Initialize Time Picker
+            flatpickr("#timePicker", {
+              enableTime: true,
+              noCalendar: true,
+              dateFormat: "H:i",
+              time_24hr: true, // 24-hour format, set false for AM/PM
+            });
+          </script>
+          <!-- Toast Notification -->
           <div
             id="toast"
-            class="hidden fixed top-5 right-5 bg-black text-white px-4 py-3 rounded-lg shadow-lg transition-opacity duration-500"
+            class="hidden fixed top-5 right-5 bg-black text-white px-4 py-3 rounded-lg shadow-lg transition-opacity duration-500 z-[9999]"
           >
             ✅ Booking successful!
           </div>
+
           <button
             type="submit"
             onclick="showToast()"
-            class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition"
+            class="bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition w-full sm:w-auto"
           >
             Book Now
           </button>
-          <!-- Toast container -->
-        </div>
-        <p class="p-5 text-white">
+        </form>
+
+        <p class="p-5 text-white text-sm sm:text-base">
           Please fill out all of the fields correctly. Your records will be
           saved in our database securely.
         </p>
       </div>
     </div>
+
+    <!-- filter for doctors dropdown -->
+    <script>
+      const doctorCtn = document.getElementById("doctorCtn");
+      const specialFilter = document.getElementById("specialFilter");
+
+      // Render doctors dynamically
+      function renderDoctors(list) {
+        doctorCtn.innerHTML = ""; // clear old data
+        if (list.length === 0) {
+          doctorCtn.innerHTML = `<p class="text-white">No doctors found</p>`;
+          return;
+        }
+
+        list.forEach((doctor) => {
+          const doctorCard = document.createElement("div");
+          doctorCard.className =
+            "bg-white border my-7 rounded-lg shadow p-6 flex flex-col md:flex-row items-center gap-4 transition hover:shadow-lg ";
+
+          doctorCard.innerHTML = `
+              <img src="${doctor.img}" alt="${doctor.name}" 
+                class="w-32 h-32 md:w-10 md:h-10 rounded-full object-cover mb-3 md:mb-0">
+
+              <div class="flex flex-col p-0 md:flex-row md:items-center md:justify-between w-full">
+                <div>
+                  <h3 class="text-lg font-semibold">${doctor.name}</h3>
+                  <p class="text-sm text-gray-500">${doctor.special}</p>
+                </div>
+
+                <a onclick="window.location.href='doctor-details.html?id=${doctor.id}'" 
+                  class="mt-3 md:mt-0 bg-red-600 w-full text-white py-1 px-2 rounded-md hover:bg-red-700 cursor-pointer transition"
+                >
+                  View Schedule
+                </a>
+              </div>
+            `;
+          doctorCtn.appendChild(doctorCard);
+        });
+      }
+
+      // Only filter when selection changes (no default rendering)
+      specialFilter.addEventListener("change", (e) => {
+        const selected = e.target.value;
+        if (selected === "") {
+          doctorCtn.innerHTML = `<p class="text-gray-500">Please select a specialization</p>`;
+        } else {
+          const filtered = doctors.filter((doc) => doc.special === selected);
+          renderDoctors(filtered);
+        }
+      });
+
+      //
+    </script>
 
     <script>
       function showToast() {
@@ -321,11 +348,11 @@
         setTimeout(() => {
           toast.style.opacity = "0";
           setTimeout(() => toast.classList.add("hidden"), 500); // wait for fade-out
-        }, 3000);
+        }, 1000);
       }
     </script>
     <!-- Best Hospital -->
-    <div >
+    <div>
       <div class="text-center my-10">
         <h2 class="text-3xl text-flourish-500 font-bold">
           Best Hospitals in Town
@@ -425,7 +452,7 @@
 
     <!-- Doctors -->
 
-    <section id="doctors" data-animate="fade-up" class="mx-auto  ">
+    <section id="doctors" data-animate="fade-up" class="mx-auto">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
         <h2 class="text-3xl text-flourish-500 font-bold">OUR DOCTORS</h2>
         <p class="text-gray-400 mt-2">
@@ -535,13 +562,12 @@
 
         <div class="w-40 h-0.5 bg-red-400 mt-4 flex mx-auto"></div>
       </div>
-      <div class="relative max-w-6xl mx-auto px-6 py-8 text-center ">
+      <div class="relative max-w-6xl mx-auto px-6 py-8 text-center">
         <!-- Testimonials -->
         <div class="testimonial hidden">
           <h2 class="text-lg font-thin text-gray-500">
-             I really
-            appreciate all your kindness and good care you have provided me
-            with. Thank you so much!
+            I really appreciate all your kindness and good care you have
+            provided me with. Thank you so much!
           </h2>
           <img
             src="../public/assets/doctor1.jpg"
@@ -617,7 +643,10 @@
     <!-- Our services -->
 
     <section>
-      <div  id="services" class="text-center my-10 container mx-auto w-full  md:justify-center md:place-items-center px-4">
+      <div
+        id="services"
+        class="text-center my-10 container mx-auto w-full md:justify-center md:place-items-center px-4"
+      >
         <h2 class="text-3xl text-flourish-500 font-bold">OUR SERVICES</h2>
 
         <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
@@ -809,6 +838,60 @@
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("footer").innerHTML = data;
+        });
+    </script>
+
+    <!-- Placeholder for spinner -->
+    <div id="spinner"></div>
+
+    <script>
+      // Load spinner markup
+      fetch("spinner.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("spinner").innerHTML = data;
+
+          // Now spinner is in DOM -> attach JS logic
+          const spinner = document.getElementById("spinner-overlay");
+
+          function showSpinner() {
+            spinner.classList.remove("hidden");
+          }
+          function hideSpinner() {
+            spinner.classList.add("hidden");
+          }
+
+          // Show on links
+          document.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+              if (
+                link.getAttribute("href") !== "#" &&
+                !link.getAttribute("href")?.startsWith("javascript")
+              ) {
+                showSpinner();
+                setTimeout(hideSpinner, 10000); // works now
+              }
+            });
+          });
+
+          // Show on .show-spinner buttons
+          document.querySelectorAll("button.show-spinner").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000); // works now
+            });
+          });
+
+          // Show on form submit
+          document.querySelectorAll("form").forEach((form) => {
+            form.addEventListener("submit", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000); // works now
+            });
+          });
+
+          // Optional: hide spinner after page load (auto)
+          setTimeout(() => hideSpinner(), 10000);
         });
     </script>
 

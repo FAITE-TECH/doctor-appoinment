@@ -42,19 +42,21 @@
     </div>
 
     <!-- Header -->
-    <header class="bg-white shadow-md fixed w-full top-0 z-50" id="header">
+    <header class="bg-white shadow-md fixed w-full h-16 top-0 z-50" id="header">
       <div
-        class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4"
+        class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4"
       >
         <!-- Logo -->
-        <a href="./index.php" class="flex items-center">
+        <a href="./home.html" class="flex items-center">
           <img src="../public/assets/logo.png" alt="Logo" class="h-10 w-auto" />
         </a>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex space-x-8 items-center font-thin text-gray-500">
+        <nav
+          class="hidden md:flex space-x-8 items-center font-thin text-gray-500"
+        >
           <!-- Home -->
-          <a href="./index.php" class="hover:text-blue-600">Home</a>
+          <a href="./home.html" class="hover:text-blue-600">Home</a>
 
           <!-- Doctor Dropdown -->
           <div class="relative group">
@@ -71,7 +73,7 @@
               <!-- Cardiology Submenu -->
               <div class="relative group/cardio">
                 <a
-                  href="#"
+                  href="./doctors.html"
                   class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
                 >
                   Cardiology <i class="fas fa-chevron-right text-sm"></i>
@@ -95,7 +97,7 @@
               <!-- Neurology Submenu -->
               <div class="relative group/neuro">
                 <a
-                  href="#"
+                  href="./doctors.html"
                   class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
                 >
                   Neurology <i class="fas fa-chevron-right text-sm"></i>
@@ -119,7 +121,7 @@
               <!-- Pediatrics Submenu -->
               <div class="relative group/pedia">
                 <a
-                  href="#"
+                  href="./doctors.html"
                   class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
                 >
                   Pediatrics <i class="fas fa-chevron-right text-sm"></i>
@@ -155,19 +157,19 @@
               class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
             >
               <a
-                href="./cardiology.php"
+                href="./departments.html"
                 class="block px-4 py-2 hover:bg-gray-100"
               >
                 Cardiology
               </a>
               <a
-                href="./neurology.php"
+                href="./departments.html"
                 class="block px-4 py-2 hover:bg-gray-100"
               >
                 Neurology
               </a>
               <a
-                href="./pediatrics.php"
+                href="./departments.html"
                 class="block px-4 py-2 hover:bg-gray-100"
               >
                 Pediatrics
@@ -192,22 +194,14 @@
             <div
               class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
             >
+              <a href="./" class="block px-4 py-2 hover:bg-gray-100"> Blog </a>
               <a
-                href="./"
-                class="block px-4 py-2 hover:bg-gray-100"
-              >
-                Blog
-              </a>
-              <a
-                href="./"
+                href="./home.html#appointment-form"
                 class="block px-4 py-2 hover:bg-gray-100"
               >
                 Book Appointment
               </a>
-              <a
-                href="./"
-                class="block px-4 py-2 hover:bg-gray-100"
-              >
+              <a href="./error.html" class="block px-4 py-2 hover:bg-gray-100">
                 404 PAGE
               </a>
             </div>
@@ -223,11 +217,11 @@
           <i class="fas fa-bars"></i>
         </button>
       </div>
-        
+
       <!-- Mobile Menu -->
       <nav
         id="mobileMenu"
-        class="hidden flex flex-col space-y-2 bg-white shadow-md align-center justify-center md:hidden mx-auto"
+        class="hidden flex flex-col space-y-2 bg-white shadow-md items-center justify-center md:hidden mx-auto z-[9999]"
       >
         <a href="./index.php" class="block hover:text-blue-600 mx-auto">Home</a>
 
@@ -329,13 +323,13 @@
             Department <i class="fas fa-chevron-down ml-1 text-sm"></i>
           </button>
           <div class="hidden flex-col pl-4 mt-2 space-y-1" data-submenu-menu>
-            <a href="./doctor-dr-smith.php" class="block hover:text-blue-600"
+            <a href="./departments.html" class="block hover:text-blue-600"
               >Cardiology</a
             >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
+            <a href="./departments.html" class="block hover:text-blue-600"
               >Neurology</a
             >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
+            <a href="./departments.html" class="block hover:text-blue-600"
               >Pediatrics</a
             >
           </div>
@@ -351,9 +345,9 @@
         <a href="./events.html" class="block hover:text-blue-600 mx-auto"
           >EVENT</a
         >
-            <!-- PAGE Dropdown -->
+        <!-- PAGE Dropdown -->
 
-         <div class="mx-auto">
+        <div class="mx-auto">
           <button
             class="flex items-center w-full justify-between hover:text-blue-600"
             data-dropdown
@@ -361,25 +355,27 @@
             PAGE <i class="fas fa-chevron-down ml-1 text-sm"></i>
           </button>
           <div class="hidden flex-col pl-4 mt-2 space-y-1" data-submenu-menu>
-            <a href="./" class="block hover:text-blue-600"
-              >BLOG</a
-            >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
+            <a href="./" class="block hover:text-blue-600">BLOG</a>
+            <a
+              href="./home.html#appointment-form"
+              class="block hover:text-blue-600"
               >Book Appointment</a
             >
-            <a href="./doctor-dr-jones.php" class="block hover:text-blue-600"
+            <a href="./error.html" class="block hover:text-blue-600"
               >404 Page</a
             >
           </div>
         </div>
-       
+
         >
         <a href="./aboutUs.php" class="block hover:text-blue-600 mx-auto"
           >CONTACT</a
-        ></nav>
+        >
+      </nav>
+    </header>
 
     <!-- Toggle Script -->
-   
+
     <script>
       // Mobile menu toggle
       const mobileMenuToggle = document.getElementById("mobileMenuToggle");
@@ -388,8 +384,6 @@
       mobileMenuToggle.addEventListener("click", () => {
         mobileMenu.classList.toggle("hidden");
       });
-
-    
     </script>
 
     <script>
@@ -416,9 +410,60 @@
         });
       });
     </script>
-    
-    </header>
-
     <script src="../public/js/script.js"></script>
+
+    <!-- Placeholder for spinner -->
+    <div id="spinner"></div>
+
+    <script>
+      // Load spinner markup
+      fetch("spinner.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("spinner").innerHTML = data;
+
+          // Now spinner is in DOM -> attach JS logic
+          const spinner = document.getElementById("spinner-overlay");
+
+          function showSpinner() {
+            spinner.classList.remove("hidden");
+          }
+          function hideSpinner() {
+            spinner.classList.add("hidden");
+          }
+
+          // Show on links
+          document.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+              if (
+                link.getAttribute("href") !== "#" &&
+                !link.getAttribute("href")?.startsWith("javascript")
+              ) {
+                showSpinner();
+                setTimeout(hideSpinner, 5000); // works now
+              }
+            });
+          });
+
+          // Show on .show-spinner buttons
+          document.querySelectorAll("button.show-spinner").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 5000); // works now
+            });
+          });
+
+          // Show on form submit
+          document.querySelectorAll("form").forEach((form) => {
+            form.addEventListener("submit", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 5000); // works now
+            });
+          });
+
+          // Optional: hide spinner after page load (auto)
+          setTimeout(() => hideSpinner(), 5000);
+        });
+    </script>
   </body>
 </html>

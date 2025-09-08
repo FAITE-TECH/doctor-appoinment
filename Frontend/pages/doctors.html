@@ -50,6 +50,8 @@
       <span>&gt;</span>
     </div>
 
+
+    <!-- Filter -->
     <section id="doctors">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
         <!-- Filter Buttons -->
@@ -63,7 +65,7 @@
           >
             All
             <div
-              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+              class="underline  w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
             ></div>
           </button>
           <button
@@ -167,6 +169,9 @@
         });
       });
     </script>
+
+        <!-- Filter -->
+
     <script>
       const filterButtons = document.querySelectorAll(".filter-btn");
 
@@ -196,7 +201,7 @@
       }
 
       .animate-fadeIn {
-        animation: fadeIn 0.5s ease forwards;
+        animation: fadeIn 1.5s ease forwards;
       }
     </style>
 
@@ -209,5 +214,58 @@
           document.getElementById("footer").innerHTML = data;
         });
     </script>
+
+
+ <!-- Placeholder for spinner -->
+<div id="spinner"></div>
+
+<script>
+  // Load spinner markup
+  fetch("spinner.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("spinner").innerHTML = data;
+
+      // Now spinner is in DOM -> attach JS logic
+      const spinner = document.getElementById("spinner-overlay");
+
+      function showSpinner() {
+        spinner.classList.remove("hidden");
+      }
+      function hideSpinner() {
+        spinner.classList.add("hidden");
+      }
+
+      // Show on links
+    document.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        if (link.getAttribute("href") !== "#" && !link.getAttribute("href")?.startsWith("javascript")) {
+          showSpinner();
+          setTimeout(hideSpinner, 10000); // works now
+        }
+      });
+    });
+
+    // Show on .show-spinner buttons
+    document.querySelectorAll("button.show-spinner").forEach(btn => {
+      btn.addEventListener("click", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Show on form submit
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Optional: hide spinner after page load (auto)
+    setTimeout(() => hideSpinner(), 10000);
+    });
+</script>
+
   </body>
 </html>

@@ -17,6 +17,8 @@
     />
   </head>
   <body class="bg-gray-50">
+
+
     <!--  Import Header -->
 
     <div id="header"></div>
@@ -56,9 +58,130 @@
         <tbody class="p-5"></tbody>
       </table>
     </div>
+    <script src="doctors-data.js"></script>
+
+
+ <!-- Filter -->
+
+    <section id="doctors">
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+        <!-- Filter Buttons -->
+        <div
+          id="doctorFilter"
+          class="flex flex-wrap justify-center gap-4 mb-10"
+        >
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="All"
+          >
+            All
+            <div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Dental"
+          >
+            Dental
+            <div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Neurologist"
+          >
+            Neurologist
+            <div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Pulmonary"
+          >
+            Pulmonary
+            <div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+        </div>
+
+        <!-- Cards Grid -->
+        <div
+          id="doctorContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const doctorContainer = document.getElementById("doctorContainer");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+
+        function renderDoctors(filteredDoctors) {
+          // Clear container
+          doctorContainer.innerHTML = "";
+
+          filteredDoctors.forEach((doctor) => {
+            const doctorCard = document.createElement("div");
+            doctorCard.className =
+              "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
+
+            doctorCard.innerHTML = `
+              <!-- Doctor Image Wrapper -->
+              <a href="doctor-details.html?id=${doctor.id}">
+                <div class="relative h-56 w-full overflow-hidden group">
+                  <img src="${doctor.img}" alt="${doctor.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                </div>
+              </a>
+
+              <!-- Doctor Content -->
+              <div class="p-6 flex flex-col justify-between flex-grow">
+                <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
+                <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">${doctor.special}</p>
+                <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${doctor.description}</p>
+              </div>
+            `;
+
+            doctorContainer.appendChild(doctorCard);
+
+            // Animate card fade in
+            requestAnimationFrame(() => {
+              doctorCard.classList.remove("opacity-0");
+            });
+          });
+        }
+
+        // Initial render - all doctors
+        renderDoctors(doctors);
+
+        // Filter functionality
+        filterButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const filter = btn.dataset.filter;
+
+            
+
+            if (filter === "All") {
+              renderDoctors(doctors);
+            } else {
+              const filteredDoctors = doctors.filter(
+                (d) => d.special === filter
+              );
+              renderDoctors(filteredDoctors);
+            }
+          });
+        });
+      });
+    </script>
+
 
     <!-- Doctor Data -->
-    <script src="doctors-data.js"></script>
     <script>
       // Get doctor id from URL
       const params = new URLSearchParams(window.location.search);
@@ -159,6 +282,43 @@
       tableBody.appendChild(row);
     </script>
 
+
+    <!-- Filter Underline -->
+
+    <script>
+      const filterButtons = document.querySelectorAll(".filter-btn");
+
+      filterButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          // Hide underline for all buttons
+          filterButtons.forEach((b) =>
+            b.querySelector(".underline").classList.add("hidden")
+          );
+
+          // Show underline for clicked button
+          btn.querySelector(".underline").classList.remove("hidden");
+        });
+      });
+    </script>
+    <style>
+      /* Simple fade-in animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease forwards;
+      }
+    </style>
+
+
     <!-- Footer -->
     <div id="footer"></div>
     <script>
@@ -168,5 +328,58 @@
           document.getElementById("footer").innerHTML = data;
         });
     </script>
+
+
+ <!-- Placeholder for spinner -->
+<div id="spinner"></div>
+
+<script>
+  // Load spinner markup
+  fetch("spinner.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("spinner").innerHTML = data;
+
+      // Now spinner is in DOM -> attach JS logic
+      const spinner = document.getElementById("spinner-overlay");
+
+      function showSpinner() {
+        spinner.classList.remove("hidden");
+      }
+      function hideSpinner() {
+        spinner.classList.add("hidden");
+      }
+
+      // Show on links
+    document.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        if (link.getAttribute("href") !== "#" && !link.getAttribute("href")?.startsWith("javascript")) {
+          showSpinner();
+          setTimeout(hideSpinner, 10000); // works now
+        }
+      });
+    });
+
+    // Show on .show-spinner buttons
+    document.querySelectorAll("button.show-spinner").forEach(btn => {
+      btn.addEventListener("click", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Show on form submit
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Optional: hide spinner after page load (auto)
+    setTimeout(() => hideSpinner(), 10000);
+    });
+</script>
+
   </body>
 </html>

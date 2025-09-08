@@ -26,28 +26,28 @@
           </h3>
           <div class="flex flex-col space-y-2">
             <a
-              href="./service.php"
+              href="./doctors.html"
               class="flex items-center gap-2 justify-center md:justify-start hover:text-gray-400"
             >
-              <i class="fa-solid fa-folder text-gray-200"></i> Blogs
+              <i class="fa-solid fa-folder text-gray-200"></i> Doctors
             </a>
             <a
-              href="./service.php"
+              href="./departments.html"
               class="flex items-center gap-2 justify-center md:justify-start hover:text-gray-400"
             >
-              <i class="fa-solid fa-folder text-gray-200"></i> Counseling
+              <i class="fa-solid fa-folder text-gray-200"></i> Departments
             </a>
             <a
-              href="./service.php"
+              href="./events.html"
               class="flex items-center gap-2 justify-center md:justify-start hover:text-gray-400"
             >
-              <i class="fa-solid fa-folder text-gray-200"></i> Health
+              <i class="fa-solid fa-folder text-gray-200"></i> Events
             </a>
             <a
-              href="./service.php"
+              href="./gallery.html"
               class="flex items-center gap-2 justify-center md:justify-start hover:text-gray-400"
             >
-              <i class="fa-solid fa-folder text-gray-200"></i> Kids
+              <i class="fa-solid fa-folder text-gray-200"></i> Gallery
             </a>
           </div>
         </div>
@@ -123,6 +123,17 @@
         </div>
       </div>
     </footer>
+
+    <!-- Load Spinner -->
+<div id="spinner"></div>
+<script>
+  fetch("spinner.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("spinner").innerHTML = data;
+    });
+</script>
+
 
     <script src="../public/js/script.js"></script>
   </body>

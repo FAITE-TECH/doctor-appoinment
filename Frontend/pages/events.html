@@ -17,7 +17,7 @@
       rel="stylesheet"
     />
 
-    <title>Document</title>
+    <title>Events</title>
   </head>
   <body>
     <div id="header"></div>
@@ -104,6 +104,57 @@
           document.getElementById("footer").innerHTML = data;
         });
     </script>
+     <!-- Placeholder for spinner -->
+<div id="spinner"></div>
+
+<script>
+  // Load spinner markup
+  fetch("spinner.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("spinner").innerHTML = data;
+
+      // Now spinner is in DOM -> attach JS logic
+      const spinner = document.getElementById("spinner-overlay");
+
+      function showSpinner() {
+        spinner.classList.remove("hidden");
+      }
+      function hideSpinner() {
+        spinner.classList.add("hidden");
+      }
+
+      // Show on links
+    document.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        if (link.getAttribute("href") !== "#" && !link.getAttribute("href")?.startsWith("javascript")) {
+          showSpinner();
+          setTimeout(hideSpinner, 10000); // works now
+        }
+      });
+    });
+
+    // Show on .show-spinner buttons
+    document.querySelectorAll("button.show-spinner").forEach(btn => {
+      btn.addEventListener("click", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Show on form submit
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Optional: hide spinner after page load (auto)
+    setTimeout(() => hideSpinner(), 10000);
+    });
+</script>
+
     <script src="../public/js/script.js"></script>
   </body>
 </html>
