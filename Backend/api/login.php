@@ -1,9 +1,12 @@
 <?php
 header('Content-Type: application/json');
+
+// Include session configuration first
+include('../includes/session_config.php');
+
+// Your existing includes
 include('../includes/db.php');
 include('../includes/functions.php');
-
-ensure_session_started();
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

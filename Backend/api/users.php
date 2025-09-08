@@ -1,9 +1,12 @@
 <?php
 header('Content-Type: application/json');
+
+// Include session configuration first
+include('../includes/session_config.php');
+
+// Your existing includes
 include('../includes/db.php');
 include('../includes/functions.php');
-
-ensure_session_started();
 
 // Check if user is authenticated
 if (!isset($_SESSION['user_id'])) {

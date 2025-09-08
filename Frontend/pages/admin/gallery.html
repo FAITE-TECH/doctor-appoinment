@@ -139,7 +139,9 @@
                     return;
                 }
 
-                const response = await fetch('/doctor-appoinment/Backend/api/gallery.php');
+                const response = await fetch('/doctor-appoinment/Backend/api/gallery.php', {
+                    credentials: 'include'
+                });
                 if (response.status === 403) {
                     showAuthMessage();
                     return;
@@ -271,6 +273,7 @@
                 
                 const response = await fetch(url, {
                     method: method,
+                    credentials: 'include',
                     body: formData
                 });
 

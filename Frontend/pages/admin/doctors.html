@@ -75,6 +75,12 @@
                 <h1 class="text-3xl font-bold text-gray-900">Doctors Management</h1>
             </div>
 
+            <!-- Toolbar -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold">Doctors</h2>
+                <button id="openAddDoctorModal" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Add Doctor</button>
+            </div>
+
             <!-- Doctors Table -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="overflow-x-auto">
@@ -100,6 +106,29 @@
     </div>
 
 
+
+    <!-- Add Doctor Modal -->
+    <div id="addDoctorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow w-full max-w-2xl mx-4">
+            <div class="flex items-center justify-between px-6 py-4 border-b">
+                <h3 class="text-lg font-semibold">Add Doctor</h3>
+                <button id="closeAddDoctorModal" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            <form id="addDoctorForm" enctype="multipart/form-data" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" name="name" placeholder="Full Name" required class="px-3 py-2 border rounded">
+                <input type="email" name="email" placeholder="Email" required class="px-3 py-2 border rounded">
+                <input type="text" name="specialization" placeholder="Specialization" required class="px-3 py-2 border rounded">
+                <input type="text" name="phone" placeholder="Phone" class="px-3 py-2 border rounded">
+                <input type="text" name="department_id" placeholder="Department ID" class="px-3 py-2 border rounded">
+                <input type="text" name="description" placeholder="Description" class="px-3 py-2 border rounded md:col-span-2">
+                <input type="file" name="image" accept="image/*" class="px-3 py-2 border rounded md:col-span-2">
+                <div class="md:col-span-2 flex justify-end gap-3">
+                    <button type="button" id="cancelAddDoctor" class="px-4 py-2 rounded border">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="../../public/js/script.js"></script>
     <script src="./js/shared-auth.js"></script>
@@ -189,9 +218,53 @@
             }
 
             setupEventListeners() {
-                document.getElementById('cancelBtn').addEventListener('click', () => {
-                    this.hideModal();
-                });
+                const form = document.getElementById('addDoctorForm');
+                const modal = document.getElementById('addDoctorModal');
+                const openBtn = document.getElementById('openAddDoctorModal');
+                const closeBtn = document.getElementById('closeAddDoctorModal');
+                const cancelBtn = document.getElementById('cancelAddDoctor');
+
+                const openModal = () => {
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    }
+                };
+                const closeModal = () => {
+                    if (modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                };
+
+                if (openBtn) openBtn.addEventListener('click', openModal);
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+                if (form) {
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        try {
+                            const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=add_doctor', {
+                                method: 'POST',
+                                credentials: 'include',
+                                body: formData
+                            });
+                            const data = await response.json();
+                            if (response.ok && data.success) {
+                                form.reset();
+                                closeModal();
+                                await this.loadDoctors();
+                            } else {
+                                alert(data.error || 'Failed to add doctor');
+                            }
+                        } catch (err) {
+                            console.error('Add doctor failed:', err);
+                            alert('Failed to add doctor');
+                        }
+                    });
+                }
             }
 
 

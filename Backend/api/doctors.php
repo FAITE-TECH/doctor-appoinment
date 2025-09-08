@@ -1,9 +1,12 @@
 <?php
 header('Content-Type: application/json');
+
+// Include session configuration first
+include('../includes/session_config.php');
+
+// Your existing includes
 include('../includes/db.php');
 include('../includes/functions.php');
-
-ensure_session_started();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;

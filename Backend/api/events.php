@@ -1,9 +1,12 @@
 <?php
 header('Content-Type: application/json');
+
+// Include session configuration first
+include('../includes/session_config.php');
+
+// Your existing includes
 include('../includes/db.php');
 include('../includes/functions.php');
-
-ensure_session_started();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;
@@ -45,15 +48,32 @@ switch ($method) {
         break;
         
     case 'POST':
-        // Create new event
-        $body = get_json_body();
-        require_fields($body, ['title', 'description', 'event_date']);
-        
-        $title = trim($body['title']);
-        $description = trim($body['description']);
-        $eventDate = $body['event_date'];
-        $eventTime = $body['event_time'] ?? null;
-        $location = trim($body['location'] ?? '');
+        // Create new event (support JSON and multipart with optional image)
+        // Ensure image column exists
+        $stmt = $conn->prepare("SHOW COLUMNS FROM events LIKE 'image_path'");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $hasImageColumn = $result && $result->num_rows > 0;
+        $stmt->close();
+        if (!$hasImageColumn) {
+            $conn->query("ALTER TABLE events ADD COLUMN image_path VARCHAR(500) NULL AFTER location");
+        }
+
+        if (!empty($_POST) || !empty($_FILES)) {
+            $title = trim($_POST['title'] ?? '');
+            $description = trim($_POST['description'] ?? '');
+            $eventDate = $_POST['event_date'] ?? '';
+            $eventTime = $_POST['event_time'] ?? null;
+            $location = trim($_POST['location'] ?? '');
+        } else {
+            $body = get_json_body();
+            require_fields($body, ['title', 'description', 'event_date']);
+            $title = trim($body['title']);
+            $description = trim($body['description']);
+            $eventDate = $body['event_date'];
+            $eventTime = $body['event_time'] ?? null;
+            $location = trim($body['location'] ?? '');
+        }
         
         if (empty($title)) {
             json_response(['error' => 'Event title is required'], 422);
@@ -68,13 +88,34 @@ switch ($method) {
             json_response(['error' => 'Invalid date format. Use YYYY-MM-DD'], 422);
         }
         
-        // Validate time format if provided
-        if ($eventTime && !preg_match('/^\d{2}:\d{2}:\d{2}$/', $eventTime)) {
-            json_response(['error' => 'Invalid time format. Use HH:MM:SS'], 422);
+        // Normalize/Validate time format if provided (accept HH:MM or HH:MM:SS)
+        if ($eventTime) {
+            if (preg_match('/^\d{2}:\d{2}$/', $eventTime)) {
+                $eventTime = $eventTime . ':00';
+            } elseif (!preg_match('/^\d{2}:\d{2}:\d{2}$/', $eventTime)) {
+                json_response(['error' => 'Invalid time format. Use HH:MM or HH:MM:SS'], 422);
+            }
         }
         
-        $stmt = $conn->prepare('INSERT INTO events (title, description, event_date, event_time, location) VALUES (?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssss', $title, $description, $eventDate, $eventTime, $location);
+        $imagePath = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $allowed = ['image/jpeg','image/png','image/gif'];
+            if (!in_array($_FILES['image']['type'], $allowed)) {
+                json_response(['error' => 'Invalid image type'], 422);
+            }
+            $uploadDir = __DIR__ . '/../../uploads/events/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('', true) . '.' . $ext;
+            $dest = $uploadDir . $filename;
+            if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
+                json_response(['error' => 'Failed to upload image'], 500);
+            }
+            $imagePath = $filename;
+        }
+        
+        $stmt = $conn->prepare('INSERT INTO events (title, description, event_date, event_time, location, image_path) VALUES (?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssss', $title, $description, $eventDate, $eventTime, $location, $imagePath);
         
         if ($stmt->execute()) {
             $eventId = $stmt->insert_id;

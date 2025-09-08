@@ -169,8 +169,105 @@ function addTableRow($table, $fields) {
 // ==============================
 // Doctors CRUD
 // ==============================
-if ($method === 'GET' && $action === 'get_doctors') getTableData('doctors', 'name');
-if ($method === 'POST' && $action === 'add_doctor') addTableRow('doctors', ['name','email','specialization','phone']);
+// Order by a safe default column to avoid errors if 'name' does not exist
+if ($method === 'GET' && $action === 'get_doctors') getTableData('doctors', 'id');
+
+// Enhanced add doctor to support both JSON and multipart (with image)
+if ($method === 'POST' && $action === 'add_doctor') {
+    checkAdminAuth();
+
+    // Helper: ensure column exists
+    $ensureColumn = function($table, $column, $definition) {
+        $stmt = $GLOBALS['conn']->prepare("SHOW COLUMNS FROM $table LIKE ?");
+        $stmt->bind_param('s', $column);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $exists = $result && $result->num_rows > 0;
+        $stmt->close();
+        if (!$exists) {
+            $GLOBALS['conn']->query("ALTER TABLE $table ADD COLUMN $column $definition");
+        }
+    };
+
+    // Ensure optional columns for richer data
+    $ensureColumn('doctors', 'name', 'VARCHAR(255) NOT NULL');
+    $ensureColumn('doctors', 'email', 'VARCHAR(255) NOT NULL');
+    $ensureColumn('doctors', 'phone', 'VARCHAR(20) NULL');
+    $ensureColumn('doctors', 'image_path', 'VARCHAR(500) NULL');
+    // Optional extra fields requested
+    $ensureColumn('doctors', 'description', 'TEXT NULL');
+    // Department linkage (optional)
+    $ensureColumn('doctors', 'department_id', 'INT NULL');
+
+    // Relax legacy NOT NULL on user_id to allow admin-created doctors without a linked user
+    try {
+        $colCheck = $GLOBALS['conn']->prepare("SHOW COLUMNS FROM doctors LIKE 'user_id'");
+        if ($colCheck) {
+            $colCheck->execute();
+            $colRes = $colCheck->get_result();
+            if ($colRes && ($colInfo = $colRes->fetch_assoc())) {
+                if (isset($colInfo['Null']) && strtoupper($colInfo['Null']) === 'NO') {
+                    // Make user_id nullable if it was defined NOT NULL
+                    $GLOBALS['conn']->query('ALTER TABLE doctors MODIFY user_id INT NULL');
+                }
+            }
+            $colCheck->close();
+        }
+    } catch (Exception $e) {
+        // If this fails, continue; insert may still work if schema already compatible
+    }
+
+    $isMultipart = !empty($_POST) || !empty($_FILES);
+
+    if ($isMultipart) {
+        $name = trim($_POST['name'] ?? '');
+        $email = strtolower(trim($_POST['email'] ?? ''));
+        $specialization = trim($_POST['specialization'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $departmentId = isset($_POST['department_id']) ? intval($_POST['department_id']) : null;
+
+        if ($name === '' || $email === '' || $specialization === '') {
+            json_response(['error' => 'Name, email, and specialization are required'], 422);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            json_response(['error' => 'Invalid email format'], 422);
+        }
+
+        $imagePath = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $allowed = ['image/jpeg','image/png','image/gif'];
+            if (!in_array($_FILES['image']['type'], $allowed)) {
+                json_response(['error' => 'Invalid image type'], 422);
+            }
+            // Ensure uploads/doctors directory exists at project root
+            $uploadDir = __DIR__ . '/../../uploads/doctors/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('', true) . '.' . $ext;
+            $dest = $uploadDir . $filename;
+            if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
+                json_response(['error' => 'Failed to upload image'], 500);
+            }
+            // Store a web-accessible path for the frontend
+            $imagePath = '/doctor-appoinment/uploads/doctors/' . $filename;
+        }
+
+        // Insert with optional department and description
+        $sql = 'INSERT INTO doctors (name, email, specialization, phone, image_path, description, department_id) VALUES (?,?,?,?,?,?,?)';
+        $stmt = $GLOBALS['conn']->prepare($sql);
+        $deptParam = $departmentId ? $departmentId : null;
+        $stmt->bind_param('ssssssi', $name, $email, $specialization, $phone, $imagePath, $description, $deptParam);
+        if ($stmt->execute()) {
+            json_response(['success' => true, 'message' => 'Doctor added successfully', 'id' => $stmt->insert_id], 201);
+        } else {
+            json_response(['error' => 'Failed to add doctor: ' . $stmt->error], 500);
+        }
+    } else {
+        // Fallback to previous JSON handling
+        addTableRow('doctors', ['name','email','specialization','phone']);
+    }
+}
 
 if ($method === 'PUT' && $action === 'update_doctor') {
     checkAdminAuth();
