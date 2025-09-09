@@ -1,5 +1,5 @@
 <?php
-header('Location: /doctor-appoinment/Frontend/pages/index.html');
+header('Location: http://localhost:8000/doctor-appoinment/Frontend/pages/index.html');
 exit;
 ?>
 

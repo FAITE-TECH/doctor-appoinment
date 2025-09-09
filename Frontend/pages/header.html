@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../public/css/styles.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!--  Top-Header -->
+
+    <div
+      id="top-header"
+      class="flex justify-between items-center px-32 py-4 bg-blue-500 shadow-md text-white"
+    >
+      <div class="font-semibold text-lg text-white">Contact-1234567890</div>
+
+      <!-- Desktop Top Nav -->
+      <div class="hidden md:block">
+        <ul class="flex space-x-6 font-medium text-white">
+          <li
+            class="fa-brands fa-facebook cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-twitter cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-google-plus-g cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-instagram cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-linkedin cursor-pointer hover:text-blue-100"
+          ></li>
+          <li
+            class="fa-brands fa-youtube cursor-pointer hover:text-blue-100"
+          ></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-md fixed w-full h-16 top-0 z-50" id="header">
+      <div
+        class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4"
+      >
+        <!-- Logo -->
+        <a href="./home.html" class="flex items-center">
+          <img src="../public/assets/logo.png" alt="Logo" class="h-10 w-auto" />
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav
+          class="hidden md:flex space-x-8 items-center font-thin text-gray-500"
+        >
+          <!-- Home -->
+          <a href="./home.html" class="hover:text-blue-600">Home</a>
+
+          <!-- Doctor Dropdown -->
+          <div class="relative group">
+            <button
+              class="flex items-center hover:text-blue-600 focus:outline-none"
+            >
+              Doctor <i class="fas fa-chevron-down ml-1 text-sm"></i>
+            </button>
+
+            <!-- First Dropdown (Departments) -->
+            <div
+              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
+            >
+              <!-- Cardiology Submenu -->
+              <div class="relative group/cardio">
+                <a
+                  href="./doctors.html"
+                  class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
+                >
+                  Cardiology <i class="fas fa-chevron-right text-sm"></i>
+                </a>
+                <div
+                  class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/cardio:opacity-100 group-hover/cardio:visible transition-all duration-300 ease-in-out"
+                >
+                  <a
+                    href="./doctor-dr-smith.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Smith</a
+                  >
+                  <a
+                    href="./doctor-dr-jones.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Jones</a
+                  >
+                </div>
+              </div>
+
+              <!-- Neurology Submenu -->
+              <div class="relative group/neuro">
+                <a
+                  href="./doctors.html"
+                  class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
+                >
+                  Neurology <i class="fas fa-chevron-right text-sm"></i>
+                </a>
+                <div
+                  class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/neuro:opacity-100 group-hover/neuro:visible transition-all duration-300 ease-in-out"
+                >
+                  <a
+                    href="./doctor-dr-williams.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Williams</a
+                  >
+                  <a
+                    href="./doctor-dr-miller.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Miller</a
+                  >
+                </div>
+              </div>
+
+              <!-- Pediatrics Submenu -->
+              <div class="relative group/pedia">
+                <a
+                  href="./doctors.html"
+                  class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
+                >
+                  Pediatrics <i class="fas fa-chevron-right text-sm"></i>
+                </a>
+                <div
+                  class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/pedia:opacity-100 group-hover/pedia:visible transition-all duration-300 ease-in-out"
+                >
+                  <a
+                    href="./doctor-dr-brown.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Brown</a
+                  >
+                  <a
+                    href="./doctor-dr-davis.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Davis</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Department Dropdown -->
+          <div class="relative group">
+            <button
+              class="flex items-center hover:text-blue-600 focus:outline-none"
+            >
+              Department <i class="fas fa-chevron-down ml-1 text-sm"></i>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div
+              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
+            >
+              <a
+                href="./departments.html"
+                class="block px-4 py-2 hover:bg-gray-100"
+              >
+                Cardiology
+              </a>
+              <a
+                href="./departments.html"
+                class="block px-4 py-2 hover:bg-gray-100"
+              >
+                Neurology
+              </a>
+              <a
+                href="./departments.html"
+                class="block px-4 py-2 hover:bg-gray-100"
+              >
+                Pediatrics
+              </a>
+            </div>
+          </div>
+
+          <!-- Other Links -->
+
+          <a href="./gallery.html" class="hover:text-blue-600">Gallery</a>
+          <a href="./services.html" class="hover:text-blue-600">Services</a>
+          <a href="./events.html" class="hover:text-blue-600">Event</a>
+          <!-- Department Dropdown -->
+          <div class="relative group">
+            <button
+              class="flex items-center hover:text-blue-600 focus:outline-none"
+            >
+              Pages <i class="fas fa-chevron-down ml-1 text-sm"></i>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div
+              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
+            >
+              <a href="./" class="block px-4 py-2 hover:bg-gray-100"> Blog </a>
+              <a
+                href="./home.html#appointment-form"
+                class="block px-4 py-2 hover:bg-gray-100"
+              >
+                Book Appointment
+              </a>
+              <a href="./error.html" class="block px-4 py-2 hover:bg-gray-100">
+                404 PAGE
+              </a>
+            </div>
+          </div>
+          <a href="./contact.html" class="hover:text-blue-600">Contact</a>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <button
+          id="mobileMenuToggle"
+          class="md:hidden text-2xl focus:outline-none"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <nav
+        id="mobileMenu"
+        class="hidden flex flex-col space-y-2 bg-white shadow-md items-center justify-center md:hidden mx-auto z-[9999]"
+      >
+        <a href="./index.php" class="block hover:text-blue-600 mx-auto">Home</a>
+
+        <!-- Doctor Dropdown -->
+        <div class="mx-auto">
+          <button
+            class="flex items-center w-full justify-between hover:text-blue-600"
+            data-dropdown
+          >
+            Doctor <i class="fas fa-chevron-down ml-1 text-sm"></i>
+          </button>
+
+          <!-- Departments -->
+          <div class="hidden flex-col pl-4 mt-2 space-y-2" data-dropdown-menu>
+            <!-- Cardiology -->
+            <div>
+              <button
+                class="flex items-center w-full justify-between hover:text-blue-600"
+                data-submenu
+              >
+                Cardiology <i class="fas fa-chevron-down ml-1 text-xs"></i>
+              </button>
+              <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-smith.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Smith</a
+                >
+                <a
+                  href="./doctor-dr-jones.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Jones</a
+                >
+              </div>
+            </div>
+
+            <!-- Neurology -->
+            <div>
+              <button
+                class="flex items-center w-full justify-between hover:text-blue-600"
+                data-submenu
+              >
+                Neurology <i class="fas fa-chevron-down ml-1 text-xs"></i>
+              </button>
+              <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-williams.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Williams</a
+                >
+                <a
+                  href="./doctor-dr-miller.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Miller</a
+                >
+              </div>
+            </div>
+
+            <!-- Pediatrics -->
+            <div>
+              <button
+                class="flex items-center w-full justify-between hover:text-blue-600"
+                data-submenu
+              >
+                Pediatrics <i class="fas fa-chevron-down ml-1 text-xs"></i>
+              </button>
+              <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-brown.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Brown</a
+                >
+                <a
+                  href="./doctor-dr-davis.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Davis</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Department Dropdown -->
+
+        <div class="mx-auto">
+          <button
+            class="flex items-center w-full justify-between hover:text-blue-600"
+            data-dropdown
+          >
+            Department <i class="fas fa-chevron-down ml-1 text-sm"></i>
+          </button>
+          <div class="hidden flex-col pl-4 mt-2 space-y-1" data-submenu-menu>
+            <a href="./departments.html" class="block hover:text-blue-600"
+              >Cardiology</a
+            >
+            <a href="./departments.html" class="block hover:text-blue-600"
+              >Neurology</a
+            >
+            <a href="./departments.html" class="block hover:text-blue-600"
+              >Pediatrics</a
+            >
+          </div>
+        </div>
+
+        <!-- Other Links -->
+        <a href="./portfolio" class="block hover:text-blue-600 mx-auto"
+          >GALLERY</a
+        >
+        <a href="./services.html" class="block hover:text-blue-600 mx-auto"
+          >SERVICES</a
+        >
+        <a href="./events.html" class="block hover:text-blue-600 mx-auto"
+          >EVENT</a
+        >
+        <!-- PAGE Dropdown -->
+
+        <div class="mx-auto">
+          <button
+            class="flex items-center w-full justify-between hover:text-blue-600"
+            data-dropdown
+          >
+            PAGE <i class="fas fa-chevron-down ml-1 text-sm"></i>
+          </button>
+          <div class="hidden flex-col pl-4 mt-2 space-y-1" data-submenu-menu>
+            <a href="./" class="block hover:text-blue-600">BLOG</a>
+            <a
+              href="./home.html#appointment-form"
+              class="block hover:text-blue-600"
+              >Book Appointment</a
+            >
+            <a href="./error.html" class="block hover:text-blue-600"
+              >404 Page</a
+            >
+          </div>
+        </div>
+
+        >
+        <a href="./aboutUs.php" class="block hover:text-blue-600 mx-auto"
+          >CONTACT</a
+        >
+      </nav>
+    </header>
+
+    <!-- Toggle Script -->
+
+    <script>
+      // Mobile menu toggle
+      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      mobileMenuToggle.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+    </script>
+
+    <script>
+      // Main Doctor dropdown
+      document.querySelectorAll("[data-dropdown]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const menu = button.nextElementSibling;
+          menu.classList.toggle("hidden");
+        });
+      });
+
+      // Submenus
+      document.querySelectorAll("[data-submenu]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const submenu = button.nextElementSibling;
+
+          // Close other submenus first
+          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
+            if (menu !== submenu) menu.classList.add("hidden");
+          });
+
+          // Toggle clicked submenu
+          submenu.classList.toggle("hidden");
+        });
+      });
+    </script>
+    <script src="../public/js/script.js"></script>
+
+    <!-- Placeholder for spinner -->
+    <div id="spinner"></div>
+
+    <script>
+      // Load spinner markup
+      fetch("spinner.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("spinner").innerHTML = data;
+
+          // Now spinner is in DOM -> attach JS logic
+          const spinner = document.getElementById("spinner-overlay");
+
+          function showSpinner() {
+            spinner.classList.remove("hidden");
+          }
+          function hideSpinner() {
+            spinner.classList.add("hidden");
+          }
+
+          // Show on links
+          document.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+              if (
+                link.getAttribute("href") !== "#" &&
+                !link.getAttribute("href")?.startsWith("javascript")
+              ) {
+                showSpinner();
+                setTimeout(hideSpinner, 5000); // works now
+              }
+            });
+          });
+
+          // Show on .show-spinner buttons
+          document.querySelectorAll("button.show-spinner").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 5000); // works now
+            });
+          });
+
+          // Show on form submit
+          document.querySelectorAll("form").forEach((form) => {
+            form.addEventListener("submit", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 5000); // works now
+            });
+          });
+
+          // Optional: hide spinner after page load (auto)
+          setTimeout(() => hideSpinner(), 5000);
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <header class="bg-white shadow-md fixed w-full top-0 z-50">
+      <div
+        class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4"
+      >
+        <!-- Logo -->
+        <a href="./index.php" class="flex items-center">
+          <img src="../public/assets/logo.png" alt="Logo" class="h-10 w-auto" />
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex space-x-8 items-center font-medium">
+          <!-- Home -->
+          <a href="./index.php" class="hover:text-blue-600">Home</a>
+
+          <!-- Doctor Dropdown -->
+          <div class="relative group">
+            <button
+              class="flex items-center hover:text-blue-600 focus:outline-none"
+            >
+              Doctor <i class="fas fa-chevron-down ml-1 text-sm"></i>
+            </button>
+
+            <!-- First Dropdown (Departments) -->
+            <div
+              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
+            >
+              <!-- Cardiology Submenu -->
+              <div class="relative group/cardio">
+                <a
+                  href="#"
+                  class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
+                >
+                  Cardiology <i class="fas fa-chevron-right text-sm"></i>
+                </a>
+                <div
+                  class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/cardio:opacity-100 group-hover/cardio:visible transition-all duration-300 ease-in-out"
+                >
+                  <a
+                    href="./doctor-dr-smith.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Smith</a
+                  >
+                  <a
+                    href="./doctor-dr-jones.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Jones</a
+                  >
+                </div>
+              </div>
+
+              <!-- Neurology Submenu -->
+              <div class="relative group/neuro">
+                <a
+                  href="#"
+                  class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
+                >
+                  Neurology <i class="fas fa-chevron-right text-sm"></i>
+                </a>
+                <div
+                  class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/neuro:opacity-100 group-hover/neuro:visible transition-all duration-300 ease-in-out"
+                >
+                  <a
+                    href="./doctor-dr-williams.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Williams</a
+                  >
+                  <a
+                    href="./doctor-dr-miller.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Miller</a
+                  >
+                </div>
+              </div>
+
+              <!-- Pediatrics Submenu -->
+              <div class="relative group/pedia">
+                <a
+                  href="#"
+                  class="flex justify-between items-center px-4 py-2 hover:bg-gray-100"
+                >
+                  Pediatrics <i class="fas fa-chevron-right text-sm"></i>
+                </a>
+                <div
+                  class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/pedia:opacity-100 group-hover/pedia:visible transition-all duration-300 ease-in-out"
+                >
+                  <a
+                    href="./doctor-dr-brown.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Brown</a
+                  >
+                  <a
+                    href="./doctor-dr-davis.php"
+                    class="block px-4 py-2 hover:bg-gray-100"
+                    >Dr. Davis</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Department Dropdown -->
+          <div class="relative group">
+            <button
+              class="flex items-center hover:text-blue-600 focus:outline-none"
+            >
+              Department <i class="fas fa-chevron-down ml-1 text-sm"></i>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div
+              class="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out"
+            >
+              <a
+                href="./cardiology.php"
+                class="block px-4 py-2 hover:bg-gray-100"
+              >
+                Cardiology
+              </a>
+              <a
+                href="./neurology.php"
+                class="block px-4 py-2 hover:bg-gray-100"
+              >
+                Neurology
+              </a>
+              <a
+                href="./pediatrics.php"
+                class="block px-4 py-2 hover:bg-gray-100"
+              >
+                Pediatrics
+              </a>
+            </div>
+          </div>
+
+          <!-- Other Links -->
+
+          <a href="./carrer.php" class="hover:text-blue-600">Careers</a>
+          <a href="./blogs.php" class="hover:text-blue-600">Blogs</a>
+          <a href="./aboutUs.php" class="hover:text-blue-600">About</a>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <button
+          id="mobileMenuToggle"
+          class="md:hidden text-2xl focus:outline-none"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <nav
+        id="mobileMenu"
+        class="hidden flex flex-col space-y-2 bg-white shadow-md align-center justify-center md:hidden mx-auto"
+      >
+        <a href="./index.php" class="block hover:text-blue-600 mx-auto">Home</a>
+
+        <!-- Doctor Dropdown -->
+        <div class=" mx-auto">
+          <button
+            class="flex items-center w-full justify-between hover:text-blue-600"
+            data-dropdown
+          >
+            Doctor <i class="fas fa-chevron-down ml-1 text-sm"></i>
+          </button>
+
+          <!-- Departments -->
+          <div class="hidden flex-col pl-4 mt-2 space-y-2" data-dropdown-menu>
+            <!-- Cardiology -->
+            <div>
+              <button
+                class="flex items-center w-full justify-between hover:text-blue-600"
+                data-submenu
+              >
+                Cardiology <i class="fas fa-chevron-down ml-1 text-xs"></i>
+              </button>
+              <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-smith.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Smith</a
+                >
+                <a
+                  href="./doctor-dr-jones.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Jones</a
+                >
+              </div>
+            </div>
+
+            <!-- Neurology -->
+            <div>
+              <button
+                class="flex items-center w-full justify-between hover:text-blue-600"
+                data-submenu
+              >
+                Neurology <i class="fas fa-chevron-down ml-1 text-xs"></i>
+              </button>
+              <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-williams.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Williams</a
+                >
+                <a
+                  href="./doctor-dr-miller.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Miller</a
+                >
+              </div>
+            </div>
+
+            <!-- Pediatrics -->
+            <div>
+              <button
+                class="flex items-center w-full justify-between hover:text-blue-600"
+                data-submenu
+              >
+                Pediatrics <i class="fas fa-chevron-down ml-1 text-xs"></i>
+              </button>
+              <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-brown.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Brown</a
+                >
+                <a
+                  href="./doctor-dr-davis.php"
+                  class="block hover:text-blue-600"
+                  >Dr. Davis</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Department Dropdown -->
+
+        <div class=" mx-auto">
+           <button
+            class="flex items-center w-full justify-between hover:text-blue-600"
+            data-dropdown
+          >
+            Department <i class="fas fa-chevron-down ml-1 text-sm"></i>
+          </button>
+          <div
+                class="hidden flex-col pl-4 mt-2 space-y-1"
+                data-submenu-menu
+              >
+                <a
+                  href="./doctor-dr-smith.php"
+                  class="block hover:text-blue-600"
+                  >Cardiology</a
+                >
+                <a
+                  href="./doctor-dr-jones.php"
+                  class="block hover:text-blue-600"
+                  >Neurology</a
+                >
+                <a
+                  href="./doctor-dr-jones.php"
+                  class="block hover:text-blue-600"
+                  >Pediatrics</a
+                >
+              </div>
+         
+        </div>
+
+        <!-- Other Links -->
+        <a href="./portfolio.php" class="block hover:text-blue-600  mx-auto"
+          >Portfolio</a
+        >
+        <a href="./carrer.php" class="block hover:text-blue-600  mx-auto">Careers</a>
+        <a href="./blogs.php" class="block hover:text-blue-600  mx-auto">Blogs</a>
+        <a href="./aboutUs.php" class="block hover:text-blue-600  mx-auto">About</a>
+      </nav>
+<script>
+      // Mobile menu toggle
+      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      mobileMenuToggle.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+    
+    </script>
+
+    <script>
+      // Main Doctor dropdown
+      document.querySelectorAll("[data-dropdown]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const menu = button.nextElementSibling;
+          menu.classList.toggle("hidden");
+        });
+      });
+
+      // Submenus
+      document.querySelectorAll("[data-submenu]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const submenu = button.nextElementSibling;
+
+          // Close other submenus first
+          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
+            if (menu !== submenu) menu.classList.add("hidden");
+          });
+
+          // Toggle clicked submenu
+          submenu.classList.toggle("hidden");
+        });
+      });
+    </script>
+    
+    </header>
+
+    
+  </body>
+</html>

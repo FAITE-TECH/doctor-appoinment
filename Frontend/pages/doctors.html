@@ -1,231 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Doctors - MedCare</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+
+    <title>Doctor Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../public/css/styles.css">
-</head>
-<body class="bg-gray-100">
-    <!-- Navigation Header -->
-    <header class="bg-white shadow-lg sticky top-0 z-50">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <a href="./index.html" class="text-2xl font-bold text-blue-600">🏥 MedCare</a>
-                </div>
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!--  Import Header -->
 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="./index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                        <a href="./doctors.html" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Doctors</a>
-                        <a href="./departments.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Departments</a>
-                        <a href="./gallery.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Gallery</a>
-                        <a href="./services.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</a>
-                        <a href="./events.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Events</a>
-                        <a href="./about.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
-                        <a href="./contact.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
-                    </div>
-                </div>
-
-                <!-- Auth Buttons -->
-                <div class="flex items-center space-x-4" id="nav-links">
-                    <a href="./signin.html" class="text-blue-600 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign in</a>
-                    <a href="./signup.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign up</a>
-                    <span id="nav-user-email" class="text-gray-700 text-sm hidden" data-auth="user"></span>
-                    <a href="./admin/index.html" id="adminLink" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors hidden" data-auth="admin">Admin Panel</a>
-                    <button id="signoutBtn" class="bg-gray-900 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors hidden" data-auth="user">Sign out</button>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">Our Expert Doctors</h1>
-            <p class="text-xl text-gray-600">Meet our team of experienced healthcare professionals</p>
-            
-            <!-- Admin Controls - Only visible to admin users -->
-            <div id="adminControls" class="mt-6 hidden" data-auth="admin">
-                <div class="flex justify-center space-x-4">
-                    <button id="addDoctorBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                        + Add New Doctor
-                    </button>
-                    <a href="./admin/doctors.html" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                        Manage Doctors (Admin Panel)
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Doctor Card 1 -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="p-6">
-                    <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <span class="text-3xl">👨‍⚕️</span>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Dr. John Smith</h3>
-                    <p class="text-blue-600 text-center mb-4">Cardiology</p>
-                    <p class="text-gray-600 text-center">Specialized in heart and cardiovascular system treatment with over 15 years of experience.</p>
-                </div>
-            </div>
-
-            <!-- Doctor Card 2 -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="p-6">
-                    <div class="w-24 h-24 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <span class="text-3xl">👩‍⚕️</span>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Dr. Sarah Johnson</h3>
-                    <p class="text-green-600 text-center mb-4">Pediatrics</p>
-                    <p class="text-gray-600 text-center">Expert in medical care for infants, children, and adolescents with a gentle approach.</p>
-                </div>
-            </div>
-
-            <!-- Doctor Card 3 -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="p-6">
-                    <div class="w-24 h-24 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <span class="text-3xl">👨‍⚕️</span>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Dr. Michael Brown</h3>
-                    <p class="text-purple-600 text-center mb-4">Orthopedics</p>
-                    <p class="text-gray-600 text-center">Specialized in bones, joints, and musculoskeletal system treatment.</p>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Add Doctor Modal - Only visible to admin users -->
-    <div id="addDoctorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full" data-auth="admin">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Add New Doctor</h3>
-                <form id="addDoctorForm">
-                    <div class="mb-4">
-                        <label for="doctorName" class="block text-sm font-medium text-gray-700 mb-2">Doctor Name</label>
-                        <input type="text" id="doctorName" name="name" required 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="doctorEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="doctorEmail" name="email" required 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="doctorSpecialization" class="block text-sm font-medium text-gray-700 mb-2">Specialization</label>
-                        <input type="text" id="doctorSpecialization" name="specialization" required 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="doctorPhone" class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                        <input type="tel" id="doctorPhone" name="phone" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="doctorImage" class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
-                        <input type="file" id="doctorImage" name="image" accept="image/*" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <p class="text-xs text-gray-500 mt-1">Upload doctor's profile picture (optional)</p>
-                    </div>
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" id="cancelAddDoctor" 
-                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
-                            Cancel
-                        </button>
-                        <button type="submit" 
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Add Doctor
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script src="../public/js/script.js"></script>
+    <div id="header"></div>
     <script>
-        // Admin functionality for doctors page
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Check authentication status first
-            try {
-                const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=me');
-                const data = await response.json();
-                
-                if (data.authenticated && data.user.role === 'admin') {
-                    // Show admin controls
-                    const adminControls = document.getElementById('adminControls');
-                    if (adminControls) {
-                        adminControls.classList.remove('hidden');
-                        console.log('Admin controls shown for:', data.user.email);
-                    }
-                } else {
-                    console.log('User not admin or not authenticated');
-                }
-            } catch (error) {
-                console.error('Error checking authentication:', error);
-            }
-            
-            const addDoctorBtn = document.getElementById('addDoctorBtn');
-            const addDoctorModal = document.getElementById('addDoctorModal');
-            const cancelAddDoctor = document.getElementById('cancelAddDoctor');
-            const addDoctorForm = document.getElementById('addDoctorForm');
-
-            // Show modal
-            if (addDoctorBtn) {
-                addDoctorBtn.addEventListener('click', function() {
-                    addDoctorModal.classList.remove('hidden');
-                });
-            }
-
-            // Hide modal
-            if (cancelAddDoctor) {
-                cancelAddDoctor.addEventListener('click', function() {
-                    addDoctorModal.classList.add('hidden');
-                    addDoctorForm.reset();
-                });
-            }
-
-            // Handle form submission
-            if (addDoctorForm) {
-                addDoctorForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                                const formData = new FormData(e.target);
-            // Add the image file to formData
-            const imageFile = document.getElementById('doctorImage').files[0];
-            if (imageFile) {
-                formData.append('image', imageFile);
-            }
-
-                    try {
-                                        const response = await fetch('/doctor-appoinment/Backend/api/doctors.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                        if (response.ok) {
-                            alert('Doctor added successfully!');
-                            addDoctorModal.classList.add('hidden');
-                            addDoctorForm.reset();
-                            // Optionally refresh the page or update the doctor list
-                            location.reload();
-                        } else {
-                            const error = await response.json();
-                            alert('Error: ' + (error.error || 'Failed to add doctor'));
-                        }
-                    } catch (error) {
-                        console.error('Error adding doctor:', error);
-                        alert('Error adding doctor. Please try again.');
-                    }
-                });
-            }
+      fetch("header.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("header").innerHTML = data;
         });
     </script>
-</body>
+
+    <div class="relative w-full h-40 max-w-6xl mx-auto">
+      <img
+        src="../public/assets/eyecare.jpg"
+        alt="services"
+        class="w-full h-full object-cover rounded-lg"
+      />
+      <h1
+        class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded"
+      >
+        Doctors
+      </h1>
+    </div>
+
+    <div
+      class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm justify-center max-w-6xl"
+    >
+      <a href="home.html#doctors" class="text-blue-600 hover:underline">Home</a>
+      <span>&gt;</span>
+      <a href="doctors.html" class="text-blue-600 hover:underline">Doctors</a>
+      <span>&gt;</span>
+    </div>
+
+
+    <!-- Filter -->
+    <section id="doctors">
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+        <!-- Filter Buttons -->
+        <div
+          id="doctorFilter"
+          class="flex flex-wrap justify-center gap-4 mb-10"
+        >
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="All"
+          >
+            All
+            <div
+              class="underline  w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Dental"
+          >
+            Dental
+            <div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Neurologist"
+          >
+            Neurologist
+            <div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Pulmonary"
+          >
+            Pulmonary
+            <div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+        </div>
+
+        <!-- Cards Grid -->
+        <div
+          id="doctorContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <script src="doctors-data.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const doctorContainer = document.getElementById("doctorContainer");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+
+        function renderDoctors(filteredDoctors) {
+          // Clear container
+          doctorContainer.innerHTML = "";
+
+          filteredDoctors.forEach((doctor) => {
+            const doctorCard = document.createElement("div");
+            doctorCard.className =
+              "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
+
+            doctorCard.innerHTML = `
+        <!-- Doctor Image Wrapper -->
+        <a href="doctor-details.html?id=${doctor.id}">
+          <div class="relative h-56 w-full overflow-hidden group">
+            <img src="${doctor.img}" alt="${doctor.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          </div>
+        </a>
+
+        <!-- Doctor Content -->
+        <div class="p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
+          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">${doctor.special}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${doctor.description}</p>
+        </div>
+      `;
+
+            doctorContainer.appendChild(doctorCard);
+
+            // Animate card fade in
+            requestAnimationFrame(() => {
+              doctorCard.classList.remove("opacity-0");
+            });
+          });
+        }
+
+        // Initial render - all doctors
+        renderDoctors(doctors);
+
+        // Filter functionality
+        filterButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const filter = btn.dataset.filter;
+
+            
+
+            if (filter === "All") {
+              renderDoctors(doctors);
+            } else {
+              const filteredDoctors = doctors.filter(
+                (d) => d.special === filter
+              );
+              renderDoctors(filteredDoctors);
+            }
+          });
+        });
+      });
+    </script>
+
+        <!-- Filter -->
+
+    <script>
+      const filterButtons = document.querySelectorAll(".filter-btn");
+
+      filterButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          // Hide underline for all buttons
+          filterButtons.forEach((b) =>
+            b.querySelector(".underline").classList.add("hidden")
+          );
+
+          // Show underline for clicked button
+          btn.querySelector(".underline").classList.remove("hidden");
+        });
+      });
+    </script>
+    <style>
+      /* Simple fade-in animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 1.5s ease forwards;
+      }
+    </style>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+    <script>
+      fetch("footer.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("footer").innerHTML = data;
+        });
+    </script>
+
+
+ <!-- Placeholder for spinner -->
+<div id="spinner"></div>
+
+<script>
+  // Load spinner markup
+  fetch("spinner.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("spinner").innerHTML = data;
+
+      // Now spinner is in DOM -> attach JS logic
+      const spinner = document.getElementById("spinner-overlay");
+
+      function showSpinner() {
+        spinner.classList.remove("hidden");
+      }
+      function hideSpinner() {
+        spinner.classList.add("hidden");
+      }
+
+      // Show on links
+    document.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        if (link.getAttribute("href") !== "#" && !link.getAttribute("href")?.startsWith("javascript")) {
+          showSpinner();
+          setTimeout(hideSpinner, 10000); // works now
+        }
+      });
+    });
+
+    // Show on .show-spinner buttons
+    document.querySelectorAll("button.show-spinner").forEach(btn => {
+      btn.addEventListener("click", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Show on form submit
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", () => {
+        showSpinner();
+        setTimeout(hideSpinner, 10000); // works now
+      });
+    });
+
+    // Optional: hide spinner after page load (auto)
+    setTimeout(() => hideSpinner(), 10000);
+    });
+</script>
+
+  </body>
 </html>

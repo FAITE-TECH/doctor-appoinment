@@ -1,124 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery - MedCare</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../public/css/styles.css">
-</head>
-<body class="bg-gray-100">
-    <!-- Navigation Header -->
-    <header class="bg-white shadow-lg sticky top-0 z-50">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <a href="./index.html" class="text-2xl font-bold text-blue-600">🏥 MedCare</a>
-                </div>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="./index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                        <a href="./doctors.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Doctors</a>
-                        <a href="./departments.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Departments</a>
-                        <a href="./gallery.html" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Gallery</a>
-                        <a href="./services.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</a>
-                        <a href="./events.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Events</a>
-                        <a href="./about.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
-                        <a href="./contact.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
-                    </div>
-                </div>
+    <title>Gallery</title>
+  </head>
+  <body>
+    <!-- Header -->
+    <div id="header"></div>
+    <script>
+      fetch("header.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("header").innerHTML = data;
+        });
+    </script>
 
-                <!-- Auth Buttons -->
-                <div class="flex items-center space-x-4" id="nav-links">
-                    <a href="./signin.html" class="text-blue-600 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign in</a>
-                    <a href="./signup.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors" data-auth="guest">Sign up</a>
-                    <span id="nav-user-email" class="text-gray-700 text-sm hidden" data-auth="user"></span>
-                    <a href="./admin/index.html" id="adminLink" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors hidden" data-auth="admin">Admin Panel</a>
-                    <button id="signoutBtn" class="bg-gray-900 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors hidden" data-auth="user">Sign out</button>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <!-- Hero -->
+    <div class="relative w-full h-40 mx-auto">
+      <img
+        src="../public/assets/doctor1.jpg"
+        alt="doctor"
+        class="w-full h-full object-cover rounded-lg"
+      />
+      <h1
+        class="absolute bottom-5 left-20 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded"
+      >
+        Gallery
+      </h1>
+    </div>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">Hospital Gallery</h1>
-            <p class="text-xl text-gray-600">Take a virtual tour of our facilities and medical equipment</p>
+    <!-- Navigation -->
+
+    <div
+      class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm mx-auto justify-center max-w-6xl"
+    >
+      <a href="home.html" class="text-blue-600 hover:underline">Home</a>
+      <span>&gt;</span>
+      <a href="gallery.html" class="text-blue-600 hover:underline">Gallery</a>
+      <span>&gt;</span>
+    </div>
+
+    <section id="doctors">
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+        <!-- Filter Buttons -->
+        <div
+          id="doctorFilter"
+          class="flex flex-wrap justify-center gap-4 mb-10"
+        >
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Doctors"
+          >
+            Doctor
+            <div
+              class="underline  w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Departments"
+          >
+            Departments<div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Services"
+          >
+            Services<div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="Latest News"
+          >
+            Latest News<div
+              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Hospital Building -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="w-full h-64 bg-blue-100 flex items-center justify-center">
-                    <span class="text-6xl">🏥</span>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Hospital Building</h3>
-                    <p class="text-gray-600 text-sm">Modern hospital facility with state-of-the-art infrastructure</p>
-                </div>
-            </div>
+        <!-- Cards Grid -->
+        <div
+          id="cardsContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500"
+        ></div>
+      </div>
+    </section>
 
-            <!-- Operating Room -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="w-full h-64 bg-green-100 flex items-center justify-center">
-                    <span class="text-6xl">⚡</span>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Operating Room</h3>
-                    <p class="text-gray-600 text-sm">Advanced surgical suite with modern medical equipment</p>
-                </div>
-            </div>
+    <script src="services-data.js"></script>
+    <script src="doctors-data.js"></script>
+    <script src="departments-data.js"></script>
+    <script src="latestNews-data.js"></script>
 
-            <!-- Laboratory -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="w-full h-64 bg-purple-100 flex items-center justify-center">
-                    <span class="text-6xl">🧪</span>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Laboratory</h3>
-                    <p class="text-gray-600 text-sm">Fully equipped laboratory for accurate diagnostics</p>
-                </div>
-            </div>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cardsContainer = document.getElementById("cardsContainer");
+    const filterButtons = document.querySelectorAll(".filter-btn");
 
-            <!-- Radiology Department -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="w-full h-64 bg-yellow-100 flex items-center justify-center">
-                    <span class="text-6xl">📷</span>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Radiology Department</h3>
-                    <p class="text-gray-600 text-sm">Advanced imaging technology for precise diagnosis</p>
-                </div>
-            </div>
+    // Helper: animate cards in
+    function animateIn(card) {
+      card.classList.add("opacity-0", "translate-y-10", "scale-95");
+      requestAnimationFrame(() => {
+        card.classList.remove("opacity-0", "translate-y-10", "scale-95");
+      });
+    }
 
-            <!-- Patient Room -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="w-full h-64 bg-pink-100 flex items-center justify-center">
-                    <span class="text-6xl">🛏️</span>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Patient Room</h3>
-                    <p class="text-gray-600 text-sm">Comfortable and well-equipped patient accommodation</p>
-                </div>
-            </div>
+    // Helper: animate cards out (before new content comes in)
+    function animateOut(callback) {
+      const cards = [...cardsContainer.children];
+      let finished = 0;
 
-            <!-- Emergency Department -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="w-full h-64 bg-red-100 flex items-center justify-center">
-                    <span class="text-6xl">🚨</span>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Emergency Department</h3>
-                    <p class="text-gray-600 text-sm">24/7 emergency care with rapid response capability</p>
-                </div>
+      if (cards.length === 0) {
+        callback();
+        return;
+      }
+
+      cards.forEach((card) => {
+        card.classList.add("opacity-0", "-translate-y-10", "scale-90", "transition-all", "duration-500");
+        card.addEventListener(
+          "transitionend",
+          () => {
+            finished++;
+            if (finished === cards.length) {
+              callback();
+            }
+          },
+          { once: true }
+        );
+      });
+    }
+
+    // Render function with smooth transition
+    function renderCards(data, type) {
+      animateOut(() => {
+        cardsContainer.innerHTML = ""; // clear after out animation
+
+        if (!data || data.length === 0) {
+          cardsContainer.innerHTML = `<p class="col-span-full text-red-500 font-semibold">No ${type} found.</p>`;
+          return;
+        }
+
+        data.forEach((item, index) => {
+          const card = document.createElement("div");
+          card.className =
+            "bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 transform";
+
+          card.innerHTML = `
+            <a href="${type.toLowerCase()}-details.html?id=${item.id}">
+              <div class="relative h-56 w-full overflow-hidden group">
+                <img src="${item.img}" alt="${item.name || item.type}" 
+                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+              </div>
+            </a>
+            <div class="p-6 flex flex-col flex-grow">
+              <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">
+                ${item.name || item.type || item.title}
+              </h3>
+              <p class="text-gray-600 text-sm clamp-6 leading-relaxed">
+                ${item.description || ""}
+              </p>
+              <p class="text-gray-900 text-sm mt-4 text-start leading-">
+                ${item.date || ""}
+              </p>
             </div>
-        </div>
-    </main>
+          `;
+
+          cardsContainer.appendChild(card);
+
+          // Stagger animation slightly for nice effect
+          setTimeout(() => animateIn(card), index * 100);
+        });
+      });
+    }
+
+    // Default load Doctors
+    renderCards(doctors, "Doctors");
+
+    // Handle filter button clicks
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const filter = btn.dataset.filter;
+
+        if (filter === "Doctors") renderCards(doctors, "Doctors");
+        else if (filter === "Departments") renderCards(departments, "Departments");
+        else if (filter === "Services") renderCards(services, "Services");
+        else if (filter === "Latest News") renderCards(latestNews, "Latest News");
+
+        // Underline toggle
+        filterButtons.forEach((b) => {
+          const underline = b.querySelector(".underline");
+          if (underline) underline.classList.add("hidden");
+        });
+
+        const activeUnderline = btn.querySelector(".underline");
+        if (activeUnderline) activeUnderline.classList.remove("hidden");
+      });
+    });
+  });
+</script>
+
+
+
+    <!-- Footer -->
+    <div id="footer"></div>
+    <script>
+      fetch("footer.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("footer").innerHTML = data;
+        });
+    </script>
+
+    <!--  Spinner -->
+    <div id="spinner"></div>
+
+    <script>
+      // Load spinner markup
+      fetch("spinner.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("spinner").innerHTML = data;
+
+          // Now spinner is in DOM -> attach JS logic
+          const spinner = document.getElementById("spinner-overlay");
+
+          function showSpinner() {
+            spinner.classList.remove("hidden");
+          }
+          function hideSpinner() {
+            spinner.classList.add("hidden");
+          }
+
+          // Show on links
+          document.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+              if (
+                link.getAttribute("href") !== "#" &&
+                !link.getAttribute("href")?.startsWith("javascript")
+              ) {
+                showSpinner();
+                setTimeout(hideSpinner, 10000); // works now
+              }
+            });
+          });
+
+          // Show on .show-spinner buttons
+          document.querySelectorAll("button.show-spinner").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000); // works now
+            });
+          });
+
+          // Show on form submit
+          document.querySelectorAll("form").forEach((form) => {
+            form.addEventListener("submit", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000); // works now
+            });
+          });
+
+          // Optional: hide spinner after page load (auto)
+          setTimeout(() => hideSpinner(), 10000);
+        });
+    </script>
 
     <script src="../public/js/script.js"></script>
-</body>
+  </body>
 </html>
