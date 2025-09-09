@@ -7,11 +7,28 @@ ini_set('log_errors', 1);
 header('Content-Type: application/json');
 
 // Include session configuration first
-include('../includes/session_config.php');
+$sessionConfigPath = __DIR__ . '/../includes/session_config.php';
+if (file_exists($sessionConfigPath)) {
+    include($sessionConfigPath);
+} else {
+    // Fallback for different server configurations
+    include('../includes/session_config.php');
+}
 
 // Your existing includes
-include('../includes/db.php');
-include('../includes/functions.php');
+$dbPath = __DIR__ . '/../includes/db.php';
+if (file_exists($dbPath)) {
+    include($dbPath);
+} else {
+    include('../includes/db.php');
+}
+
+$functionsPath = __DIR__ . '/../includes/functions.php';
+if (file_exists($functionsPath)) {
+    include($functionsPath);
+} else {
+    include('../includes/functions.php');
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : '';

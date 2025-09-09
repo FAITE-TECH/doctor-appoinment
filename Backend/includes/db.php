@@ -7,8 +7,13 @@ $dbname = "doctor";
 $socket = "/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock";
 
 try {
-    // Create connection with socket
+    // Try connection with socket first, then fallback to port
     $conn = new mysqli($servername, $username, $password, $dbname, 3306, $socket);
+    
+    // If socket connection fails, try with port only
+    if ($conn->connect_error) {
+        $conn = new mysqli($servername, $username, $password, $dbname, 3306);
+    }
     
     // Check connection
     if ($conn->connect_error) {
