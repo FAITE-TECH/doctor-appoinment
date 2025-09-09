@@ -103,15 +103,39 @@ switch ($method) {
             if (!in_array($_FILES['image']['type'], $allowed)) {
                 json_response(['error' => 'Invalid image type'], 422);
             }
-            $uploadDir = __DIR__ . '/../../uploads/events/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+            // Build upload directory path
+            $uploadDir = realpath(__DIR__ . '/../../uploads');
+            if ($uploadDir === false) {
+                // Create uploads directory if it doesn't exist
+                $uploadDir = __DIR__ . '/../../uploads';
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $eventUploadDir = $uploadDir . '/events/';
+            if (!is_dir($eventUploadDir)) {
+                if (!mkdir($eventUploadDir, 0755, true)) {
+                    json_response(['error' => 'Failed to create events upload directory'], 500);
+                }
+            }
+
+            if (!is_writable($eventUploadDir)) {
+                json_response(['error' => 'Upload directory is not writable: ' . $eventUploadDir], 500);
+            }
+
             $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
             $filename = uniqid('', true) . '.' . $ext;
-            $dest = $uploadDir . $filename;
+            $dest = $eventUploadDir . $filename;
+
             if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
-                json_response(['error' => 'Failed to upload image'], 500);
+                json_response([
+                    'error' => 'Failed to move uploaded image',
+                    'tmp_file' => $_FILES['image']['tmp_name'],
+                    'dest' => $dest
+                ], 500);
             }
-            $imagePath = $filename;
+
+            $imagePath = $filename; // Only store filename in DB
         }
         
         $stmt = $conn->prepare('INSERT INTO events (title, description, event_date, event_time, location, image_path) VALUES (?, ?, ?, ?, ?, ?)');

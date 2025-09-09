@@ -106,7 +106,7 @@
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <h3 id="modalTitle" class="text-lg font-medium text-gray-900 mb-4">Add Department</h3>
-                <form id="departmentForm">
+                <form id="departmentForm" enctype="multipart/form-data">
                     <input type="hidden" id="departmentId" name="id">
                     <div class="mb-4">
                         <label for="departmentName" class="block text-sm font-medium text-gray-700 mb-2">Department Name</label>
@@ -117,6 +117,11 @@
                         <label for="departmentDescription" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
                         <textarea id="departmentDescription" name="description" rows="3" required
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="departmentImage" class="block text-sm font-medium text-gray-700 mb-2">Image (optional)</label>
+                        <input type="file" id="departmentImage" name="image" accept="image/*"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
                     </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" id="cancelDepartmentBtn" 
@@ -253,12 +258,6 @@
         document.getElementById('departmentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = new FormData(e.target);
-            const departmentData = {
-                name: formData.get('name'),
-                description: formData.get('description')
-            };
-
             try {
                 const url = editingDepartmentId 
                     ? `/doctor-appoinment/Backend/api/departments.php?id=${editingDepartmentId}`
@@ -266,12 +265,29 @@
                 
                 const method = editingDepartmentId ? 'PUT' : 'POST';
                 
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(departmentData)
-                });
+                let response;
+                if (editingDepartmentId) {
+                    // Keep edit as JSON
+                    const formData = new FormData(e.target);
+                    const departmentData = {
+                        name: formData.get('name'),
+                        description: formData.get('description')
+                    };
+                    response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(departmentData)
+                    });
+                } else {
+                    // Create with multipart for image
+                    const formData = new FormData(e.target);
+                    response = await fetch(url, {
+                        method: method,
+                        credentials: 'include',
+                        body: formData
+                    });
+                }
 
                 if (response.ok) {
                     hideDepartmentModal();

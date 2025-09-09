@@ -178,14 +178,10 @@ if ($method === 'POST' && $action === 'add_doctor') {
 
     // Helper: ensure column exists
     $ensureColumn = function($table, $column, $definition) {
-        $stmt = $GLOBALS['conn']->prepare("SHOW COLUMNS FROM $table LIKE ?");
-        $stmt->bind_param('s', $column);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $GLOBALS['conn']->query("SHOW COLUMNS FROM `$table` LIKE '$column'");
         $exists = $result && $result->num_rows > 0;
-        $stmt->close();
         if (!$exists) {
-            $GLOBALS['conn']->query("ALTER TABLE $table ADD COLUMN $column $definition");
+            $GLOBALS['conn']->query("ALTER TABLE `$table` ADD COLUMN `$column` $definition");
         }
     };
 
@@ -201,17 +197,12 @@ if ($method === 'POST' && $action === 'add_doctor') {
 
     // Relax legacy NOT NULL on user_id to allow admin-created doctors without a linked user
     try {
-        $colCheck = $GLOBALS['conn']->prepare("SHOW COLUMNS FROM doctors LIKE 'user_id'");
-        if ($colCheck) {
-            $colCheck->execute();
-            $colRes = $colCheck->get_result();
-            if ($colRes && ($colInfo = $colRes->fetch_assoc())) {
-                if (isset($colInfo['Null']) && strtoupper($colInfo['Null']) === 'NO') {
-                    // Make user_id nullable if it was defined NOT NULL
-                    $GLOBALS['conn']->query('ALTER TABLE doctors MODIFY user_id INT NULL');
-                }
+        $colRes = $GLOBALS['conn']->query("SHOW COLUMNS FROM doctors LIKE 'user_id'");
+        if ($colRes && ($colInfo = $colRes->fetch_assoc())) {
+            if (isset($colInfo['Null']) && strtoupper($colInfo['Null']) === 'NO') {
+                // Make user_id nullable if it was defined NOT NULL
+                $GLOBALS['conn']->query('ALTER TABLE doctors MODIFY user_id INT NULL');
             }
-            $colCheck->close();
         }
     } catch (Exception $e) {
         // If this fails, continue; insert may still work if schema already compatible
@@ -225,13 +216,21 @@ if ($method === 'POST' && $action === 'add_doctor') {
         $specialization = trim($_POST['specialization'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
         $description = trim($_POST['description'] ?? '');
-        $departmentId = isset($_POST['department_id']) ? intval($_POST['department_id']) : null;
+        $departmentId = isset($_POST['department_id']) && !empty($_POST['department_id']) ? intval($_POST['department_id']) : null;
 
         if ($name === '' || $email === '' || $specialization === '') {
             json_response(['error' => 'Name, email, and specialization are required'], 422);
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             json_response(['error' => 'Invalid email format'], 422);
+        }
+        
+        // Validate department_id if provided
+        if ($departmentId !== null) {
+            $deptCheck = $GLOBALS['conn']->query("SELECT id FROM departments WHERE id = $departmentId");
+            if (!$deptCheck || $deptCheck->num_rows === 0) {
+                json_response(['error' => 'Invalid department selected'], 422);
+            }
         }
 
         $imagePath = null;
@@ -273,9 +272,21 @@ if ($method === 'PUT' && $action === 'update_doctor') {
     checkAdminAuth();
     $body = get_json_body();
     require_fields($body, ['id','name','email','specialization','phone']);
+    
+    // Handle optional department_id
+    $departmentId = isset($body['department_id']) && !empty($body['department_id']) ? intval($body['department_id']) : null;
+    
+    // Validate department_id if provided
+    if ($departmentId !== null) {
+        $deptCheck = $GLOBALS['conn']->query("SELECT id FROM departments WHERE id = $departmentId");
+        if (!$deptCheck || $deptCheck->num_rows === 0) {
+            json_response(['error' => 'Invalid department selected'], 422);
+        }
+    }
+    
     try {
-        $stmt = $GLOBALS['conn']->prepare('UPDATE doctors SET name=?, email=?, specialization=?, phone=? WHERE id=?');
-        $stmt->bind_param('ssssi', $body['name'], $body['email'], $body['specialization'], $body['phone'], $body['id']);
+        $stmt = $GLOBALS['conn']->prepare('UPDATE doctors SET name=?, email=?, specialization=?, phone=?, department_id=? WHERE id=?');
+        $stmt->bind_param('ssssii', $body['name'], $body['email'], $body['specialization'], $body['phone'], $departmentId, $body['id']);
         
         if ($stmt->execute()) {
             json_response(['success'=>true,'message'=>'Doctor updated successfully']);
@@ -311,6 +322,25 @@ if ($method === 'DELETE' && $action === 'delete_doctor') {
 // ==============================
 if ($method === 'GET' && $action === 'get_departments') getTableData('departments','name');
 if ($method === 'POST' && $action === 'add_department') addTableRow('departments',['name','description']);
+
+// Get departments for dropdown (simplified version for frontend)
+if ($method === 'GET' && $action === 'get_departments_dropdown') {
+    checkAdminAuth();
+    try {
+        $sql = "SELECT id, name FROM departments ORDER BY name ASC";
+        $stmt = $GLOBALS['conn']->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $departments = [];
+        while ($row = $result->fetch_assoc()) {
+            $departments[] = $row;
+        }
+        json_response(['success' => true, 'departments' => $departments]);
+    } catch (Exception $e) {
+        json_response(['error' => 'Failed to load departments: ' . $e->getMessage()], 500);
+    }
+}
 
 // ==============================
 // Services CRUD

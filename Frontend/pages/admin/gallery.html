@@ -262,8 +262,6 @@
         document.getElementById('imageForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = new FormData(e.target);
-            
             try {
                 const url = editingImageId 
                     ? `/doctor-appoinment/Backend/api/gallery.php?id=${editingImageId}`
@@ -271,18 +269,40 @@
                 
                 const method = editingImageId ? 'PUT' : 'POST';
                 
-                const response = await fetch(url, {
-                    method: method,
-                    credentials: 'include',
-                    body: formData
-                });
+                let response;
+                if (editingImageId) {
+                    // Edit via JSON (no file upload)
+                    const imageData = {
+                        title: document.getElementById('imageTitle').value,
+                        description: document.getElementById('imageDescription').value
+                    };
+                    response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(imageData)
+                    });
+                } else {
+                    // Create via FormData (with file upload)
+                    const formData = new FormData(e.target);
+                    response = await fetch(url, {
+                        method: method,
+                        credentials: 'include',
+                        body: formData
+                    });
+                }
 
                 if (response.ok) {
                     hideImageModal();
                     loadGallery();
+                } else {
+                    const errorData = await response.json();
+                    console.error('Error saving image:', errorData);
+                    alert('Error: ' + (errorData.error || 'Failed to save image'));
                 }
             } catch (error) {
                 console.error('Error saving image:', error);
+                alert('Error: ' + error.message);
             }
         });
 

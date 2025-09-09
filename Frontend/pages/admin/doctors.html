@@ -91,12 +91,12 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialization</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-        
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="doctorsTableBody" class="bg-white divide-y divide-gray-200">
                             <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">Loading...</td>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -111,7 +111,7 @@
     <div id="addDoctorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow w-full max-w-2xl mx-4">
             <div class="flex items-center justify-between px-6 py-4 border-b">
-                <h3 class="text-lg font-semibold">Add Doctor</h3>
+                <h3 id="doctorModalTitle" class="text-lg font-semibold">Add Doctor</h3>
                 <button id="closeAddDoctorModal" class="text-gray-500 hover:text-gray-700">✕</button>
             </div>
             <form id="addDoctorForm" enctype="multipart/form-data" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -119,7 +119,9 @@
                 <input type="email" name="email" placeholder="Email" required class="px-3 py-2 border rounded">
                 <input type="text" name="specialization" placeholder="Specialization" required class="px-3 py-2 border rounded">
                 <input type="text" name="phone" placeholder="Phone" class="px-3 py-2 border rounded">
-                <input type="text" name="department_id" placeholder="Department ID" class="px-3 py-2 border rounded">
+                <select name="department_id" class="px-3 py-2 border rounded">
+                    <option value="">Select Department (Optional)</option>
+                </select>
                 <input type="text" name="description" placeholder="Description" class="px-3 py-2 border rounded md:col-span-2">
                 <input type="file" name="image" accept="image/*" class="px-3 py-2 border rounded md:col-span-2">
                 <div class="md:col-span-2 flex justify-end gap-3">
@@ -137,6 +139,8 @@
             constructor() {
                 this.apiBase = '/doctor-appoinment/Backend/api/admin.php';
                 this.doctors = [];
+                this.departments = [];
+                this.editingDoctorId = null;
                 this.init();
             }
 
@@ -150,8 +154,44 @@
                     }
                 }
                 
+                await this.loadDepartments();
                 await this.loadDoctors();
                 this.setupEventListeners();
+            }
+
+            async loadDepartments() {
+                try {
+                    const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=get_departments_dropdown', {
+                        credentials: 'include',
+                        cache: 'no-cache'
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            this.departments = data.departments;
+                            this.populateDepartmentDropdown();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load departments:', error);
+                }
+            }
+
+            populateDepartmentDropdown() {
+                const select = document.querySelector('select[name="department_id"]');
+                if (!select) return;
+                
+                // Clear existing options except the first one
+                select.innerHTML = '<option value="">Select Department (Optional)</option>';
+                
+                // Add department options
+                this.departments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.id;
+                    option.textContent = dept.name;
+                    select.appendChild(option);
+                });
             }
 
             async loadDoctors() {
@@ -182,7 +222,7 @@
                 const tbody = document.getElementById('doctorsTableBody');
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center">
+                        <td colspan="5" class="px-6 py-4 text-center">
                             <div class="text-gray-500 mb-2">Authentication required to view doctors</div>
                             <a href="../signin.html" class="text-blue-600 hover:text-blue-800 underline">Click here to login</a>
                         </td>
@@ -212,7 +252,10 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900">${doctor.phone}</div>
                         </td>
-
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3" onclick='doctorsManager.openEditDoctor(${JSON.stringify("__ID__").replace("\"__ID__\"", String(doctor.id))})'>Edit</button>
+                            <button class="text-red-600 hover:text-red-900" onclick='doctorsManager.deleteDoctor(${JSON.stringify("__ID__\n").replace("\"__ID__\\n\"", String(doctor.id))})'>Delete</button>
+                        </td>
                     </tr>
                 `).join('');
             }
@@ -235,6 +278,9 @@
                         modal.classList.add('hidden');
                         modal.classList.remove('flex');
                     }
+                    this.editingDoctorId = null;
+                    document.getElementById('doctorModalTitle').textContent = 'Add Doctor';
+                    form.reset();
                 };
 
                 if (openBtn) openBtn.addEventListener('click', openModal);
@@ -244,26 +290,104 @@
                 if (form) {
                     form.addEventListener('submit', async (e) => {
                         e.preventDefault();
-                        const formData = new FormData(form);
-                        try {
-                            const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=add_doctor', {
-                                method: 'POST',
-                                credentials: 'include',
-                                body: formData
-                            });
-                            const data = await response.json();
-                            if (response.ok && data.success) {
-                                form.reset();
-                                closeModal();
-                                await this.loadDoctors();
-                            } else {
-                                alert(data.error || 'Failed to add doctor');
+                        if (this.editingDoctorId) {
+                            // Update via JSON (ignore image during edit for now)
+                            const fd = new FormData(form);
+                            const payload = {
+                                id: this.editingDoctorId,
+                                name: fd.get('name') || '',
+                                email: fd.get('email') || '',
+                                specialization: fd.get('specialization') || '',
+                                phone: fd.get('phone') || '',
+                                department_id: fd.get('department_id') || null
+                            };
+                            try {
+                                const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=update_doctor', {
+                                    method: 'PUT',
+                                    credentials: 'include',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(payload)
+                                });
+                                const data = await response.json();
+                                if (response.ok && data.success) {
+                                    closeModal();
+                                    await this.loadDoctors();
+                                } else {
+                                    alert(data.error || 'Failed to update doctor');
+                                }
+                            } catch (err) {
+                                console.error('Update doctor failed:', err);
+                                alert('Failed to update doctor');
                             }
-                        } catch (err) {
-                            console.error('Add doctor failed:', err);
-                            alert('Failed to add doctor');
+                        } else {
+                            // Create via multipart FormData (supports image)
+                            const formData = new FormData(form);
+                            try {
+                                const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=add_doctor', {
+                                    method: 'POST',
+                                    credentials: 'include',
+                                    body: formData
+                                });
+                                const data = await response.json();
+                                if (response.ok && data.success) {
+                                    form.reset();
+                                    closeModal();
+                                    await this.loadDoctors();
+                                } else {
+                                    alert(data.error || 'Failed to add doctor');
+                                }
+                            } catch (err) {
+                                console.error('Add doctor failed:', err);
+                                alert('Failed to add doctor');
+                            }
                         }
                     });
+                }
+            }
+
+            openEditDoctor(id) {
+                const modal = document.getElementById('addDoctorModal');
+                const form = document.getElementById('addDoctorForm');
+                const title = document.getElementById('doctorModalTitle');
+                const doctor = this.doctors.find(d => String(d.id) === String(id));
+                if (!doctor) return;
+                this.editingDoctorId = id;
+                if (title) title.textContent = 'Edit Doctor';
+                if (form) {
+                    form.querySelector('input[name="name"]').value = doctor.name || '';
+                    form.querySelector('input[name="email"]').value = doctor.email || '';
+                    form.querySelector('input[name="specialization"]').value = doctor.specialization || '';
+                    form.querySelector('input[name="phone"]').value = doctor.phone || '';
+                    form.querySelector('input[name="description"]').value = doctor.description || '';
+                    
+                    // Set department dropdown
+                    const departmentSelect = form.querySelector('select[name="department_id"]');
+                    if (departmentSelect) {
+                        departmentSelect.value = doctor.department_id || '';
+                    }
+                }
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+            }
+
+            async deleteDoctor(id) {
+                if (!confirm('Are you sure you want to delete this doctor?')) return;
+                try {
+                    const resp = await fetch(`/doctor-appoinment/Backend/api/admin.php?action=delete_doctor&id=${id}`, {
+                        method: 'DELETE',
+                        credentials: 'include'
+                    });
+                    const data = await resp.json();
+                    if (resp.ok && data.success) {
+                        await this.loadDoctors();
+                    } else {
+                        alert(data.error || 'Failed to delete doctor');
+                    }
+                } catch (e) {
+                    console.error('Delete doctor failed:', e);
+                    alert('Failed to delete doctor');
                 }
             }
 

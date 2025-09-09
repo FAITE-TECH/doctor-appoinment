@@ -106,15 +106,18 @@ switch ($method) {
             json_response(['error' => 'Image ID is required'], 422);
         }
 
-        // Handle FormData (from JS fetch)
-        parse_str(file_get_contents("php://input"), $putVars);
-
-        // Support both JSON and FormData
-        if (empty($putVars)) {
+        // Handle both FormData and JSON requests
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        
+        if (strpos($contentType, 'application/json') !== false) {
+            // JSON request
             $body = get_json_body();
             $title = trim($body['title'] ?? '');
             $description = trim($body['description'] ?? '');
         } else {
+            // FormData request - parse from php://input
+            $input = file_get_contents("php://input");
+            parse_str($input, $putVars);
             $title = trim($putVars['title'] ?? '');
             $description = trim($putVars['description'] ?? '');
         }
