@@ -137,7 +137,7 @@
     <script>
         class DoctorsManager {
             constructor() {
-                this.apiBase = '/doctor-appoinment/Backend/api/admin.php';
+                this.apiBase = '/Backend/api/admin.php';
                 this.doctors = [];
                 this.departments = [];
                 this.editingDoctorId = null;
@@ -161,7 +161,7 @@
 
             async loadDepartments() {
                 try {
-                    const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=get_departments_dropdown', {
+                    const response = await fetch('/Backend/api/admin.php?action=get_departments_dropdown', {
                         credentials: 'include',
                         cache: 'no-cache'
                     });
@@ -196,7 +196,7 @@
 
             async loadDoctors() {
                 try {
-                    const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=get_doctors', {
+                    const response = await fetch('/Backend/api/admin.php?action=get_doctors', {
                         credentials: 'include',
                         cache: 'no-cache'
                     });
@@ -302,7 +302,7 @@
                                 department_id: fd.get('department_id') || null
                             };
                             try {
-                                const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=update_doctor', {
+                                const response = await fetch('/Backend/api/admin.php?action=update_doctor', {
                                     method: 'PUT',
                                     credentials: 'include',
                                     headers: { 'Content-Type': 'application/json' },
@@ -323,7 +323,7 @@
                             // Create via multipart FormData (supports image)
                             const formData = new FormData(form);
                             try {
-                                const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=add_doctor', {
+                                const response = await fetch('/Backend/api/admin.php?action=add_doctor', {
                                     method: 'POST',
                                     credentials: 'include',
                                     body: formData
@@ -375,7 +375,7 @@
             async deleteDoctor(id) {
                 if (!confirm('Are you sure you want to delete this doctor?')) return;
                 try {
-                    const resp = await fetch(`/doctor-appoinment/Backend/api/admin.php?action=delete_doctor&id=${id}`, {
+                    const resp = await fetch(`/Backend/api/admin.php?action=delete_doctor&id=${id}`, {
                         method: 'DELETE',
                         credentials: 'include'
                     });

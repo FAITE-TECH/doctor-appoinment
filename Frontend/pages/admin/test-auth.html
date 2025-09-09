@@ -83,7 +83,7 @@
 
         async function testAuthAPI() {
             try {
-                const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=me', {
+                const response = await fetch('/Backend/api/auth.php?action=me', {
                     credentials: 'include'
                 });
                 const data = await response.json();
@@ -95,7 +95,7 @@
 
         async function testAdminAPI() {
             try {
-                const response = await fetch('/doctor-appoinment/Backend/api/admin.php?action=dashboard_stats', {
+                const response = await fetch('/Backend/api/admin.php?action=dashboard_stats', {
                     credentials: 'include'
                 });
                 const data = await response.json();
@@ -107,7 +107,7 @@
 
         async function testLogout() {
             try {
-                const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=signout', {
+                const response = await fetch('/Backend/api/auth.php?action=signout', {
                     method: 'POST',
                     credentials: 'include'
                 });
