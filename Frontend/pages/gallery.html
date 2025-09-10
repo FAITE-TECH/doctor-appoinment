@@ -16,45 +16,47 @@
     <!-- Header -->
     <div id="header"></div>
     <script>
-  fetch("header.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("header").innerHTML = data;
+      fetch("header.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("header").innerHTML = data;
 
-      // === Mobile menu toggle ===
-      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-      const mobileMenu = document.getElementById("mobileMenu");
+          // === Mobile menu toggle ===
+          const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+          const mobileMenu = document.getElementById("mobileMenu");
 
-      if (mobileMenuToggle && mobileMenu) {
-        mobileMenuToggle.addEventListener("click", () => {
-          mobileMenu.classList.toggle("hidden");
-        });
-      }
+          if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener("click", () => {
+              mobileMenu.classList.toggle("hidden");
+            });
+          }
 
-      // === Main Doctor dropdown ===
-      document.querySelectorAll("[data-dropdown]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const menu = button.nextElementSibling;
-          menu.classList.toggle("hidden");
-        });
-      });
-
-      // === Submenus ===
-      document.querySelectorAll("[data-submenu]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const submenu = button.nextElementSibling;
-
-          // Close other submenus first
-          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
-            if (menu !== submenu) menu.classList.add("hidden");
+          // === Main Doctor dropdown ===
+          document.querySelectorAll("[data-dropdown]").forEach((button) => {
+            button.addEventListener("click", () => {
+              const menu = button.nextElementSibling;
+              menu.classList.toggle("hidden");
+            });
           });
 
-          // Toggle clicked submenu
-          submenu.classList.toggle("hidden");
+          // === Submenus ===
+          document.querySelectorAll("[data-submenu]").forEach((button) => {
+            button.addEventListener("click", () => {
+              const submenu = button.nextElementSibling;
+
+              // Close other submenus first
+              document
+                .querySelectorAll("[data-submenu-menu]")
+                .forEach((menu) => {
+                  if (menu !== submenu) menu.classList.add("hidden");
+                });
+
+              // Toggle clicked submenu
+              submenu.classList.toggle("hidden");
+            });
+          });
         });
-      });
-    });
-</script>
+    </script>
 
     <!-- Hero -->
     <div class="relative w-full h-40 mx-auto">
@@ -94,14 +96,15 @@
           >
             Doctor
             <div
-              class="underline  w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+              class="underline w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
             ></div>
           </button>
           <button
             class="filter-btn relative px-4 py-2 text-black transition"
             data-filter="Departments"
           >
-            Departments<div
+            Departments
+            <div
               class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
             ></div>
           </button>
@@ -109,7 +112,8 @@
             class="filter-btn relative px-4 py-2 text-black transition"
             data-filter="Services"
           >
-            Services<div
+            Services
+            <div
               class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
             ></div>
           </button>
@@ -117,7 +121,8 @@
             class="filter-btn relative px-4 py-2 text-black transition"
             data-filter="Latest News"
           >
-            Latest News<div
+            Latest News
+            <div
               class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
             ></div>
           </button>
@@ -136,60 +141,66 @@
     <script src="departments-data.js"></script>
     <script src="latestNews-data.js"></script>
 
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const cardsContainer = document.getElementById("cardsContainer");
-    const filterButtons = document.querySelectorAll(".filter-btn");
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const cardsContainer = document.getElementById("cardsContainer");
+        const filterButtons = document.querySelectorAll(".filter-btn");
 
-    // Helper: animate cards in
-    function animateIn(card) {
-      card.classList.add("opacity-0", "translate-y-10", "scale-95");
-      requestAnimationFrame(() => {
-        card.classList.remove("opacity-0", "translate-y-10", "scale-95");
-      });
-    }
-
-    // Helper: animate cards out (before new content comes in)
-    function animateOut(callback) {
-      const cards = [...cardsContainer.children];
-      let finished = 0;
-
-      if (cards.length === 0) {
-        callback();
-        return;
-      }
-
-      cards.forEach((card) => {
-        card.classList.add("opacity-0", "-translate-y-10", "scale-90", "transition-all", "duration-500");
-        card.addEventListener(
-          "transitionend",
-          () => {
-            finished++;
-            if (finished === cards.length) {
-              callback();
-            }
-          },
-          { once: true }
-        );
-      });
-    }
-
-    // Render function with smooth transition
-    function renderCards(data, type) {
-      animateOut(() => {
-        cardsContainer.innerHTML = ""; // clear after out animation
-
-        if (!data || data.length === 0) {
-          cardsContainer.innerHTML = `<p class="col-span-full text-red-500 font-semibold">No ${type} found.</p>`;
-          return;
+        // Helper: animate cards in
+        function animateIn(card) {
+          card.classList.add("opacity-0", "translate-y-10", "scale-95");
+          requestAnimationFrame(() => {
+            card.classList.remove("opacity-0", "translate-y-10", "scale-95");
+          });
         }
 
-        data.forEach((item, index) => {
-          const card = document.createElement("div");
-          card.className =
-            "bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 transform";
+        // Helper: animate cards out (before new content comes in)
+        function animateOut(callback) {
+          const cards = [...cardsContainer.children];
+          let finished = 0;
 
-          card.innerHTML = `
+          if (cards.length === 0) {
+            callback();
+            return;
+          }
+
+          cards.forEach((card) => {
+            card.classList.add(
+              "opacity-0",
+              "-translate-y-10",
+              "scale-90",
+              "transition-all",
+              "duration-500"
+            );
+            card.addEventListener(
+              "transitionend",
+              () => {
+                finished++;
+                if (finished === cards.length) {
+                  callback();
+                }
+              },
+              { once: true }
+            );
+          });
+        }
+
+        // Render function with smooth transition
+        function renderCards(data, type) {
+          animateOut(() => {
+            cardsContainer.innerHTML = ""; // clear after out animation
+
+            if (!data || data.length === 0) {
+              cardsContainer.innerHTML = `<p class="col-span-full text-red-500 font-semibold">No ${type} found.</p>`;
+              return;
+            }
+
+            data.forEach((item, index) => {
+              const card = document.createElement("div");
+              card.className =
+                "bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 transform";
+
+              card.innerHTML = `
             <a href="${type.toLowerCase()}-details.html?id=${item.id}">
               <div class="relative h-56 w-full overflow-hidden group">
                 <img src="${item.img}" alt="${item.name || item.type}" 
@@ -209,57 +220,57 @@
             </div>
           `;
 
-          cardsContainer.appendChild(card);
+              cardsContainer.appendChild(card);
 
-          // Stagger animation slightly for nice effect
-          setTimeout(() => animateIn(card), index * 100);
+              // Stagger animation slightly for nice effect
+              setTimeout(() => animateIn(card), index * 100);
+            });
+          });
+        }
+
+        // Default load Doctors
+        renderCards(doctors, "Doctors");
+
+        // Handle filter button clicks
+        filterButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const filter = btn.dataset.filter;
+
+            if (filter === "Doctors") renderCards(doctors, "Doctors");
+            else if (filter === "Departments")
+              renderCards(departments, "Departments");
+            else if (filter === "Services") renderCards(services, "Services");
+            else if (filter === "Latest News")
+              renderCards(latestNews, "Latest News");
+
+            // Underline toggle
+            filterButtons.forEach((b) => {
+              const underline = b.querySelector(".underline");
+              if (underline) underline.classList.add("hidden");
+            });
+
+            const activeUnderline = btn.querySelector(".underline");
+            if (activeUnderline) activeUnderline.classList.remove("hidden");
+          });
         });
       });
-    }
-
-    // Default load Doctors
-    renderCards(doctors, "Doctors");
-
-    // Handle filter button clicks
-    filterButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const filter = btn.dataset.filter;
-
-        if (filter === "Doctors") renderCards(doctors, "Doctors");
-        else if (filter === "Departments") renderCards(departments, "Departments");
-        else if (filter === "Services") renderCards(services, "Services");
-        else if (filter === "Latest News") renderCards(latestNews, "Latest News");
-
-        // Underline toggle
-        filterButtons.forEach((b) => {
-          const underline = b.querySelector(".underline");
-          if (underline) underline.classList.add("hidden");
-        });
-
-        const activeUnderline = btn.querySelector(".underline");
-        if (activeUnderline) activeUnderline.classList.remove("hidden");
-      });
-    });
-  });
-</script>
-
-
+    </script>
 
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-  fetch("footer.html")
-    .then((res) => res.text())
-    .then((data) => {
-      document.getElementById("footer").innerHTML = data;
+      fetch("footer.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("footer").innerHTML = data;
 
-      // Now the footer exists, so set the year
-      const yearSpan = document.getElementById("currentYear");
-      if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-      }
-    });
-</script>
+          // Now the footer exists, so set the year
+          const yearSpan = document.getElementById("currentYear");
+          if (yearSpan) {
+            yearSpan.textContent = new Date().getFullYear();
+          }
+        });
+    </script>
 
     <!--  Spinner -->
     <div id="spinner"></div>
