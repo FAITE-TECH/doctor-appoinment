@@ -1,0 +1,66 @@
+<!-- Navigation Header -->
+<header class="bg-white shadow-md fixed w-full top-0 z-50">
+  <div class="w-full flex justify-between items-center px-2 sm:px-4 lg:px-6 py-4">
+    <!-- Logo -->
+    <a href="./index.html" class="flex items-center space-x-3">
+      <img src="../public/assets/logo.png" alt="HPC Hospital Logo" class="h-12 w-auto" />
+      <div class="flex flex-col">
+        <span class="text-xl font-bold text-blue-600 leading-tight">HPC Hospital</span>
+        <span class="text-xs text-gray-500 leading-tight">Speciality Primary Care</span>
+      </div>
+    </a>
+
+    <!-- Navigation Links -->
+    <nav class="hidden lg:flex items-center space-x-8 font-medium text-gray-600">
+      <a href="./home.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="home">Home</a>
+      <a href="./doctors.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="doctors">Doctors</a>
+      <a href="./departments.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="departments">Departments</a>
+      <a href="./services.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="services">Services</a>
+      <a href="./gallery.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="gallery">Gallery</a>
+      <a href="./events.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="events">Events</a>
+      <a href="./contact.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="contact">Contact</a>
+    </nav>
+
+    <!-- User Authentication -->
+    <div class="flex items-center space-x-3" id="nav-links">
+      <!-- Guest Links -->
+      <a href="./signin.html" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200 px-2 py-1" data-auth="guest">Sign In</a>
+      <a href="./signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium" data-auth="guest">Sign Up</a>
+      
+      <!-- User Links -->
+      <div class="hidden flex items-center space-x-3" data-auth="user">
+        <span id="nav-user-email" class="text-gray-700 font-medium text-sm px-2 py-1"></span>
+        <a href="./home.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">Dashboard</a>
+        <button id="signoutBtn" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors duration-200 font-medium">Sign Out</button>
+      </div>
+
+      <!-- Admin Link -->
+      <a href="./admin/index.html" class="hidden bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200 font-medium" data-auth="admin" id="adminLink">Admin Panel</a>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button id="mobileMenuToggle" class="lg:hidden text-2xl focus:outline-none p-2 hover:bg-gray-100 rounded-md transition-colors duration-200">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <nav id="mobileMenu" class="hidden flex flex-col space-y-1 bg-white shadow-lg border-t border-gray-200 lg:hidden z-[9999] px-4 py-4">
+    <a href="./home.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="home">Home</a>
+    <a href="./doctors.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="doctors">Doctors</a>
+    <a href="./departments.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="departments">Departments</a>
+    <a href="./services.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="services">Services</a>
+    <a href="./gallery.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="gallery">Gallery</a>
+    <a href="./events.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="events">Events</a>
+    <a href="./contact.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="contact">Contact</a>
+    
+    <!-- Mobile Auth Links -->
+    <div class="border-t border-gray-200 pt-4 mt-4">
+      <a href="./signin.html" class="block py-3 px-4 text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-auth="guest">Sign In</a>
+      <a href="./signup.html" class="block py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium text-center" data-auth="guest">Sign Up</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Add top padding to account for fixed header -->
+<div class="pt-24"></div>

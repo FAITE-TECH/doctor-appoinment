@@ -22,10 +22,14 @@
   <body>
     <div id="header"></div>
     <script>
-      fetch("header.html")
+      fetch("shared-nav.html")
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
+          // Initialize navigation after it's loaded
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
         });
     </script>
 
@@ -60,38 +64,80 @@
        
       </div>
     </section>
-    <script src="services-data.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
+      // Global variable to store events data
+      let events = [];
+
+      // Fetch events from API
+      async function fetchEvents() {
+        try {
+          const response = await fetch('../../Backend/api/events.php?action=public');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            events = data.data;
+            renderEvents();
+          } else {
+            console.error('Failed to fetch events:', data.message);
+            // Fallback to empty state
+            const serviceContainer = document.getElementById("serviceContainer");
+            serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No events available at the moment.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching events:', error);
+          // Fallback to empty state
+          const serviceContainer = document.getElementById("serviceContainer");
+          serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load events. Please try again later.</p>';
+        }
+      }
+
+      // Render events on the page
+      function renderEvents() {
         const serviceContainer = document.getElementById("serviceContainer");
+        serviceContainer.innerHTML = ''; // Clear existing content
 
-        services.forEach((service) => {
-          const serviceCard = document.createElement("div");
-          serviceCard.className =
-            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+        if (events.length === 0) {
+          serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No events available at the moment.</p>';
+          return;
+        }
 
-          serviceCard.innerHTML = `
-        <!-- Service Image Wrapper -->
-        <a  href="service-details.html?id=${service.id}">
+        events.forEach((event) => {
+          const eventCard = document.createElement("div");
+          eventCard.className =
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          // Use the image from database or fallback to default
+          const eventImage = event.image_path ? `/doctor-appoinment/uploads/events/${event.image_path}` : "../public/assets/eyecare.jpg";
+          const eventTitle = event.title || "Event";
+          const eventDescription = event.description || "Join us for this special event.";
+          const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";
+
+          eventCard.innerHTML = `
+        <!-- Event Image Wrapper -->
         <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${service.img}" alt="${service.type}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-          
+          <img src="${eventImage}" alt="${eventTitle}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
         </div>
-        </a>
 
-        <!-- Service Content -->
+        <!-- Event Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${service.type}</h3>
-          
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${eventTitle}</h3>
+          <div class="flex items-center gap-1 mb-2">
+            <i class="fa-solid fa-calendar-days text-gray-300 text-sm"></i>
+            <h4 class="text-md font-semibold text-gray-300 mb-2 text-start">${eventDate}</h4>
+          </div>
 
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${service.description}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${eventDescription}</p>
 
-      
         </div>
       `;
 
-          serviceContainer.appendChild(serviceCard);
+          serviceContainer.appendChild(eventCard);
         });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchEvents();
       });
     </script>
 
@@ -156,5 +202,6 @@
 </script>
 
     <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
   </body>
 </html>

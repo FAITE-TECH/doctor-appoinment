@@ -53,20 +53,30 @@ class SharedAdminAuth {
 
     async checkAuth() {
         try {
+            console.log('Checking authentication...');
             const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=me', {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
             });
             
+            console.log('Auth response status:', response.status);
+            
             if (response.ok) {
                 const data = await response.json();
-                if (data.authenticated && data.user.role === 'admin') {
+                console.log('Auth response data:', data);
+                
+                if (data.authenticated && data.user && data.user.role === 'admin') {
                     this.isAuthenticated = true;
                     this.user = data.user;
                     this.setCachedAuth(data.user);
                     this.authChecked = true;
+                    console.log('✅ Admin authenticated successfully');
                     return true;
+                } else {
+                    console.log('❌ Not authenticated as admin:', data);
                 }
+            } else {
+                console.log('❌ Auth response not ok:', response.status);
             }
             
             this.isAuthenticated = false;

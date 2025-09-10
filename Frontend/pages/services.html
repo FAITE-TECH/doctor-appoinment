@@ -23,10 +23,14 @@
   <body>
     <div id="header"></div>
     <script>
-      fetch("header.html")
+      fetch("shared-nav.html")
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
+          // Initialize navigation after it's loaded
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
         });
     </script>
 
@@ -61,31 +65,72 @@
        
       </div>
     </section>
-    <script src="services-data.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
+      // Global variable to store services data
+      let services = [];
+
+      // Fetch services from API
+      async function fetchServices() {
+        try {
+          const response = await fetch('../../Backend/api/services.php?action=public');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            services = data.data;
+            renderServices();
+          } else {
+            console.error('Failed to fetch services:', data.message);
+            // Fallback to empty state
+            const serviceContainer = document.getElementById("serviceContainer");
+            serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No services available at the moment.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching services:', error);
+          // Fallback to empty state
+          const serviceContainer = document.getElementById("serviceContainer");
+          serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load services. Please try again later.</p>';
+        }
+      }
+
+      // Render services on the page
+      function renderServices() {
         const serviceContainer = document.getElementById("serviceContainer");
+        serviceContainer.innerHTML = ''; // Clear existing content
+
+        if (services.length === 0) {
+          serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No services available at the moment.</p>';
+          return;
+        }
 
         services.forEach((service) => {
           const serviceCard = document.createElement("div");
           serviceCard.className =
-            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          // Use the image from database or fallback to default
+          const serviceImage = service.image_path ? `/doctor-appoinment/uploads/services/${service.image_path}` : "../public/assets/eyecare.jpg";
+          const serviceName = service.name || "Service";
+          const serviceDescription = service.description || "Quality healthcare service provided by our experienced team.";
+          const servicePrice = service.price ? parseFloat(service.price) : 0;
 
           serviceCard.innerHTML = `
         <!-- Service Image Wrapper -->
-        <a  href="service-details.html?id=${service.id}">
+        <a href="service-details.html?id=${service.id}">
         <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${service.img}" alt="${service.type}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <img src="${serviceImage}" alt="${serviceName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
           
         </div>
         </a>
 
         <!-- Service Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${service.type}</h3>
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${serviceName}</h3>
           
+          <div class="mb-3">
+            <span class="text-2xl font-bold text-green-600">Rs ${servicePrice.toFixed(2)}</span>
+          </div>
 
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${service.description}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${serviceDescription}</p>
 
       
         </div>
@@ -93,6 +138,11 @@
 
           serviceContainer.appendChild(serviceCard);
         });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchServices();
       });
     </script>
 
@@ -159,5 +209,6 @@
 </script>
 
     <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
   </body>
 </html>

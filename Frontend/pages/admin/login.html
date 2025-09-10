@@ -62,8 +62,41 @@
 
     <script src="../../public/js/script.js"></script>
     <script>
-        // Redirect to main signin page with admin redirect parameter
-        window.location.href = '../signin.html?redirect=admin';
+        // Handle admin login directly
+        document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.user && data.user.role === 'admin') {
+                    // Successfully logged in as admin
+                    window.location.href = './index.html';
+                } else {
+                    alert(data.error || 'Invalid admin credentials');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+            }
+        });
     </script>
 </body>
 </html>

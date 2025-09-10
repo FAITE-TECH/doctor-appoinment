@@ -16,10 +16,14 @@
     <!-- Header -->
     <div id="header"></div>
     <script>
-      fetch("header.html")
+      fetch("shared-nav.html")
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
+          // Initialize navigation after it's loaded
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
         });
     </script>
 
@@ -184,8 +188,15 @@
       });
     }
 
-    // Default load Doctors
-    renderCards(doctors, "Doctors");
+    // Wait for doctors data to load, then render
+    if (window.doctors && window.doctors.length > 0) {
+      renderCards(doctors, "Doctors");
+    } else {
+      // Listen for doctors data loaded event
+      window.addEventListener('doctorsDataLoaded', (event) => {
+        renderCards(event.detail, "Doctors");
+      });
+    }
 
     // Handle filter button clicks
     filterButtons.forEach((btn) => {
@@ -277,5 +288,6 @@
     </script>
 
     <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
   </body>
 </html>

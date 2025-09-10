@@ -1,24 +1,37 @@
-const latestNews = [
-  {
-    id: 1,
-    title: "New Clinic Opening",
-    description: "We are excited to announce the opening of our new clinic in downtown.",
-    img: "../public/assets/eyecare.jpg",
-    date: "2023-10-01",
-  },
-  {
-    id: 2,
-    title: "Health Tips for Winter",
-    description: "Stay healthy this winter with our top 5 health tips.",
-    img: "../public/assets/eyecare.jpg",
-    date: "2023-10-05",
-  },
-  {
-    id: 3,
-    title: "Meet Our Doctors",
-    description: "Get to know our team of experienced doctors.",
-    img: "../public/assets/eyecare.jpg",
-    date: "2023-10-10",
-  },
-];
-window.latestNews = latestNews;
+// Fetch latest news (events) data from API
+let latestNews = [];
+
+async function fetchLatestNewsData() {
+  try {
+    const response = await fetch('../../Backend/api/events.php?action=public');
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      // Transform the data to match the expected format for gallery
+      latestNews = data.data.map(event => ({
+        id: event.id,
+        title: event.title,
+        description: event.description || "Join us for this special event.",
+        img: event.image_path ? `/doctor-appoinment/uploads/events/${event.image_path}` : "../public/assets/eyecare.jpg",
+        date: event.event_date || "TBA"
+      }));
+      
+      // Make latestNews available globally
+      window.latestNews = latestNews;
+      
+      // Trigger a custom event to notify that latestNews data is loaded
+      window.dispatchEvent(new CustomEvent('latestNewsDataLoaded', { detail: latestNews }));
+    } else {
+      console.error('Failed to fetch latest news:', data.message);
+      // Fallback to empty array
+      window.latestNews = [];
+    }
+  } catch (error) {
+    console.error('Error fetching latest news:', error);
+    // Fallback to empty array
+    window.latestNews = [];
+  }
+}
+
+// Fetch latest news data immediately
+fetchLatestNewsData();

@@ -2,25 +2,131 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Frontend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HPC Hospital - Doctor Appointment System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../public/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="../public/assets/logo.png">
 </head>
-<body class="bg-gray-100 p-6">
-  <header class="mb-6">
-    <nav class="flex items-center justify-between bg-white rounded-md p-4 shadow">
-      <a href="./index.html" class="text-xl font-semibold">Doctor Appointment</a>
-      <ul class="flex items-center gap-4" id="nav-links">
-        <li><a href="./signin.html" class="text-blue-600 hover:underline" data-auth="guest">Sign in</a></li>
-        <li><a href="./signup.html" class="text-blue-600 hover:underline" data-auth="guest">Sign up</a></li>
-        <li class="hidden" data-auth="user"><span id="nav-user-email" class="text-gray-700"></span></li>
-        <li class="hidden" data-auth="user"><button id="signoutBtn" class="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700">Sign out</button></li>
-      </ul>
-    </nav>
-  </header>
-  <h1 class="text-3xl font-bold text-blue-600">Welcome to My Project</h1>
-  <p class="mt-2 text-gray-700">This is the frontend connected to backend APIs.</p>
-  <a href="./contact.html">contact</a>
+<body class="bg-gray-100">
+  <div id="header"></div>
+  <script>
+    fetch("shared-nav.html")
+      .then((res) => res.text())
+      .then((data) => {
+        document.getElementById("header").innerHTML = data;
+        // Initialize navigation after it's loaded
+        if (window.initNavigationAfterLoad) {
+          window.initNavigationAfterLoad();
+        }
+      });
+  </script>
+
+  <!-- Main Content -->
+  <main class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+      <div class="max-w-6xl mx-auto px-6 text-center">
+        <h1 class="text-5xl font-bold mb-6">Welcome to HPC Hospital</h1>
+        <p class="text-xl mb-8 text-blue-100">Your health is our priority. Book appointments with our expert doctors and access world-class medical care.</p>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center" id="hero-actions">
+          <!-- Guest Actions -->
+          <div class="flex flex-col sm:flex-row gap-4" data-auth="guest">
+            <a href="./signup.html" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Get Started</a>
+            <a href="./home.html" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Explore Services</a>
+          </div>
+          
+          <!-- User Actions -->
+          <div class="flex flex-col sm:flex-row gap-4 hidden" data-auth="user">
+            <a href="./home.html" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Go to Dashboard</a>
+            <a href="./home.html#appointment-form" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Book Appointment</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">Why Choose HPC Hospital?</h2>
+          <p class="text-gray-600">Experience healthcare excellence with our comprehensive services</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center p-6">
+            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-user-md text-blue-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Expert Doctors</h3>
+            <p class="text-gray-600">Our team of experienced doctors provides specialized care in various medical fields.</p>
+          </div>
+          
+          <div class="text-center p-6">
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-calendar-check text-green-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Easy Booking</h3>
+            <p class="text-gray-600">Book appointments online with our user-friendly system and get instant confirmation.</p>
+          </div>
+          
+          <div class="text-center p-6">
+            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-heart text-purple-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Quality Care</h3>
+            <p class="text-gray-600">We are committed to providing the highest quality healthcare services to our patients.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Links Section -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">Quick Access</h2>
+          <p class="text-gray-600">Navigate to our main services and features</p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <a href="./doctors.html" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition text-center">
+            <i class="fas fa-user-md text-blue-600 text-3xl mb-3"></i>
+            <h3 class="font-semibold">Doctors</h3>
+          </a>
+          
+          <a href="./departments.html" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition text-center">
+            <i class="fas fa-hospital text-green-600 text-3xl mb-3"></i>
+            <h3 class="font-semibold">Departments</h3>
+          </a>
+          
+          <a href="./services.html" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition text-center">
+            <i class="fas fa-stethoscope text-purple-600 text-3xl mb-3"></i>
+            <h3 class="font-semibold">Services</h3>
+          </a>
+          
+          <a href="./gallery.html" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition text-center">
+            <i class="fas fa-images text-orange-600 text-3xl mb-3"></i>
+            <h3 class="font-semibold">Gallery</h3>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <p>&copy; 2024 HPC Hospital. All rights reserved.</p>
+      <p class="mt-2 text-gray-400">Your health, our commitment.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
   <script src="../public/js/script.js"></script>
+  <script src="shared-nav.js"></script>
 </body>
 </html>

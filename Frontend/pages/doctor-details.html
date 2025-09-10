@@ -58,9 +58,6 @@
         <tbody class="p-5"></tbody>
       </table>
     </div>
-    <script src="doctors-data.js"></script>
-
-
  <!-- Filter -->
 
     <section id="doctors">
@@ -183,19 +180,48 @@
 
     <!-- Doctor Data -->
     <script>
-      // Get doctor id from URL
-      const params = new URLSearchParams(window.location.search);
-      const doctorId = parseInt(params.get("id"));
+      // Global variable to store doctors data
+      let doctors = [];
+      let currentDoctor = null;
 
-      // Find doctor by id
-      const doctor = doctors.find((d) => d.id === doctorId);
+      // Fetch doctors from API
+      async function fetchDoctors() {
+        try {
+          const response = await fetch('/doctor-appoinment/Backend/api/doctors.php?action=doctors');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            doctors = data.data;
+            loadDoctorDetails();
+          } else {
+            console.error('Failed to fetch doctors:', data.message);
+            document.getElementById("doctorDetail").innerHTML = '<p class="text-center text-gray-500">Doctor not found.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching doctors:', error);
+          document.getElementById("doctorDetail").innerHTML = '<p class="text-center text-gray-500">Unable to load doctor details. Please try again later.</p>';
+        }
+      }
 
-      if (doctor) {
-        document.getElementById("doctorDetail").innerHTML = `
+      function loadDoctorDetails() {
+        // Get doctor id from URL
+        const params = new URLSearchParams(window.location.search);
+        const doctorId = parseInt(params.get("id"));
+
+        // Find doctor by id
+        currentDoctor = doctors.find((d) => d.id === doctorId);
+
+        if (currentDoctor) {
+          // Use the image from database or fallback to default
+          const doctorImage = currentDoctor.image_path || "../public/assets/doctor1.jpg";
+          const doctorSpecialization = currentDoctor.specialization || currentDoctor.department_name || "General";
+          const doctorDescription = currentDoctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
+
+          document.getElementById("doctorDetail").innerHTML = `
         <div class="relative w-full h-40 max-w-6xl mx-auto ">
-            <img src="${doctor.img}" alt="${doctor.name}" class="w-full h-full object-cover  rounded-lg">
+            <img src="${doctorImage}" alt="${currentDoctor.name}" class="w-full h-full object-cover  rounded-lg">
             <h1 class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
-                ${doctor.name}
+                ${currentDoctor.name}
             </h1>
         </div>
 
@@ -204,82 +230,108 @@
             <span>&gt;</span>
             <a href="doctors.html" class="text-blue-600 hover:underline">Doctor</a>
             <span>&gt;</span>
-            <span class="text-gray-800 font-medium">${doctor.name}</span>
+            <span class="text-gray-800 font-medium">${currentDoctor.name}</span>
         </div>
 
 
 
         <div class="bg-white  p-6 flex flex-col justify-between max-w-6xl mx-auto md:flex-row gap-6">
-          <img src="${doctor.img}" alt="${doctor.name}" class="w-60 h-60 object-cover rounded-lg shadow-md">
+          <img src="${doctorImage}" alt="${currentDoctor.name}" class="w-60 h-60 object-cover rounded-lg shadow-md">
           
           <div class="md:w-1/3">
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">${doctor.name}</h2>
-            <p class=" text-gray-600 text-sm px-3 py-1 font-italic w-fit mb-4">${doctor.special}</p>
-            <p class="text-gray-600 leading-relaxed mb-4">${doctor.description}</p>
-            <p class="text-gray-600 mb-1"><i class="fa-solid fa-envelope"></i>  <a href="mailto:${doctor.email}" class="text-gray-500">${doctor.email}</a></p>
-            <p class="text-gray-600 mb-1"><i class="fa-solid fa-phone"></i> <a href="tel:${doctor.phone}" class="text-gray-500">${doctor.phone}</a></p>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">${currentDoctor.name}</h2>
+            <p class=" text-gray-600 text-sm px-3 py-1 font-italic w-fit mb-4">${doctorSpecialization}</p>
+            <p class="text-gray-600 leading-relaxed mb-4">${doctorDescription}</p>
+            <p class="text-gray-600 mb-1"><i class="fa-solid fa-envelope"></i>  <a href="mailto:${currentDoctor.email}" class="text-gray-500">${currentDoctor.email}</a></p>
+            <p class="text-gray-600 mb-1"><i class="fa-solid fa-phone"></i> <a href="tel:${currentDoctor.phone}" class="text-gray-500">${currentDoctor.phone}</a></p>
 
             <button onclick="window.location.href='./home.html#appointment-form'" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Book Schedule</button>
           </div>
 
           <div class="mt-4 md:w-1/3 ">
-            <h3 class="text-xl font-bold text-gray-800 mb-2  border-t border-gray-200">Other Doctors in ${doctor.special}</h3>
+            <h3 class="text-xl font-bold text-gray-800 mb-2  border-t border-gray-200">Other Doctors in ${doctorSpecialization}</h3>
            
            <ul id="other-doctors" class="divide-y divide-gray-200 border border-gray-200 rounded-lg"></ul>
 
           </div>
         </div>
       `;
-      } else {
-        document.getElementById(
-          "doctorDetail"
-        ).innerHTML = `<p class="text-red-500 font-semibold">Doctor not found.</p>`;
+          // Load other doctors in the same specialization
+          loadOtherDoctors(doctorSpecialization);
+          
+          // Load schedule table
+          loadScheduleTable();
+        } else {
+          document.getElementById("doctorDetail").innerHTML = '<p class="text-red-500 font-semibold">Doctor not found.</p>';
+        }
       }
 
-      const otherDoctorsContainer = document.querySelector("#other-doctors");
-      const otherDoctors = doctors.filter(
-        (d) => d.special === doctor.special && d.name !== doctor.name
-      );
+      function loadOtherDoctors(specialization) {
+        const otherDoctorsContainer = document.querySelector("#other-doctors");
+        if (!otherDoctorsContainer) return;
 
-      otherDoctorsContainer.innerHTML = otherDoctors
-        .map(
-          (d) => `
-        <li class="flex items-center gap-3 p-3 hover:bg-gray-50 transition">
-            <div>
-            <h4 class="text-gray-800 font-semibold text-sm">${d.name}</h4>
-            </div>
-        </li>
-        `
-        )
-        .join("");
+        const otherDoctors = doctors.filter((d) => 
+          ((d.specialization && d.specialization.toLowerCase().includes(specialization.toLowerCase())) ||
+           (d.department_name && d.department_name.toLowerCase().includes(specialization.toLowerCase()))) &&
+          d.name !== currentDoctor.name
+        );
 
-      // schedule table
-      const tableBody = document.querySelector("#scheduleTable tbody");
+        otherDoctorsContainer.innerHTML = otherDoctors
+          .map((d) => `
+            <li class="flex items-center gap-3 p-3 hover:bg-gray-50 transition">
+              <div>
+                <h4 class="text-gray-800 font-semibold text-sm">${d.name}</h4>
+              </div>
+            </li>
+          `)
+          .join("");
+      }
 
-      const row = document.createElement("tr");
+      function loadScheduleTable() {
+        const tableBody = document.querySelector("#scheduleTable tbody");
+        if (!tableBody) return;
 
-      // doctor name
-      row.innerHTML = `<td class="border px-2 py-1 font-semibold text-center text-gray-400 h-20">${doctor.name}</td>`;
+        const row = document.createElement("tr");
 
-      // days of week
-      const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ];
-      days.forEach((day) => {
-        const scheduleTime = doctor.schedule[day];
-        const bgClass = scheduleTime ? "bg-blue-100" : ""; // only add bg if schedule exists
-        row.innerHTML += `<td class="border px-2 py-1 text-center ${bgClass}">${
-          scheduleTime || "--"
-        }</td>`;
+        // doctor name
+        row.innerHTML = `<td class="border px-2 py-1 font-semibold text-center text-gray-400 h-20">${currentDoctor.name}</td>`;
+
+        // days of week
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        
+        // Since real doctor data doesn't have schedule, show default availability
+        days.forEach((day) => {
+          // Default schedule for all doctors (can be customized later)
+          const defaultSchedule = {
+            "Monday": "09:00 - 17:00",
+            "Tuesday": "09:00 - 17:00", 
+            "Wednesday": "09:00 - 17:00",
+            "Thursday": "09:00 - 17:00",
+            "Friday": "09:00 - 17:00",
+            "Saturday": "09:00 - 13:00",
+            "Sunday": "--"
+          };
+          
+          const scheduleTime = defaultSchedule[day];
+          const bgClass = scheduleTime && scheduleTime !== "--" ? "bg-blue-100" : "";
+          row.innerHTML += `<td class="border px-2 py-1 text-center ${bgClass}">${scheduleTime}</td>`;
+        });
+
+        tableBody.appendChild(row);
+      }
+
+      // Initialize when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        fetchDoctors();
       });
-
-      tableBody.appendChild(row);
     </script>
 
 

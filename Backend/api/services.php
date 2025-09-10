@@ -10,8 +10,25 @@ include('../includes/functions.php');
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;
+$action = isset($_GET['action']) ? $_GET['action'] : '';
 
-// Check if user is admin
+// Public endpoints (no authentication required)
+if ($method === 'GET' && $action === 'public') {
+    // Get all services for public use
+    $stmt = $conn->prepare('SELECT * FROM services ORDER BY created_at DESC');
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $services = [];
+    while ($row = $result->fetch_assoc()) {
+        $services[] = $row;
+    }
+    $stmt->close();
+    
+    echo json_encode(['status' => 'success', 'data' => $services]);
+    exit;
+}
+
+// Check if user is admin for other operations
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     json_response(['error' => 'Unauthorized access'], 403);
 }

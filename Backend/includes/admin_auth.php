@@ -1,6 +1,7 @@
 <?php
 // Admin authentication helper - include this in all admin pages
-session_start();
+// Include session configuration first
+include('session_config.php');
 
 // Check if user is authenticated and is admin
 function checkAdminAuth() {

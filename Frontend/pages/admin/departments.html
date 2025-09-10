@@ -154,7 +154,7 @@
                     return;
                 }
 
-                const response = await fetch('/Backend/api/departments.php');
+                const response = await fetch('/doctor-appoinment/Backend/api/departments.php');
                 if (response.status === 403) {
                     showAuthMessage();
                     return;
@@ -239,7 +239,7 @@
         async function deleteDepartment(id) {
             if (confirm('Are you sure you want to delete this department?')) {
                 try {
-                    const response = await fetch(`/Backend/api/departments.php?id=${id}`, {
+                    const response = await fetch(`/doctor-appoinment/Backend/api/departments.php?id=${id}`, {
                         method: 'DELETE'
                     });
                     if (response.ok) {
@@ -260,8 +260,8 @@
             
             try {
                 const url = editingDepartmentId 
-                    ? `/Backend/api/departments.php?id=${editingDepartmentId}`
-                    : '/Backend/api/departments.php';
+                    ? `/doctor-appoinment/Backend/api/departments.php?id=${editingDepartmentId}`
+                    : '/doctor-appoinment/Backend/api/departments.php';
                 
                 const method = editingDepartmentId ? 'PUT' : 'POST';
                 

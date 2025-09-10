@@ -1,118 +1,48 @@
-const doctors = [
-  {
-    id: 1,
-    name: "Dr.K.Arulanandem",
-    special: "Pulmonary",
-    img: "../public/assets/doctor1.jpg",
-    description:
-      "Veranda was born and raised in Jakarta, Indonesia. He graduated from the University of Singapore, where he completed is bachelor’s degree. His admission to the State Bar of California took place on the 25th of November, 1985.Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
-    email: "doc1@example.com",
-    phone: "123-456-7890",
-    schedule: {
-      Sunday: "09:00 - 12:00",
-      Monday: "",
-      Tuesday: "10:00 - 14:00",
-      Wednesday: "",
-      Thursday: "11:00 - 15:00",
-      Friday: "",
-      Saturday: "08:00 - 11:00",
-    },
-  },
-  {
-    id: 2,
-    name: "Dr.S.Sivschelvan",
-    special: "Dental",
-    img: "../public/assets/doctor1.jpg",
-    description:
-      "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
-    email: "doc1@example.com",
-    phone: "123-456-7890",
-    schedule: {
-      Sunday: "",
-      Monday: "12:00 - 15:00",
-      Tuesday: "13:00 - 17:00",
-      Wednesday: "08:00 - 10:00",
-      Thursday: "",
-      Friday: "",
-      Saturday: "",
-    },
-  },
-  {
-    id: 3,
-    name: "Dr.G.Madhivannan",
-    special: "Neurologist",
-    img: "../public/assets/doctor1.jpg",
-    description:
-      "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
-    email: "doc1@example.com",
-    phone: "123-456-7890",
-    schedule: {
-      Sunday: "09:00 - 12:00",
-      Monday: "",
-      Tuesday: "10:00 - 14:00",
-      Wednesday: "",
-      Thursday: "11:00 - 15:00",
-      Friday: "",
-      Saturday: "08:00 - 11:00",
-    },
-  },
-  {
-    id: 4,
-    name: "Dr.N.Shobana",
-    special: "Dental",
-    img: "../public/assets/doctor4.jpg",
-    description:
-      "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
-    email: "doc1@example.com",
-    phone: "123-456-7890",
-    schedule: {
-      Sunday: "09:00 - 12:00",
-      Monday: "",
-      Tuesday: "10:00 - 14:00",
-      Wednesday: "",
-      Thursday: "11:00 - 15:00",
-      Friday: "",
-      Saturday: "08:00 - 11:00",
-    },
-  },
-  {
-    id: 5,
-    name: "Dr.(Mrs)S.Annet Jothy Luxmi",
-    special: "Neurologist",
-    img: "../public/assets/doctor4.jpg",
-    description:
-      "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
-    email: "doc1@example.com",
-    phone: "123-456-7890",
-    schedule: {
-      Sunday: "",
-      Monday: "12:00 - 15:00",
-      Tuesday: "13:00 - 17:00",
-      Wednesday: "08:00 - 10:00",
-      Thursday: "",
-      Friday: "",
-      Saturday: "",
-    },
-  },
-  {
-    id: 6,
-    name: "Dr.(Mrs)M.Midhuna",
-    special: "Dental",
-    img: "../public/assets/doctor4.jpg",
-    description:
-      "Kathryn was born and raised in Indonesia, North Way Indonesia He graduated from the University of Indonesia, where he completed is bachelor’s degree. His admission to the State Bar of London took place on the 10st of April, 1983. Weebles wobble but they don’t fall down. Weebles are around, don’t fall down! Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble, Weeble wobble. Don’t",
-    email: "doc1@example.com",
-    phone: "123-456-7890",
-    schedule: {
-      Sunday: "",
-      Monday: "12:00 - 15:00",
-      Tuesday: "13:00 - 17:00",
-      Wednesday: "08:00 - 10:00",
-      Thursday: "",
-      Friday: "",
-      Saturday: "",
-    },
-  },
-  
-];
-window.doctors = doctors;
+// Fetch doctors data from API
+let doctors = [];
+
+async function fetchDoctorsData() {
+  try {
+    const response = await fetch('../../Backend/api/doctors.php?action=doctors');
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      // Transform the data to match the expected format for gallery
+      doctors = data.data.map(doctor => ({
+        id: doctor.id,
+        name: doctor.name,
+        special: doctor.department_name || doctor.specialization || 'General',
+        img: doctor.image_path || "../public/assets/doctor1.jpg",
+        description: doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.",
+        email: doctor.email || "contact@hospital.com",
+        phone: doctor.phone || "123-456-7890",
+        schedule: {
+          Sunday: "09:00 - 12:00",
+          Monday: "10:00 - 14:00",
+          Tuesday: "10:00 - 14:00",
+          Wednesday: "10:00 - 14:00",
+          Thursday: "11:00 - 15:00",
+          Friday: "10:00 - 14:00",
+          Saturday: "08:00 - 11:00",
+        }
+      }));
+      
+      // Make doctors available globally
+      window.doctors = doctors;
+      
+      // Trigger a custom event to notify that doctors data is loaded
+      window.dispatchEvent(new CustomEvent('doctorsDataLoaded', { detail: doctors }));
+    } else {
+      console.error('Failed to fetch doctors:', data.message);
+      // Fallback to empty array
+      window.doctors = [];
+    }
+  } catch (error) {
+    console.error('Error fetching doctors:', error);
+    // Fallback to empty array
+    window.doctors = [];
+  }
+}
+
+// Fetch doctors data immediately
+fetchDoctorsData();

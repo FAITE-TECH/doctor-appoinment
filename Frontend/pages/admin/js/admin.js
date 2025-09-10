@@ -50,23 +50,48 @@ class AdminPanel {
 
     async checkAdminAuth() {
         try {
+            console.log('AdminPanel: Checking admin authentication...');
             const data = await this.handleApiCall('/doctor-appoinment/Backend/api/auth.php?action=me');
+            console.log('AdminPanel: Auth response:', data);
             
-            if (data.authenticated && data.user.role === 'admin') {
+            if (data.authenticated && data.user && data.user.role === 'admin') {
                 // User is authenticated as admin
-                document.getElementById('admin-user-info').textContent = `${data.user.name} (${data.user.role})`;
-                document.getElementById('welcomeMessage').textContent = `Welcome, ${data.user.name}! You are logged in as an administrator.`;
+                const userInfoEl = document.getElementById('admin-user-info');
+                const welcomeEl = document.getElementById('welcomeMessage');
+                
+                if (userInfoEl) {
+                    userInfoEl.textContent = `${data.user.name} (${data.user.role})`;
+                }
+                if (welcomeEl) {
+                    welcomeEl.textContent = `Welcome, ${data.user.name}! You are logged in as an administrator.`;
+                }
+                console.log('✅ AdminPanel: Admin authenticated successfully');
                 return true;
             } else {
                 // User is not authenticated as admin, but don't redirect
-                document.getElementById('admin-user-info').textContent = 'Not authenticated';
-                document.getElementById('welcomeMessage').textContent = 'Please log in to access admin features.';
+                const userInfoEl = document.getElementById('admin-user-info');
+                const welcomeEl = document.getElementById('welcomeMessage');
+                
+                if (userInfoEl) {
+                    userInfoEl.textContent = 'Not authenticated';
+                }
+                if (welcomeEl) {
+                    welcomeEl.textContent = 'Please log in to access admin features.';
+                }
+                console.log('❌ AdminPanel: Not authenticated as admin');
                 return false;
             }
         } catch (error) {
-            console.error('Auth check failed:', error);
-            document.getElementById('admin-user-info').textContent = 'Authentication error';
-            document.getElementById('welcomeMessage').textContent = 'Unable to verify authentication.';
+            console.error('AdminPanel: Auth check failed:', error);
+            const userInfoEl = document.getElementById('admin-user-info');
+            const welcomeEl = document.getElementById('welcomeMessage');
+            
+            if (userInfoEl) {
+                userInfoEl.textContent = 'Authentication error';
+            }
+            if (welcomeEl) {
+                welcomeEl.textContent = 'Unable to verify authentication.';
+            }
             return false;
         }
     }

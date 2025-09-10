@@ -30,14 +30,16 @@
     <title>HPC Hospital</title>
   </head>
   <body>
-    <!--  Import Header -->
-
     <div id="header"></div>
     <script>
-      fetch("header.html")
+      fetch("shared-nav.html")
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
+          // Initialize navigation after it's loaded
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
         });
     </script>
     <!-- Hero Image -->
@@ -139,10 +141,6 @@
               class="border h-12 px-3 py-2 focus:ring-2 focus:ring-blue-400 rounded-md"
             >
               <option value="">Select one</option>
-              <option value="Pulmonary">Pulmonary</option>
-              <option value="Dental">Dental</option>
-              <option value="Neurologist">Neurologist</option>
-              <option value="Pediatrics">Pediatrics</option>
             </select>
           </div>
 
@@ -201,10 +199,6 @@
                 required
               >
                 <option value="">Select one</option>
-                <option value="Pulmonary">Pulmonary</option>
-                <option value="Dental">Dental</option>
-                <option value="Neurologist">Neurologist</option>
-                <option value="Pediatrics">Pediatrics</option>
               </select>
             </div>
             <div class="flex-1 flex flex-col">
@@ -290,8 +284,8 @@
       const doctorCtn = document.getElementById("doctorCtn");
       const specialFilter = document.getElementById("specialFilter");
 
-      // Render doctors dynamically
-      function renderDoctors(list) {
+      // Render doctors dynamically for appointment form
+      function renderFilteredDoctors(list) {
         doctorCtn.innerHTML = ""; // clear old data
         if (list.length === 0) {
           doctorCtn.innerHTML = `<p class="text-white">No doctors found</p>`;
@@ -303,14 +297,18 @@
           doctorCard.className =
             "bg-white border my-7 rounded-lg shadow p-6 flex flex-col md:flex-row items-center gap-4 transition hover:shadow-lg ";
 
+          // Use the image from database or fallback to default
+          const doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
+          const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
+
           doctorCard.innerHTML = `
-              <img src="${doctor.img}" alt="${doctor.name}" 
+              <img src="${doctorImage}" alt="${doctor.name}" 
                 class="w-32 h-32 md:w-10 md:h-10 rounded-full object-cover mb-3 md:mb-0">
 
               <div class="flex flex-col p-0 md:flex-row md:items-center md:justify-between w-full">
                 <div>
                   <h3 class="text-lg font-semibold">${doctor.name}</h3>
-                  <p class="text-sm text-gray-500">${doctor.special}</p>
+                  <p class="text-sm text-gray-500">${doctorSpecialization}</p>
                 </div>
 
                 <a onclick="window.location.href='doctor-details.html?id=${doctor.id}'" 
@@ -330,12 +328,49 @@
         if (selected === "") {
           doctorCtn.innerHTML = `<p class="text-gray-500">Please select a specialization</p>`;
         } else {
-          const filtered = doctors.filter((doc) => doc.special === selected);
-          renderDoctors(filtered);
+          const filtered = doctors.filter((doc) => 
+            (doc.specialization && doc.specialization.toLowerCase().includes(selected.toLowerCase())) ||
+            (doc.department_name && doc.department_name.toLowerCase().includes(selected.toLowerCase()))
+          );
+          renderFilteredDoctors(filtered);
         }
       });
 
-      //
+      // Update the global doctors variable when fetched
+      window.updateDoctorsForFilter = function(doctorsData) {
+        doctors = doctorsData;
+      };
+
+      // Populate doctor dropdown when department is selected
+      document.addEventListener('DOMContentLoaded', function() {
+        const deptSelect = document.getElementById('deptSelect');
+        const doctorSelect = document.getElementById('doctorSelect');
+
+        if (deptSelect && doctorSelect) {
+          deptSelect.addEventListener('change', function() {
+            const selectedDept = this.value;
+            
+            // Clear doctor dropdown
+            doctorSelect.innerHTML = '<option value="">Select one</option>';
+            
+            if (selectedDept) {
+              // Filter doctors by selected department
+              const filteredDoctors = doctors.filter(doctor => 
+                (doctor.specialization && doctor.specialization.toLowerCase().includes(selectedDept.toLowerCase())) ||
+                (doctor.department_name && doctor.department_name.toLowerCase().includes(selectedDept.toLowerCase()))
+              );
+
+              // Add filtered doctors to dropdown
+              filteredDoctors.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.id;
+                option.textContent = doctor.name;
+                doctorSelect.appendChild(option);
+              });
+            }
+          });
+        }
+      });
     </script>
 
     <script>
@@ -480,24 +515,104 @@
       </div>
     </section>
 
-    <script src="doctors-data.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const doctorContainer = document.getElementById("doctorContainer");
+      // Global variable to store doctors data
+      let doctors = [];
 
-        doctors.slice(0, 4).forEach((doctor) => {
+      // Fetch doctors from API
+      async function fetchDoctors() {
+        try {
+          const response = await fetch('/doctor-appoinment/Backend/api/doctors.php?action=doctors');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            doctors = data.data;
+            renderDoctors();
+            populateDepartmentDropdowns();
+            // Update the filter functionality with real data
+            if (window.updateDoctorsForFilter) {
+              window.updateDoctorsForFilter(doctors);
+            }
+          } else {
+            console.error('Failed to fetch doctors:', data.message);
+            // Fallback to empty state
+            const doctorContainer = document.getElementById("doctorContainer");
+            doctorContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No doctors available at the moment.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching doctors:', error);
+          // Fallback to empty state
+          const doctorContainer = document.getElementById("doctorContainer");
+          doctorContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load doctors. Please try again later.</p>';
+        }
+      }
+
+      // Populate department dropdowns based on available doctor specializations
+      function populateDepartmentDropdowns() {
+        const specializations = new Set();
+        
+        doctors.forEach(doctor => {
+          if (doctor.specialization) {
+            specializations.add(doctor.specialization);
+          }
+          if (doctor.department_name) {
+            specializations.add(doctor.department_name);
+          }
+        });
+
+        const specialFilter = document.getElementById("specialFilter");
+        const deptSelect = document.getElementById("deptSelect");
+
+        // Clear existing options except the first one
+        [specialFilter, deptSelect].forEach(select => {
+          if (select) {
+            // Keep the first option (Select one)
+            const firstOption = select.querySelector('option[value=""]');
+            select.innerHTML = '';
+            if (firstOption) {
+              select.appendChild(firstOption);
+            }
+
+            // Add specialization options
+            specializations.forEach(spec => {
+              const option = document.createElement('option');
+              option.value = spec;
+              option.textContent = spec;
+              select.appendChild(option);
+            });
+          }
+        });
+      }
+
+      // Render doctors on the page
+      function renderDoctors() {
+        const doctorContainer = document.getElementById("doctorContainer");
+        doctorContainer.innerHTML = ''; // Clear existing content
+
+        // Show only first 4 doctors
+        const doctorsToShow = doctors.slice(0, 4);
+
+        if (doctorsToShow.length === 0) {
+          doctorContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No doctors available at the moment.</p>';
+          return;
+        }
+
+        doctorsToShow.forEach((doctor) => {
           const doctorCard = document.createElement("div");
           doctorCard.className =
-            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          // Use the image from database or fallback to default
+          const doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
+          const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
+          const doctorDescription = doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
 
           doctorCard.innerHTML = `
         <!-- Doctor Image Wrapper -->
           <div class="relative h-56 w-full overflow-hidden group">
             <!-- Main clickable image -->
-            <a href="doctor-details.html?id=${
-              doctor.id
-            }" class="block h-full w-full">
-              <img src="${doctor.img}" alt="${doctor.name}"
+            <a href="doctor-details.html?id=${doctor.id}" class="block h-full w-full">
+              <img src="${doctorImage}" alt="${doctor.name}"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
             </a>
 
@@ -524,23 +639,17 @@
        
         <!-- Doctor Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl  font-sans-serif text-blue-800 mb-2 text-start">${
-            doctor.name
-          }</h3>
-          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto]  px-3 py-1 rounded-full uppercase w-fit mb-3">
-            ${doctor.special}
+          <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
+          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">
+            ${doctorSpecialization}
           </p>
           
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start">${
-            doctor.description
-          }</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start">${doctorDescription}</p>
 
           <div class="flex justify-between items-center text-gray-400 text-sm">
-            <p>${doctor.experience || "10+ years"} experience</p>
-            <button onclick="window.location.href='doctor-details.html?id=${
-              doctor.id
-            }'" 
-              class="text-black font-sans-serif px-4 py-2 rounded-md hover:text-blue-500  transition">
+            <p>10+ years experience</p>
+            <button onclick="window.location.href='doctor-details.html?id=${doctor.id}'" 
+              class="text-black font-sans-serif px-4 py-2 rounded-md hover:text-blue-500 transition">
               View →
             </button>
           </div>
@@ -549,6 +658,11 @@
 
           doctorContainer.appendChild(doctorCard);
         });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchDoctors();
       });
     </script>
 
@@ -669,31 +783,71 @@
         </div>
       </div>
     </section>
-    <script src="services-data.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const serviceContainer = document.getElementById("serviceContainer");
+      // Global variable to store services data
+      let services = [];
 
-        services.slice(0, 4).forEach((service) => {
+      // Fetch services from API
+      async function fetchServices() {
+        try {
+          const response = await fetch('/doctor-appoinment/Backend/api/services.php?action=public');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            services = data.data;
+            renderServices();
+          } else {
+            console.error('Failed to fetch services:', data.message);
+            // Fallback to empty state
+            const serviceContainer = document.getElementById("serviceContainer");
+            serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No services available at the moment.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching services:', error);
+          // Fallback to empty state
+          const serviceContainer = document.getElementById("serviceContainer");
+          serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load services. Please try again later.</p>';
+        }
+      }
+
+      // Render services on the page
+      function renderServices() {
+        const serviceContainer = document.getElementById("serviceContainer");
+        serviceContainer.innerHTML = ''; // Clear existing content
+
+        // Show only first 4 services
+        const servicesToShow = services.slice(0, 4);
+
+        if (servicesToShow.length === 0) {
+          serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No services available at the moment.</p>';
+          return;
+        }
+
+        servicesToShow.forEach((service) => {
           const serviceCard = document.createElement("div");
           serviceCard.className =
-            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          // Use the image from database or fallback to default
+          const serviceImage = service.image_path ? `/doctor-appoinment/uploads/services/${service.image_path}` : "../public/assets/eyecare.jpg";
+          const serviceName = service.name || "Service";
+          const serviceDescription = service.description || "Quality healthcare service provided by our experienced team.";
 
           serviceCard.innerHTML = `
         <!-- Service Image Wrapper -->
-        <a  href="service-details.html?id=${service.id}">
+        <a href="service-details.html?id=${service.id}">
         <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${service.img}" alt="${service.type}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <img src="${serviceImage}" alt="${serviceName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
           
         </div>
         </a>
 
         <!-- Service Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${service.type}</h3>
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${serviceName}</h3>
           
 
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${service.description}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${serviceDescription}</p>
 
       
         </div>
@@ -701,6 +855,11 @@
 
           serviceContainer.appendChild(serviceCard);
         });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchServices();
       });
     </script>
 
@@ -733,31 +892,69 @@
         </div>
       </div>
     </section>
-    <script src="latestNews-data.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const newsContainer = document.getElementById("newsContainer");
+      // Global variable to store events data
+      let events = [];
 
-        latestNews.forEach((news) => {
+      // Fetch events from API
+      async function fetchEvents() {
+        try {
+          const response = await fetch('/doctor-appoinment/Backend/api/events.php?action=public');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            events = data.data;
+            renderEvents();
+          } else {
+            console.error('Failed to fetch events:', data.message);
+            // Fallback to empty state
+            const newsContainer = document.getElementById("newsContainer");
+            newsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No events available at the moment.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching events:', error);
+          // Fallback to empty state
+          const newsContainer = document.getElementById("newsContainer");
+          newsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load events. Please try again later.</p>';
+        }
+      }
+
+      // Render events on the page
+      function renderEvents() {
+        const newsContainer = document.getElementById("newsContainer");
+        newsContainer.innerHTML = ''; // Clear existing content
+
+        if (events.length === 0) {
+          newsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No events available at the moment.</p>';
+          return;
+        }
+
+        events.forEach((event) => {
           const newsCard = document.createElement("div");
           newsCard.className =
-            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          // Use the image from database or fallback to default
+          const eventImage = event.image_path ? `/doctor-appoinment/uploads/events/${event.image_path}` : "../public/assets/eyecare.jpg";
+          const eventTitle = event.title || "Event";
+          const eventDescription = event.description || "Join us for this special event.";
+          const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";
 
           newsCard.innerHTML = `
-        <!-- Service Image Wrapper -->
+        <!-- Event Image Wrapper -->
         <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${news.img}" alt="${news.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <img src="${eventImage}" alt="${eventTitle}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
         </div>
 
-        <!-- Service Content -->
+        <!-- Event Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${news.title}</h3>
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${eventTitle}</h3>
           <div class="flex items-center gap-1 mb-2">
             <i class="fa-solid fa-calendar-days text-gray-300 text-sm"></i>
-            <h4 class="text-md font-semibold text-gray-300 mb-2 text-start">${news.date}</h4>
+            <h4 class="text-md font-semibold text-gray-300 mb-2 text-start">${eventDate}</h4>
           </div>
 
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${news.description}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${eventDescription}</p>
 
         </div>
         </div>
@@ -765,6 +962,11 @@
 
           newsContainer.appendChild(newsCard);
         });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchEvents();
       });
     </script>
 
@@ -797,30 +999,65 @@
         </div>
       </div>
     </section>
-    <script src="departments-data.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const departmentsContainer = document.getElementById(
-          "departmentsContainer"
-        );
+      // Global variable to store departments data
+      let departments = [];
+
+      // Fetch departments from API
+      async function fetchDepartments() {
+        try {
+          const response = await fetch('/doctor-appoinment/Backend/api/departments.php?action=public');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            departments = data.data;
+            renderDepartments();
+          } else {
+            console.error('Failed to fetch departments:', data.message);
+            // Fallback to empty state
+            const departmentsContainer = document.getElementById("departmentsContainer");
+            departmentsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No departments available at the moment.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching departments:', error);
+          // Fallback to empty state
+          const departmentsContainer = document.getElementById("departmentsContainer");
+          departmentsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load departments. Please try again later.</p>';
+        }
+      }
+
+      // Render departments on the page
+      function renderDepartments() {
+        const departmentsContainer = document.getElementById("departmentsContainer");
+        departmentsContainer.innerHTML = ''; // Clear existing content
+
+        if (departments.length === 0) {
+          departmentsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No departments available at the moment.</p>';
+          return;
+        }
 
         departments.forEach((department) => {
           const departmentCard = document.createElement("div");
           departmentCard.className =
-            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          // Use the image from database or fallback to default
+          const departmentImage = department.image_path ? `/doctor-appoinment/uploads/departments/${department.image_path}` : "../public/assets/nephrology.jpg";
+          const departmentName = department.name || "Department";
+          const departmentDescription = department.description || "Specialized medical department providing quality healthcare services.";
 
           departmentCard.innerHTML = `
-        <!-- department Image Wrapper -->
+        <!-- Department Image Wrapper -->
         <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${department.img}" alt="${department.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <img src="${departmentImage}" alt="${departmentName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
         </div>
 
-        <!-- department Content -->
+        <!-- Department Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${department.name}</h3>
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${departmentName}</h3>
           
 
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${department.description}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${departmentDescription}</p>
 
         </div>
         </div>
@@ -828,6 +1065,11 @@
 
           departmentsContainer.appendChild(departmentCard);
         });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchDepartments();
       });
     </script>
 
@@ -896,5 +1138,6 @@
     </script>
 
     <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
   </body>
 </html>

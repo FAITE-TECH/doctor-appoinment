@@ -8,7 +8,7 @@
     <title>Doctor Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script
-      src="https://kit.fontawesome.com/a076d05399.js"
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"
       crossorigin="anonymous"
     ></script>
     <link
@@ -17,14 +17,16 @@
     />
   </head>
   <body>
-    <!--  Import Header -->
-
     <div id="header"></div>
     <script>
-      fetch("header.html")
+      fetch("shared-nav.html")
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
+          // Initialize navigation after it's loaded
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
         });
     </script>
 
@@ -65,36 +67,10 @@
           >
             All
             <div
-              class="underline  w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+              class="underline w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
             ></div>
           </button>
-          <button
-            class="filter-btn relative px-4 py-2 text-black transition"
-            data-filter="Dental"
-          >
-            Dental
-            <div
-              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
-            ></div>
-          </button>
-          <button
-            class="filter-btn relative px-4 py-2 text-black transition"
-            data-filter="Neurologist"
-          >
-            Neurologist
-            <div
-              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
-            ></div>
-          </button>
-          <button
-            class="filter-btn relative px-4 py-2 text-black transition"
-            data-filter="Pulmonary"
-          >
-            Pulmonary
-            <div
-              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
-            ></div>
-          </button>
+          <!-- Dynamic department buttons will be added here by JavaScript -->
         </div>
 
         <!-- Cards Grid -->
@@ -107,86 +83,159 @@
       </div>
     </section>
 
-    <script src="doctors-data.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const doctorContainer = document.getElementById("doctorContainer");
-        const filterButtons = document.querySelectorAll(".filter-btn");
+      // Global variable to store doctors data
+      let doctors = [];
+      let availableDepartments = new Set();
+      let doctorContainer;
 
-        function renderDoctors(filteredDoctors) {
-          // Clear container
-          doctorContainer.innerHTML = "";
+      // Fetch doctors from API
+      async function fetchDoctors() {
+        try {
+          const response = await fetch('../../Backend/api/doctors.php?action=doctors');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            doctors = data.data;
+            
+            // Extract unique departments from doctors data
+            availableDepartments.clear();
+            doctors.forEach(doctor => {
+              if (doctor.department_name) {
+                availableDepartments.add(doctor.department_name);
+              }
+            });
+            
+            // Update filter buttons dynamically
+            updateFilterButtons();
+            
+            renderDoctors(doctors);
+          } else {
+            console.error('Failed to fetch doctors:', data.message);
+            // Fallback to empty state
+            const doctorContainer = document.getElementById("doctorContainer");
+            doctorContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No doctors available at the moment.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching doctors:', error);
+          // Fallback to empty state
+          const doctorContainer = document.getElementById("doctorContainer");
+          doctorContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load doctors. Please try again later.</p>';
+        }
+      }
 
-          filteredDoctors.forEach((doctor) => {
-            const doctorCard = document.createElement("div");
-            doctorCard.className =
-              "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
+      // Render doctors function (global scope)
+      function renderDoctors(filteredDoctors) {
+        // Clear container
+        doctorContainer.innerHTML = "";
 
-            doctorCard.innerHTML = `
+        if (filteredDoctors.length === 0) {
+          doctorContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No doctors found for the selected filter.</p>';
+          return;
+        }
+
+        filteredDoctors.forEach((doctor) => {
+          const doctorCard = document.createElement("div");
+          doctorCard.className =
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
+
+          // Use the image from database or fallback to default
+          let doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
+          // If image_path is absolute, use it as is, otherwise make it relative
+          if (doctor.image_path && !doctor.image_path.startsWith('http') && !doctor.image_path.startsWith('/')) {
+            doctorImage = "../" + doctor.image_path;
+          } else if (doctor.image_path && doctor.image_path.startsWith('/')) {
+            doctorImage = doctor.image_path;
+          }
+          const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
+          const doctorDescription = doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
+
+          doctorCard.innerHTML = `
         <!-- Doctor Image Wrapper -->
         <a href="doctor-details.html?id=${doctor.id}">
           <div class="relative h-56 w-full overflow-hidden group">
-            <img src="${doctor.img}" alt="${doctor.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+            <img src="${doctorImage}" alt="${doctor.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
           </div>
         </a>
 
         <!-- Doctor Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
           <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
-          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">${doctor.special}</p>
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${doctor.description}</p>
+          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">${doctorSpecialization}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${doctorDescription}</p>
         </div>
       `;
 
-            doctorContainer.appendChild(doctorCard);
+          doctorContainer.appendChild(doctorCard);
 
-            // Animate card fade in
-            requestAnimationFrame(() => {
-              doctorCard.classList.remove("opacity-0");
-            });
+          // Animate card fade in
+          requestAnimationFrame(() => {
+            doctorCard.classList.remove("opacity-0");
           });
-        }
+        });
+      }
 
-        // Initial render - all doctors
-        renderDoctors(doctors);
+      // Update filter buttons based on available departments
+      function updateFilterButtons() {
+        const filterContainer = document.getElementById("doctorFilter");
+        
+        // Keep the "All" button and remove others
+        const allButton = filterContainer.querySelector('[data-filter="All"]');
+        filterContainer.innerHTML = '';
+        filterContainer.appendChild(allButton);
+        
+        // Add dynamic department buttons
+        availableDepartments.forEach(department => {
+          const button = document.createElement('button');
+          button.className = 'filter-btn relative px-4 py-2 text-black transition';
+          button.setAttribute('data-filter', department);
+          button.innerHTML = `
+            ${department}
+            <div class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"></div>
+          `;
+          filterContainer.appendChild(button);
+        });
+        
+        // Re-attach event listeners to all filter buttons
+        attachFilterListeners();
+      }
 
-        // Filter functionality
+      document.addEventListener("DOMContentLoaded", () => {
+        doctorContainer = document.getElementById("doctorContainer");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+
+        // Fetch and render doctors
+        fetchDoctors();
+      });
+
+      // Attach filter listeners to buttons
+      function attachFilterListeners() {
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        
         filterButtons.forEach((btn) => {
           btn.addEventListener("click", () => {
             const filter = btn.dataset.filter;
 
-            
+            // Update visual state
+            filterButtons.forEach((b) =>
+              b.querySelector(".underline").classList.add("hidden")
+            );
+            btn.querySelector(".underline").classList.remove("hidden");
 
+            // Filter doctors
             if (filter === "All") {
               renderDoctors(doctors);
             } else {
-              const filteredDoctors = doctors.filter(
-                (d) => d.special === filter
+              const filteredDoctors = doctors.filter((d) => 
+                d.department_name && d.department_name === filter
               );
               renderDoctors(filteredDoctors);
             }
           });
         });
-      });
+      }
     </script>
 
-        <!-- Filter -->
-
-    <script>
-      const filterButtons = document.querySelectorAll(".filter-btn");
-
-      filterButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          // Hide underline for all buttons
-          filterButtons.forEach((b) =>
-            b.querySelector(".underline").classList.add("hidden")
-          );
-
-          // Show underline for clicked button
-          btn.querySelector(".underline").classList.remove("hidden");
-        });
-      });
-    </script>
     <style>
       /* Simple fade-in animation */
       @keyframes fadeIn {
@@ -267,5 +316,7 @@
     });
 </script>
 
+    <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
   </body>
 </html>
