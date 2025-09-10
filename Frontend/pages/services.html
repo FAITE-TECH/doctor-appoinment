@@ -131,13 +131,19 @@
 
     <!-- Footer -->
     <div id="footer"></div>
-    <script>
-      fetch("footer.html")
-        .then((res) => res.text())
-        .then((data) => {
-          document.getElementById("footer").innerHTML = data;
-        });
-    </script>
+   <script>
+  fetch("footer.html")
+    .then((res) => res.text())
+    .then((data) => {
+      document.getElementById("footer").innerHTML = data;
+
+      // Now the footer exists, so set the year
+      const yearSpan = document.getElementById("currentYear");
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+    });
+</script>
 
 
  <!-- Placeholder for spinner -->

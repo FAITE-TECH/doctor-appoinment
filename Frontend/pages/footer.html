@@ -12,7 +12,10 @@
     <title>Document</title>
   </head>
   <body>
-    <footer id="footer" class="bg-gradient-to-r from-gray-700 to-black py-10 w-full ">
+    <footer
+      id="footer"
+      class="bg-gradient-to-r from-gray-700 to-black py-10 w-full"
+    >
       <div
         class="grid grid-cols-1 md:grid-cols-3 gap-8 text-white px-32 mx-auto text-center md:text-left"
       >
@@ -122,18 +125,40 @@
           </p>
         </div>
       </div>
+      <!-- Logo and copyrights -->
+      <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8 ">
+        <div class="sm:flex sm:items-center sm:justify-between">
+          <div class="flex justify-center text-teal-600 sm:justify-start">
+            <img
+              src="../public/assets/logo.png"
+              alt="logo"
+              class="h-10 w-auto bg-gray-50 rounded-lg"
+            />
+          </div>
+
+          <p
+            class="mt-4 text-center text-sm text-gray-500 lg:mt-0 lg:text-right dark:text-gray-400"
+          >
+            Copyright &copy; <span id="currentYear"></span> All rights reserved.
+          </p>
+        </div>
+      </div>
     </footer>
+    <!-- current year script -->
+    <script>
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+    </script>
 
     <!-- Load Spinner -->
-<div id="spinner"></div>
-<script>
-  fetch("spinner.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("spinner").innerHTML = data;
-    });
-</script>
-
+    <div id="spinner"></div>
+    <script>
+      fetch("spinner.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("spinner").innerHTML = data;
+        });
+    </script>
 
     <script src="../public/js/script.js"></script>
   </body>
