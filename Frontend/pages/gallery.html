@@ -16,12 +16,45 @@
     <!-- Header -->
     <div id="header"></div>
     <script>
-      fetch("header.html")
-        .then((res) => res.text())
-        .then((data) => {
-          document.getElementById("header").innerHTML = data;
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("header").innerHTML = data;
+
+      // === Mobile menu toggle ===
+      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      if (mobileMenuToggle && mobileMenu) {
+        mobileMenuToggle.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
         });
-    </script>
+      }
+
+      // === Main Doctor dropdown ===
+      document.querySelectorAll("[data-dropdown]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const menu = button.nextElementSibling;
+          menu.classList.toggle("hidden");
+        });
+      });
+
+      // === Submenus ===
+      document.querySelectorAll("[data-submenu]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const submenu = button.nextElementSibling;
+
+          // Close other submenus first
+          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
+            if (menu !== submenu) menu.classList.add("hidden");
+          });
+
+          // Toggle clicked submenu
+          submenu.classList.toggle("hidden");
+        });
+      });
+    });
+</script>
 
     <!-- Hero -->
     <div class="relative w-full h-40 mx-auto">

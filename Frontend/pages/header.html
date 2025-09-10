@@ -53,7 +53,7 @@
 
         <!-- Desktop Navigation -->
         <nav
-          class="hidden md:flex space-x-8 items-center font-thin text-gray-500"
+          class="hidden md:flex space-x-8 items-center font-thin  text-gray-500"
         >
           <!-- Home -->
           <a href="./home.html" class="hover:text-blue-600">Home</a>
@@ -221,21 +221,24 @@
       <!-- Mobile Menu -->
       <nav
         id="mobileMenu"
-        class="hidden flex flex-col space-y-2 bg-white shadow-md items-center justify-center md:hidden mx-auto z-[9999]"
+        class="hidden flex flex-col space-y-4 bg-gray-100 shadow-md font-thin items-center justify-center md:hidden mx-auto z-[9999] border-t border-gray-200"
       >
-        <a href="./index.php" class="block hover:text-blue-600 mx-auto">Home</a>
+        <a href="./home.html" class="block w-full text-center px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition">
+          Home
+        </a>
 
         <!-- Doctor Dropdown -->
-        <div class="mx-auto">
+        <div class="mx-auto ">
           <button
-            class="flex items-center w-full justify-between hover:text-blue-600"
+            class="flex items-center w-full justify-between px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition"
             data-dropdown
           >
             Doctor <i class="fas fa-chevron-down ml-1 text-sm"></i>
           </button>
 
           <!-- Departments -->
-          <div class="hidden flex-col pl-4 mt-2 space-y-2" data-dropdown-menu>
+          <div 
+            class="hidden flex-col pl-4 mt-2 space-y-2 border-b border-gray-200" data-dropdown-menu>
             <!-- Cardiology -->
             <div>
               <button
@@ -249,12 +252,12 @@
                 data-submenu-menu
               >
                 <a
-                  href="./doctor-dr-smith.php"
+                  href="./doctors.html"
                   class="block hover:text-blue-600"
                   >Dr. Smith</a
                 >
                 <a
-                  href="./doctor-dr-jones.php"
+                  href="./doctors.html"
                   class="block hover:text-blue-600"
                   >Dr. Jones</a
                 >
@@ -274,12 +277,12 @@
                 data-submenu-menu
               >
                 <a
-                  href="./doctor-dr-williams.php"
+                  href="./doctors.html"
                   class="block hover:text-blue-600"
                   >Dr. Williams</a
                 >
                 <a
-                  href="./doctor-dr-miller.php"
+                  href="./doctors.html"
                   class="block hover:text-blue-600"
                   >Dr. Miller</a
                 >
@@ -299,12 +302,12 @@
                 data-submenu-menu
               >
                 <a
-                  href="./doctor-dr-brown.php"
+                  href="./doctors.html"
                   class="block hover:text-blue-600"
                   >Dr. Brown</a
                 >
                 <a
-                  href="./doctor-dr-davis.php"
+                  href="./doctors.html"
                   class="block hover:text-blue-600"
                   >Dr. Davis</a
                 >
@@ -317,7 +320,7 @@
 
         <div class="mx-auto">
           <button
-            class="flex items-center w-full justify-between hover:text-blue-600"
+            class="flex items-center w-full justify-between px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition"
             data-dropdown
           >
             Department <i class="fas fa-chevron-down ml-1 text-sm"></i>
@@ -336,41 +339,27 @@
         </div>
 
         <!-- Other Links -->
-        <a href="./portfolio" class="block hover:text-blue-600 mx-auto"
-          >GALLERY</a
-        >
-        <a href="./services.html" class="block hover:text-blue-600 mx-auto"
-          >SERVICES</a
-        >
-        <a href="./events.html" class="block hover:text-blue-600 mx-auto"
-          >EVENT</a
-        >
+        <a href="./gallery.html" class="block w-full text-center px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition">GALLERY</a>
+        <a href="./services.html" class="block w-full text-center px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition">SERVICES</a>
+        <a href="./events.html" class="block w-full text-center px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition">EVENT</a>
         <!-- PAGE Dropdown -->
 
         <div class="mx-auto">
           <button
-            class="flex items-center w-full justify-between hover:text-blue-600"
+            class="flex items-center w-full justify-between px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition"
             data-dropdown
           >
-            PAGE <i class="fas fa-chevron-down ml-1 text-sm"></i>
+            PAGE <i class="fas fa-chevron-down ml- text-sm"></i>
           </button>
           <div class="hidden flex-col pl-4 mt-2 space-y-1" data-submenu-menu>
             <a href="./" class="block hover:text-blue-600">BLOG</a>
-            <a
-              href="./home.html#appointment-form"
-              class="block hover:text-blue-600"
-              >Book Appointment</a
-            >
-            <a href="./error.html" class="block hover:text-blue-600"
-              >404 Page</a
-            >
+            <a href="./home.html#appointment-form" class="block hover:text-blue-600">Book Appointment</a>
+            <a href="./error.html" class="block hover:text-blue-600">404 Page</a>
           </div>
         </div>
 
-        >
-        <a href="./aboutUs.php" class="block hover:text-blue-600 mx-auto"
-          >CONTACT</a
-        >
+        
+        <a href="./contact.html" class="block w-full text-center px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition">CONTACT</a>
       </nav>
     </header>
 

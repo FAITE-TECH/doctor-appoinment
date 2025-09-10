@@ -33,13 +33,47 @@
     <!--  Import Header -->
 
     <div id="header"></div>
-    <script>
-      fetch("header.html")
-        .then((res) => res.text())
-        .then((data) => {
-          document.getElementById("header").innerHTML = data;
+  <script>
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("header").innerHTML = data;
+
+      // === Mobile menu toggle ===
+      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      if (mobileMenuToggle && mobileMenu) {
+        mobileMenuToggle.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
         });
-    </script>
+      }
+
+      // === Main Doctor dropdown ===
+      document.querySelectorAll("[data-dropdown]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const menu = button.nextElementSibling;
+          menu.classList.toggle("hidden");
+        });
+      });
+
+      // === Submenus ===
+      document.querySelectorAll("[data-submenu]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const submenu = button.nextElementSibling;
+
+          // Close other submenus first
+          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
+            if (menu !== submenu) menu.classList.add("hidden");
+          });
+
+          // Toggle clicked submenu
+          submenu.classList.toggle("hidden");
+        });
+      });
+    });
+</script>
+
     <!-- Hero Image -->
     <div
       class="relative md:w-full md:h-[600px] h-[400px] mb-6 shadow-lg rounded-2xl flex justify-center align-center"
@@ -125,15 +159,13 @@
     <!-- Form Section -->
     <div class="flex flex-col lg:flex-row gap-8 px-6 py-10 max-w-6xl mx-auto">
       <!-- Check Schedule -->
-      <div class="flex-1 p-6 bg-blue-500 rounded-lg" id="appointment-form">
+      <div class="flex-1 p-4 bg-blue-500 rounded-lg" id="appointment-form">
         <h1 class="text-xl font-bold text-white mb-4">Check Schedule</h1>
         <div class="w-20 h-0.5 bg-red-400 mb-6"></div>
 
         <div class="flex flex-col gap-4">
           <div class="flex flex-col">
-            <label class="text-sm font-medium text-white mb-1"
-              >Department</label
-            >
+            <label class="text-sm font-medium text-white mb-1">Department</label>
             <select
               id="specialFilter"
               class="border h-12 px-3 py-2 focus:ring-2 focus:ring-blue-400 rounded-md"
@@ -301,23 +333,22 @@
         list.forEach((doctor) => {
           const doctorCard = document.createElement("div");
           doctorCard.className =
-            "bg-white border my-7 rounded-lg shadow p-6 flex flex-col md:flex-row items-center gap-4 transition hover:shadow-lg ";
+            "bg-gray-100 border my-4  shadow p-2 flex flex-col md:flex-row items-center gap-4 transition hover:shadow-lg ";
 
           doctorCard.innerHTML = `
               <img src="${doctor.img}" alt="${doctor.name}" 
                 class="w-32 h-32 md:w-10 md:h-10 rounded-full object-cover mb-3 md:mb-0">
 
-              <div class="flex flex-col p-0 md:flex-row md:items-center md:justify-between w-full">
+              <div class="flex flex-col p-0 md:flex-row items-center justify-between w-full">
                 <div>
                   <h3 class="text-lg font-semibold">${doctor.name}</h3>
                   <p class="text-sm text-gray-500">${doctor.special}</p>
                 </div>
-
-                <a onclick="window.location.href='doctor-details.html?id=${doctor.id}'" 
-                  class="mt-3 md:mt-0 bg-red-600 w-full text-white py-1 px-2 rounded-md hover:bg-red-700 cursor-pointer transition"
+                <button onclick="window.location.href='doctor-details.html?id=${doctor.id}'" 
+                  class="md:ml-3 ml-0 md:mt-0 bg-red-600 w-fit text-white  text-center py-1 px-2 rounded-md hover:bg-red-700 cursor-pointer transition"
                 >
                   View Schedule
-                </a>
+                </button>
               </div>
             `;
           doctorCtn.appendChild(doctorCard);
@@ -328,7 +359,7 @@
       specialFilter.addEventListener("change", (e) => {
         const selected = e.target.value;
         if (selected === "") {
-          doctorCtn.innerHTML = `<p class="text-gray-500">Please select a specialization</p>`;
+          doctorCtn.innerHTML = `<p class="text-white ">Please select a specialization</p>`;
         } else {
           const filtered = doctors.filter((doc) => doc.special === selected);
           renderDoctors(filtered);
@@ -643,10 +674,7 @@
     <!-- Our services -->
 
     <section>
-      <div
-        id="services"
-        class="text-center my-10 container mx-auto w-full md:justify-center md:place-items-center px-4"
-      >
+      <div id="services" class="text-center my-10 container mx-auto max-w-6xl px-4">
         <h2 class="text-3xl text-flourish-500 font-bold">OUR SERVICES</h2>
 
         <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
