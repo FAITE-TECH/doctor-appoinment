@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    
 
     <link
       rel="stylesheet"
@@ -23,6 +22,13 @@
       rel="stylesheet"
     />
     <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
     <title>HPC Hospital</title>
   </head>
@@ -30,46 +36,48 @@
     <!--  Import Header -->
 
     <div id="header"></div>
-  <script>
-  fetch("header.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("header").innerHTML = data;
+    <script>
+      fetch("header.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("header").innerHTML = data;
 
-      // === Mobile menu toggle ===
-      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-      const mobileMenu = document.getElementById("mobileMenu");
+          // === Mobile menu toggle ===
+          const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+          const mobileMenu = document.getElementById("mobileMenu");
 
-      if (mobileMenuToggle && mobileMenu) {
-        mobileMenuToggle.addEventListener("click", () => {
-          mobileMenu.classList.toggle("hidden");
-        });
-      }
+          if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener("click", () => {
+              mobileMenu.classList.toggle("hidden");
+            });
+          }
 
-      // === Main Doctor dropdown ===
-      document.querySelectorAll("[data-dropdown]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const menu = button.nextElementSibling;
-          menu.classList.toggle("hidden");
-        });
-      });
-
-      // === Submenus ===
-      document.querySelectorAll("[data-submenu]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const submenu = button.nextElementSibling;
-
-          // Close other submenus first
-          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
-            if (menu !== submenu) menu.classList.add("hidden");
+          // === Main Doctor dropdown ===
+          document.querySelectorAll("[data-dropdown]").forEach((button) => {
+            button.addEventListener("click", () => {
+              const menu = button.nextElementSibling;
+              menu.classList.toggle("hidden");
+            });
           });
 
-          // Toggle clicked submenu
-          submenu.classList.toggle("hidden");
+          // === Submenus ===
+          document.querySelectorAll("[data-submenu]").forEach((button) => {
+            button.addEventListener("click", () => {
+              const submenu = button.nextElementSibling;
+
+              // Close other submenus first
+              document
+                .querySelectorAll("[data-submenu-menu]")
+                .forEach((menu) => {
+                  if (menu !== submenu) menu.classList.add("hidden");
+                });
+
+              // Toggle clicked submenu
+              submenu.classList.toggle("hidden");
+            });
+          });
         });
-      });
-    });
-</script>
+    </script>
 
     <!-- Hero Image -->
     <div
@@ -162,7 +170,9 @@
 
         <div class="flex flex-col gap-4">
           <div class="flex flex-col">
-            <label class="text-sm font-medium text-white mb-1">Department</label>
+            <label class="text-sm font-medium text-white mb-1"
+              >Department</label
+            >
             <select
               id="specialFilter"
               class="border h-12 px-3 py-2 focus:ring-2 focus:ring-blue-400 rounded-md"
@@ -185,7 +195,10 @@
         <h1 class="text-xl font-bold text-white mb-4">Book Appointment</h1>
         <div class="w-24 h-0.5 bg-red-400 mb-6"></div>
 
-        <form class="flex flex-col gap-6">
+        <form
+          class="flex flex-col gap-6"
+          onsubmit="event.preventDefault(); downloadPDF();"
+        >
           <!-- Patient Info -->
           <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1 flex flex-col">
@@ -194,6 +207,7 @@
               >
               <input
                 type="text"
+                id="patientName"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
@@ -204,6 +218,7 @@
               >
               <input
                 type="text"
+                id="phoneNo"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
@@ -212,6 +227,7 @@
               <label class="text-sm font-medium text-white mb-1">Email</label>
               <input
                 type="email"
+                id="email"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
@@ -244,6 +260,8 @@
                 required
               >
                 <option value="">Select one</option>
+                <option value="Dr.K.Arulanandem">Dr.K.Arulanandem</option>
+                <option value="Dr.S.Sivschelvan">Dr.S.Sivschelvan</option>
               </select>
             </div>
           </div>
@@ -273,7 +291,7 @@
               />
             </div>
           </div>
-          <!-- Flatpickr JS -->
+          <!-- Mordern Date time Ui Flatpickr JS -->
           <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
           <script>
             // Initialize Date Picker
@@ -300,7 +318,6 @@
 
           <button
             type="submit"
-            onclick="showToast()"
             class="bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition w-full sm:w-auto"
           >
             Book Now
@@ -314,6 +331,91 @@
       </div>
     </div>
 
+    <!-- Pdf Structure -->
+    <div
+      id="print"
+      class="hidden max-w-4xl h-full mx-auto border border-gray-300 rounded-lg p-4 bg-white shadow-lg"
+    >
+      <div class="flex items-center justify-between border-b pb-4 mb-4">
+        <img
+          src="../public/assets/logo.png"
+          alt="Hospital Logo"
+          class="h-16 w-16 object-contain"
+        />
+
+        <div class="text-right">
+          <h1 class="text-2xl font-bold text-gray-800">SPC Hospital</h1>
+          <p class="text-sm text-gray-600">
+            N0 386C, New Kalmunai Road, Navatkudah, Battialoa.
+          </p>
+          <p class="text-sm text-gray-600">
+            📞 065-2247600 / 07 600 600 36 | ✉️ info@hpc.lk
+          </p>
+          <p class="text-sm text-gray-600">✉️ info@hpc.lk</p>
+        </div>
+      </div>
+
+      <h2
+        class="text-xl font-semibold text-center text-gray-700 mb-6 underline"
+      >
+        Appointment Confirmation
+      </h2>
+
+      <div class="space-y-3 text-gray-800">
+        <p><b>Patient Name:</b> <span id="printPatientName"></span></p>
+        <p><b>Phone No:</b> <span id="printPhoneNo"></span></p>
+        <p><b>Email:</b> <span id="printEmail"></span></p>
+        <p><b>Department:</b> <span id="printDept"></span></p>
+        <p><b>Doctor:</b> <span id="printDoctor"></span></p>
+        <p><b>Date:</b> <span id="printDate"></span></p>
+        <p><b>Time:</b> <span id="printTime"></span></p>
+      </div>
+
+      <div class="mt-8 border-t pt-4 text-center text-gray-500 text-sm">
+        <p>Thank you! for booking with SPCHospital.</p>
+        <p>Please arrive 15 minutes before your appointment.</p>
+      </div>
+    </div>
+
+    <!-- Download PDF -->
+    <script type="text/javascript">
+      function downloadPDF() {
+        document.getElementById("printPatientName").innerText =
+          document.getElementById("patientName").value;
+        document.getElementById("printPhoneNo").innerText =
+          document.getElementById("phoneNo").value;
+        document.getElementById("printEmail").innerText =
+          document.getElementById("email").value;
+        document.getElementById("printDept").innerText =
+          document.getElementById("deptSelect").value;
+        document.getElementById("printDoctor").innerText =
+          document.getElementById("doctorSelect").value;
+        document.getElementById("printDate").innerText =
+          document.getElementById("datePicker").value;
+        document.getElementById("printTime").innerText =
+          document.getElementById("timePicker").value;
+
+        const element = document.getElementById("print");
+        element.classList.remove("hidden");
+
+        const opt = {
+          margin: 0.5,
+          filename: "appointment.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 1.5 },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        };
+
+        html2pdf()
+          .set(opt)
+          .from(element)
+          .save()
+          .then(() => {
+            element.classList.add("hidden");
+          });
+      }
+    </script>
+
     <!-- filter for doctors dropdown -->
     <script>
       const doctorCtn = document.getElementById("doctorCtn");
@@ -321,7 +423,7 @@
 
       // Render doctors dynamically
       function renderDoctors(list) {
-        doctorCtn.innerHTML = ""; // clear old data
+        doctorCtn.innerHTML = ""; 
         if (list.length === 0) {
           doctorCtn.innerHTML = `<p class="text-white">No doctors found</p>`;
           return;
@@ -671,7 +773,10 @@
     <!-- Our services -->
 
     <section>
-      <div id="services" class="text-center my-10 container mx-auto max-w-6xl px-4">
+      <div
+        id="services"
+        class="text-center my-10 container mx-auto max-w-6xl px-4"
+      >
         <h2 class="text-3xl text-flourish-500 font-bold">OUR SERVICES</h2>
 
         <div class="w-40 h-0.5 bg-red-400 mt-4 mx-auto"></div>
@@ -859,18 +964,18 @@
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-  fetch("footer.html")
-    .then((res) => res.text())
-    .then((data) => {
-      document.getElementById("footer").innerHTML = data;
+      fetch("footer.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("footer").innerHTML = data;
 
-      // Now the footer exists, so set the year
-      const yearSpan = document.getElementById("currentYear");
-      if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-      }
-    });
-</script>
+          // Now the footer exists, so set the year
+          const yearSpan = document.getElementById("currentYear");
+          if (yearSpan) {
+            yearSpan.textContent = new Date().getFullYear();
+          }
+        });
+    </script>
 
     <!-- Placeholder for spinner -->
     <div id="spinner"></div>
