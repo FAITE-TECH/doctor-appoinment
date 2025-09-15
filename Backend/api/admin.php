@@ -73,11 +73,10 @@ if ($method === 'GET' && $action === 'dashboard_stats') {
 if ($method === 'GET' && $action === 'recent_appointments') {
     checkAdminAuth();
     try {
-        $sql = "SELECT a.*, u.name AS patient_name, du.name AS doctor_name 
+        $sql = "SELECT a.*, u.name AS patient_name, d.name AS doctor_name 
                 FROM appointments a
                 JOIN users u ON a.user_id = u.id
                 JOIN doctors d ON a.doctor_id = d.id
-                JOIN users du ON d.user_id = du.id
                 ORDER BY a.created_at DESC LIMIT 5";
         
         $stmt = $GLOBALS['conn']->prepare($sql);
