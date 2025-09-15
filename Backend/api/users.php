@@ -18,11 +18,14 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     json_response(['error' => 'Forbidden: Admins only'], 403);
 }
 
-$sql = "SELECT id, name, email, role FROM users ORDER BY name";
+$sql = "SELECT u.id, u.name, u.email, u.created_at, r.role_name 
+        FROM users u 
+        JOIN roles r ON u.role_id = r.id 
+        ORDER BY u.created_at DESC";
 $result = $conn->query($sql);
 
 if (!$result) {
-    json_response(['error' => 'Database error'], 500);
+    json_response(['error' => 'Database error: ' . $conn->error], 500);
 }
 
 $users = [];
@@ -32,5 +35,14 @@ if ($result->num_rows > 0) {
     }
 }
 
-json_response(['success' => true, 'users' => $users]);
+// Get total count
+$countSql = "SELECT COUNT(*) as total FROM users";
+$countResult = $conn->query($countSql);
+$totalUsers = $countResult ? $countResult->fetch_assoc()['total'] : 0;
+
+json_response([
+    'success' => true, 
+    'users' => $users,
+    'total_users' => $totalUsers
+]);
 ?>

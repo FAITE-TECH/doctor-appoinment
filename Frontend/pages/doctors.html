@@ -30,21 +30,21 @@
         });
     </script>
 
-    <div class="relative w-full h-40 max-w-6xl mx-auto">
+    <div class="relative w-full h-32 sm:h-40 max-w-6xl mx-auto mx-4 sm:mx-auto">
       <img
         src="../public/assets/eyecare.jpg"
         alt="services"
         class="w-full h-full object-cover rounded-lg"
       />
       <h1
-        class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded"
+        class="absolute bottom-2 left-2 text-lg sm:text-xl font-bold text-white bg-black/50 px-2 py-1 rounded"
       >
         Doctors
       </h1>
     </div>
 
     <div
-      class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm justify-center max-w-6xl"
+      class="flex text-gray-600 my-6 sm:my-10 leading-relaxed space-x-1 text-xs sm:text-sm justify-center max-w-6xl px-4"
     >
       <a href="home.html#doctors" class="text-blue-600 hover:underline">Home</a>
       <span>&gt;</span>
@@ -55,14 +55,14 @@
 
     <!-- Filter -->
     <section id="doctors">
-      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+      <div class="text-center my-6 sm:my-10 container mx-auto max-w-6xl px-4">
         <!-- Filter Buttons -->
         <div
           id="doctorFilter"
-          class="flex flex-wrap justify-center gap-4 mb-10"
+          class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6 sm:mb-10"
         >
           <button
-            class="filter-btn relative px-4 py-2 text-black transition"
+            class="filter-btn relative px-3 sm:px-4 py-1 sm:py-2 text-black transition text-sm sm:text-base"
             data-filter="All"
           >
             All
@@ -76,7 +76,7 @@
         <!-- Cards Grid -->
         <div
           id="doctorContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 transition-all duration-500"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -159,10 +159,10 @@
         </a>
 
         <!-- Doctor Content -->
-        <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
-          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">${doctorSpecialization}</p>
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${doctorDescription}</p>
+        <div class="p-4 sm:p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-lg sm:text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
+          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-2 sm:px-3 py-1 rounded-full uppercase w-fit mb-3">${doctorSpecialization}</p>
+          <p class="text-gray-600 text-sm sm:text-md mb-4 clamp-4 text-start leading-relaxed">${doctorDescription}</p>
         </div>
       `;
 
@@ -187,7 +187,7 @@
         // Add dynamic department buttons
         availableDepartments.forEach(department => {
           const button = document.createElement('button');
-          button.className = 'filter-btn relative px-4 py-2 text-black transition';
+          button.className = 'filter-btn relative px-3 sm:px-4 py-1 sm:py-2 text-black transition text-sm sm:text-base';
           button.setAttribute('data-filter', department);
           button.innerHTML = `
             ${department}

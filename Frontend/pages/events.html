@@ -33,15 +33,15 @@
         });
     </script>
 
-    <div class="relative w-full h-40 max-w-6xl mx-auto ">
-            <img src="../public/assets/eyecare.jpg" alt="services" class="w-full h-full object-cover  rounded-lg">
-            <h1 class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
+    <div class="relative w-full h-32 sm:h-40 max-w-6xl mx-auto mx-4 sm:mx-auto">
+            <img src="../public/assets/eyecare.jpg" alt="services" class="w-full h-full object-cover rounded-lg">
+            <h1 class="absolute bottom-2 left-2 text-lg sm:text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
                  Events
             </h1>
         </div>
 
 
-        <div class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm  justify-center max-w-6xl ">
+        <div class="flex text-gray-600 my-6 sm:my-10 leading-relaxed space-x-1 text-xs sm:text-sm justify-center max-w-6xl px-4">
             <a href="home.html#doctors" class="text-blue-600 hover:underline">Home</a>
             <span>&gt;</span>
             <a href="doctors.html" class="text-blue-600 hover:underline">Events</a>
@@ -50,13 +50,13 @@
 
 
   <section id="services">
-      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+      <div class="text-center my-6 sm:my-10 container mx-auto max-w-6xl px-4">
        
 
         <!-- Services Cards Grid -->
         <div
           id="serviceContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-6 sm:mt-10"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -119,14 +119,14 @@
         </div>
 
         <!-- Event Content -->
-        <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${eventTitle}</h3>
+        <div class="p-4 sm:p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-lg sm:text-xl font-semibold text-blue-800 mb-2 text-start">${eventTitle}</h3>
           <div class="flex items-center gap-1 mb-2">
             <i class="fa-solid fa-calendar-days text-gray-300 text-sm"></i>
-            <h4 class="text-md font-semibold text-gray-300 mb-2 text-start">${eventDate}</h4>
+            <h4 class="text-sm sm:text-md font-semibold text-gray-300 mb-2 text-start">${eventDate}</h4>
           </div>
 
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${eventDescription}</p>
+          <p class="text-gray-600 text-sm sm:text-md mb-4 clamp-4 text-start leading-relaxed">${eventDescription}</p>
 
         </div>
       `;

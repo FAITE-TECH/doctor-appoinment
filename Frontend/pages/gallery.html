@@ -52,65 +52,31 @@
       <span>&gt;</span>
     </div>
 
-    <section id="doctors">
+    <section id="gallery">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
-        <!-- Filter Buttons -->
-        <div
-          id="doctorFilter"
-          class="flex flex-wrap justify-center gap-4 mb-10"
-        >
-          <button
-            class="filter-btn relative px-4 py-2 text-black transition"
-            data-filter="Doctors"
-          >
-            Doctor
-            <div
-              class="underline  w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
-            ></div>
-          </button>
-          <button
-            class="filter-btn relative px-4 py-2 text-black transition"
-            data-filter="Departments"
-          >
-            Departments<div
-              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
-            ></div>
-          </button>
-          <button
-            class="filter-btn relative px-4 py-2 text-black transition"
-            data-filter="Services"
-          >
-            Services<div
-              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
-            ></div>
-          </button>
-          <button
-            class="filter-btn relative px-4 py-2 text-black transition"
-            data-filter="Latest News"
-          >
-            Latest News<div
-              class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
-            ></div>
-          </button>
-        </div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">Our Gallery</h2>
+        <p class="text-gray-600 mb-10 max-w-2xl mx-auto">
+          Explore our collection of images showcasing our facilities, team, and services.
+        </p>
 
-        <!-- Cards Grid -->
+        <!-- Gallery Grid -->
         <div
-          id="cardsContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500"
-        ></div>
+          id="galleryContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-all duration-500"
+        >
+          <!-- Loading message -->
+          <div id="loadingMessage" class="col-span-full text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p class="mt-2 text-gray-600">Loading gallery...</p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <script src="services-data.js"></script>
-    <script src="doctors-data.js"></script>
-    <script src="departments-data.js"></script>
-    <script src="latestNews-data.js"></script>
-
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const cardsContainer = document.getElementById("cardsContainer");
-    const filterButtons = document.querySelectorAll(".filter-btn");
+  document.addEventListener("DOMContentLoaded", async () => {
+    const galleryContainer = document.getElementById("galleryContainer");
+    const loadingMessage = document.getElementById("loadingMessage");
 
     // Helper: animate cards in
     function animateIn(card) {
@@ -120,104 +86,70 @@
       });
     }
 
-    // Helper: animate cards out (before new content comes in)
-    function animateOut(callback) {
-      const cards = [...cardsContainer.children];
-      let finished = 0;
-
-      if (cards.length === 0) {
-        callback();
-        return;
-      }
-
-      cards.forEach((card) => {
-        card.classList.add("opacity-0", "-translate-y-10", "scale-90", "transition-all", "duration-500");
-        card.addEventListener(
-          "transitionend",
-          () => {
-            finished++;
-            if (finished === cards.length) {
-              callback();
-            }
-          },
-          { once: true }
-        );
-      });
-    }
-
-    // Render function with smooth transition
-    function renderCards(data, type) {
-      animateOut(() => {
-        cardsContainer.innerHTML = ""; // clear after out animation
-
-        if (!data || data.length === 0) {
-          cardsContainer.innerHTML = `<p class="col-span-full text-red-500 font-semibold">No ${type} found.</p>`;
+    // Load gallery images from API
+    async function loadGallery() {
+      try {
+        const response = await fetch('/doctor-appoinment/Backend/api/public_gallery.php');
+        
+        if (!response.ok) {
+          throw new Error('Failed to load gallery');
+        }
+        
+        const data = await response.json();
+        const images = data.gallery || [];
+        
+        // Hide loading message
+        loadingMessage.style.display = 'none';
+        
+        if (images.length === 0) {
+          galleryContainer.innerHTML = `
+            <div class="col-span-full text-center py-12">
+              <div class="text-gray-500 text-lg">No images in gallery yet</div>
+              <p class="text-gray-400 mt-2">Check back later for updates!</p>
+            </div>
+          `;
           return;
         }
 
-        data.forEach((item, index) => {
+        // Render gallery images
+        images.forEach((image, index) => {
           const card = document.createElement("div");
-          card.className =
-            "bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 transform";
+          card.className = "bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1";
 
           card.innerHTML = `
-            <a href="${type.toLowerCase()}-details.html?id=${item.id}">
-              <div class="relative h-56 w-full overflow-hidden group">
-                <img src="${item.img}" alt="${item.name || item.type}" 
-                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-              </div>
-            </a>
-            <div class="p-6 flex flex-col flex-grow">
-              <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">
-                ${item.name || item.type || item.title}
-              </h3>
-              <p class="text-gray-600 text-sm clamp-6 leading-relaxed">
-                ${item.description || ""}
-              </p>
-              <p class="text-gray-900 text-sm mt-4 text-start leading-">
-                ${item.date || ""}
-              </p>
+            <div class="relative group">
+              <img src="/doctor-appoinment/uploads/gallery/${image.image_path}" 
+                   alt="${image.title}" 
+                   class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105">
+              <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">${image.title}</h3>
+              <p class="text-gray-600 text-sm mb-3">${image.description || 'No description available'}</p>
+              <p class="text-gray-500 text-xs">${new Date(image.created_at).toLocaleDateString()}</p>
             </div>
           `;
 
-          cardsContainer.appendChild(card);
+          galleryContainer.appendChild(card);
 
-          // Stagger animation slightly for nice effect
+          // Stagger animation for nice effect
           setTimeout(() => animateIn(card), index * 100);
         });
-      });
+        
+      } catch (error) {
+        console.error('Error loading gallery:', error);
+        loadingMessage.style.display = 'none';
+        galleryContainer.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <div class="text-red-500 text-lg">Failed to load gallery</div>
+            <p class="text-gray-400 mt-2">Please try refreshing the page</p>
+          </div>
+        `;
+      }
     }
 
-    // Wait for doctors data to load, then render
-    if (window.doctors && window.doctors.length > 0) {
-      renderCards(doctors, "Doctors");
-    } else {
-      // Listen for doctors data loaded event
-      window.addEventListener('doctorsDataLoaded', (event) => {
-        renderCards(event.detail, "Doctors");
-      });
-    }
-
-    // Handle filter button clicks
-    filterButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const filter = btn.dataset.filter;
-
-        if (filter === "Doctors") renderCards(doctors, "Doctors");
-        else if (filter === "Departments") renderCards(departments, "Departments");
-        else if (filter === "Services") renderCards(services, "Services");
-        else if (filter === "Latest News") renderCards(latestNews, "Latest News");
-
-        // Underline toggle
-        filterButtons.forEach((b) => {
-          const underline = b.querySelector(".underline");
-          if (underline) underline.classList.add("hidden");
-        });
-
-        const activeUnderline = btn.querySelector(".underline");
-        if (activeUnderline) activeUnderline.classList.remove("hidden");
-      });
-    });
+    // Load gallery on page load
+    loadGallery();
   });
 </script>
 
