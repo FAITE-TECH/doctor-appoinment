@@ -7,54 +7,34 @@
       name="description"
       content="SPC Hospital offers 24/7 emergency services, expert doctors, and modern facilities in  Navatkudah, Battialoa. Book your appointment online."
     />
-    <meta
-      name="keywords"
-      content="hospital, doctor, appointment, Navatkudah, Batticaloa, Sri Lanka, SPC Hospital"
-    />
-    <meta name="author" content="SPC General Hospital" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="SPC General Hospital" />
-    <meta
-      name="twitter:description"
-      content="Book your appointment online today."
-    />
-    <meta
-      name="twitter:image"
-      content="https://yourdomain.com/images/hospital.jpg"
-    />
+<meta name="keywords" content="hospital, doctor, appointment, Navatkudah, Batticaloa, Sri Lanka, SPC Hospital">
+  <meta name="author" content="SPC General Hospital">
+  <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SPC General Hospital">
+<meta name="twitter:description" content="Book your appointment online today.">
+<meta name="twitter:image" content="https://yourdomain.com/images/hospital.jpg">
 
-    <meta
-      property="og:title"
-      content="SPC General Hospital - Online Appointments"
-    />
-    <meta
-      property="og:description"
-      content="Easily book appointments with our trusted doctors in Navatkudah."
-    />
-    <meta
-      property="og:image"
-      content="https://yourdomain.com/images/hospital.jpg"
-    />
-    <meta property="og:url" content="https://yourdomain.com/book-appointment" />
-    <meta property="og:type" content="website" />
+<meta property="og:title" content="SPC General Hospital - Online Appointments" />
+<meta property="og:description" content="Easily book appointments with our trusted doctors in Navatkudah." />
+<meta property="og:image" content="https://yourdomain.com/images/hospital.jpg" />
+<meta property="og:url" content="https://yourdomain.com/book-appointment" />
+<meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+
+    <title>Latest News Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-
-    <link rel="stylesheet" href="../public/css/styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
-
-    <title>Services</title>
   </head>
   <body>
+    <!--  Import Header -->
+
     <div id="header"></div>
     <script>
       fetch("header.html")
@@ -98,7 +78,6 @@
           });
         });
     </script>
-
     <div class="relative w-full h-40 max-w-6xl mx-auto">
       <img
         src="../public/assets/eyecare.jpg"
@@ -108,64 +87,96 @@
       <h1
         class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded"
       >
-        Services
+        Latest News Details
       </h1>
     </div>
 
     <div
-      class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm mx-auto justify-center max-w-6xl"
+      class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm justify-center max-w-6xl"
     >
-      <a href="home.html#doctors" class="text-blue-600 hover:underline">Home</a>
+      <a href="home.html#latestNews" class="text-blue-600 hover:underline"
+        >Home</a
+      >
       <span>&gt;</span>
-      <a href="doctors.html" class="text-blue-600 hover:underline">Services</a>
+      <a href="latestNews.html" class="text-blue-600 hover:underline"
+        >latestNews</a
+      >
       <span>&gt;</span>
     </div>
-
-    <section id="services" data-animate="fade-right" class="opacity-0 transition-all duration-[2000ms] ease-out">
+    <section id="latestNews">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
         <!-- Services Cards Grid -->
         <div
-          id="serviceContainer"
+          id="latestNewsContainer"
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
         >
           <!-- Cards will be injected by JS -->
         </div>
       </div>
     </section>
-    <script src="services-data.js"></script>
+    <script src="latestNews-data.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const serviceContainer = document.getElementById("serviceContainer");
+        const latestNewsContainer = document.getElementById(
+          "latestNewsContainer"
+        );
 
-        services.forEach((service) => {
-          const serviceCard = document.createElement("div");
-          serviceCard.className =
-            "bg-white border border-gray-200  overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+        function renderLatestNews(latestNews) {
+          // Clear container
+          latestNewsContainer.innerHTML = "";
 
-          serviceCard.innerHTML = `
-        <!-- Service Image Wrapper -->
-        <a  href="service-details.html?id=${service.id}">
-        <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${service.img}" alt="${service.type}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-          
-        </div>
+          latestNews.forEach((news) => {
+            const newsCard = document.createElement("div");
+            newsCard.className =
+              "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
+
+            newsCard.innerHTML = `
+        <!-- News Image Wrapper -->
+        <a href="latestNews-details.html?id=${news.id}">
+          <div class="relative h-56 w-full overflow-hidden group">
+            <img src="${news.img}" alt="${news.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          </div>
         </a>
 
-        <!-- Service Content -->
+        <!-- News Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${service.type}</h3>
-          
-
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${service.description}</p>
-
-      
+          <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${news.title}</h3>
+          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">${news.date}</p>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${news.description}</p>
         </div>
       `;
 
-          serviceContainer.appendChild(serviceCard);
-        });
+            latestNewsContainer.appendChild(newsCard);
+
+            // Animate card fade in
+            requestAnimationFrame(() => {
+              newsCard.classList.remove("opacity-0");
+            });
+          });
+        }
+
+        // Initial render - all news
+        renderLatestNews(latestNews);
       });
     </script>
+
+    <style>
+      /* Simple fade-in animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 1.5s ease forwards;
+      }
+    </style>
 
     <!-- Footer -->
     <div id="footer"></div>
@@ -183,49 +194,6 @@
         });
     </script>
 
-
-    <!-- Scroll Animations -->
-    <script>
-      const elements = document.querySelectorAll("[data-animate]");
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const el = entry.target;
-              const anim = el.dataset.animate;
-
-              el.classList.remove("opacity-0");
-
-              if (anim === "fade-up") {
-                el.classList.add("opacity-100", "translate-y-0");
-                el.classList.remove("translate-y-10");
-              } else if (anim === "fade-left") {
-                el.classList.add("opacity-100", "translate-x-0");
-                el.classList.remove("-translate-x-10");
-              } else if (anim === "fade-right") {
-                el.classList.add("opacity-100", "translate-x-0");
-                el.classList.remove("translate-x-10");
-              } else if (anim === "fade-in") {
-                el.classList.add("opacity-100");
-              }
-
-              observer.unobserve(el); // run animation once
-            }
-          });
-        },
-        { threshold: 0.2 } // trigger when 20% visible
-      );
-
-      // Initial positions before animation
-      elements.forEach((el) => {
-        const anim = el.dataset.animate;
-        if (anim === "fade-up") el.classList.add("translate-y-10");
-        if (anim === "fade-left") el.classList.add("-translate-x-10");
-        if (anim === "fade-right") el.classList.add("translate-x-10");
-        observer.observe(el);
-      });
-    </script>
     <!-- Placeholder for spinner -->
     <div id="spinner"></div>
 
@@ -279,7 +247,5 @@
           setTimeout(() => hideSpinner(), 10000);
         });
     </script>
-
-    <script src="../public/js/script.js"></script>
   </body>
 </html>

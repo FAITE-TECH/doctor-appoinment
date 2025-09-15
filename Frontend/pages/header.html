@@ -210,7 +210,7 @@
 
         <!-- Mobile Menu Toggle -->
         <button
-          id="mobileMenuToggle"
+          id="mobileMenuToggle" 
           class="md:hidden text-2xl focus:outline-none"
         >
           <i class="fas fa-bars"></i>
@@ -219,8 +219,8 @@
 
       <!-- Mobile Menu -->
       <nav
-        id="mobileMenu"
-        class="hidden flex flex-col space-y-4 bg-gray-100 shadow-md font-thin items-center justify-center md:hidden mx-auto z-[9999] border-t border-gray-200"
+        id="mobileMenu" 
+        class="hidden flex flex-col space-y-4 bg-gray-100 shadow-md font-thin items-center justify-center md:hidden mx-auto z-[9999] border-t border-gray-200 "
       >
         <a href="./home.html" class="block w-full text-center px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition">
           Home
@@ -360,6 +360,50 @@
         <a href="./contact.html" class="block w-full text-center px-4 py-3 border-b border-gray-200 hover:bg-blue-50 hover:text-blue-600 transition">CONTACT</a>
       </nav>
     </header>
+
+
+    <!-- Scroll Animations -->
+    <script>
+      const elements = document.querySelectorAll("[data-animate]");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              const anim = el.dataset.animate;
+
+              el.classList.remove("opacity-0");
+
+              if (anim === "fade-up") {
+                el.classList.add("opacity-100", "translate-y-0");
+                el.classList.remove("translate-y-10");
+              } else if (anim === "fade-left") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("-translate-x-10");
+              } else if (anim === "fade-right") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("translate-x-10");
+              } else if (anim === "fade-in") {
+                el.classList.add("opacity-100");
+              }
+
+              observer.unobserve(el); // run animation once
+            }
+          });
+        },
+        { threshold: 0.2 } // trigger when 20% visible
+      );
+
+      // Initial positions before animation
+      elements.forEach((el) => {
+        const anim = el.dataset.animate;
+        if (anim === "fade-up") el.classList.add("translate-y-10");
+        if (anim === "fade-left") el.classList.add("-translate-x-10");
+        if (anim === "fade-right") el.classList.add("translate-x-10");
+        observer.observe(el);
+      });
+    </script>
 
     <!-- Toggle Script -->
 

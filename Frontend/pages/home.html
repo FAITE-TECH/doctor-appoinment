@@ -3,6 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="SPC Hospital offers 24/7 emergency services, expert doctors, and modern facilities in  Navatkudah, Battialoa. Book your appointment online."
+    />
+    <meta
+      name="keywords"
+      content="hospital, doctor, appointment, Navatkudah, Batticaloa, Sri Lanka, SPC Hospital"
+    />
+    <meta name="author" content="SPC General Hospital" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SPC General Hospital" />
+    <meta
+      name="twitter:description"
+      content="Book your appointment online today."
+    />
+    <meta
+      name="twitter:image"
+      content="https://yourdomain.com/images/hospital.jpg"
+    />
+
+    <meta
+      property="og:title"
+      content="SPC General Hospital - Online Appointments"
+    />
+    <meta
+      property="og:description"
+      content="Easily book appointments with our trusted doctors in Navatkudah."
+    />
+    <meta
+      property="og:image"
+      content="https://yourdomain.com/images/hospital.jpg"
+    />
+    <meta property="og:url" content="https://yourdomain.com/book-appointment" />
+    <meta property="og:type" content="website" />
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link
@@ -30,7 +64,7 @@
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
-    <title>HPC Hospital</title>
+    <title>SPC Hospital</title>
   </head>
   <body>
     <!--  Import Header -->
@@ -80,8 +114,8 @@
     </script>
 
     <!-- Hero Image -->
-    <div
-      class="relative md:w-full md:h-[600px] h-[400px] mb-6 shadow-lg rounded-2xl flex justify-center align-center"
+    <div data-animate="fade-down"
+      class="relative md:w-full md:h-[600px] h-[400px] mb-6 shadow-lg rounded-2xl flex justify-center align-center opacity-0 transition-all duration-[2000ms] ease-out"
     >
       <!-- Image -->
       <img
@@ -423,7 +457,7 @@
 
       // Render doctors dynamically
       function renderDoctors(list) {
-        doctorCtn.innerHTML = ""; 
+        doctorCtn.innerHTML = "";
         if (list.length === 0) {
           doctorCtn.innerHTML = `<p class="text-white">No doctors found</p>`;
           return;
@@ -482,14 +516,14 @@
       }
     </script>
     <!-- Best Hospital -->
-    <div>
+    <div data-animate="fade-up"  class="opacity-0 transition-all duration-[2000ms] ease-out">
       <div class="text-center my-10">
         <h2 class="text-3xl text-flourish-500 font-bold">
           Best Hospitals in Town
         </h2>
         <p class="text-gray-400">When it comes to health</p>
       </div>
-      <div class="max-w-6xl mx-auto px-6 py-12">
+      <div data-animate="fade-up"  class="max-w-6xl mx-auto px-6 py-12 opacity-0 transition-all duration-[2000ms] ease-in">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <!-- Feature 1 -->
           <div
@@ -582,9 +616,14 @@
 
     <!-- Doctors -->
 
-    <section id="doctors" data-animate="fade-up" class="mx-auto">
+    <section id="doctors" data-animate="fade-up" class="mx-auto opacity-0 transition-all duration-1000 ease-out">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
-        <h2 class="text-3xl text-flourish-500 font-bold">OUR DOCTORS</h2>
+        <h2
+          data-animate="fade-up"
+          class="opacity-0 transition-all duration-1000 ease-out text-3xl text-flourish-500 font-bold"
+        >
+          OUR DOCTORS
+        </h2>
         <p class="text-gray-400 mt-2">
           Our doctors are specialized in their field and have more than 10 years
           of experiences.
@@ -593,8 +632,8 @@
 
         <!-- Doctor Cards Grid -->
         <div
-          id="doctorContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
+          id="doctorContainer" data-animate="fade-right"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10 opacity-0 transition-all  duration-[3000ms] ease-out"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -684,7 +723,7 @@
 
     <!-- TESTIMONIALS -->
 
-    <section>
+    <section id="testimonials">
       <div class="text-center my-10">
         <h2 class="text-3xl text-flourish-500 font-bold section-title">
           TESTIMONIALS
@@ -774,8 +813,8 @@
 
     <section>
       <div
-        id="services"
-        class="text-center my-10 container mx-auto max-w-6xl px-4"
+        id="services" data-animate="fade-up" 
+        class="text-center my-10 container mx-auto max-w-6xl px-4 opacity-0 transition-all duration-[2000ms] ease-out"
       >
         <h2 class="text-3xl text-flourish-500 font-bold">OUR SERVICES</h2>
 
@@ -783,8 +822,8 @@
 
         <!-- Services Cards Grid -->
         <div
-          id="serviceContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
+          id="serviceContainer" data-animate="fade-left" 
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10 opacity-0 transition-all duration-[2000ms] ease-out"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -837,8 +876,11 @@
     <!-- LATEST NEWS -->
 
     <section>
-      <div class="text-center my-10 container max-w-6xl mx-auto px-4">
-        <h2 class="text-3xl text-flourish-500 font-bold">LATEST NEWS</h2>
+      <div
+        class="text-center my-10 container max-w-6xl mx-auto px-4"
+        id="latestNews"
+      >
+        <h2 data-animate="fade-up"  class="text-3xl text-flourish-500 font-bold opacity-0 transition-all duration-[2000ms] ease-out">LATEST NEWS</h2>
         <p class="text-gray-400 mt-2">
           Our doctors are specialized in their field and have more than 10 years
           of experiences.
@@ -847,15 +889,15 @@
 
         <!-- Services Cards Grid -->
         <div
-          id="newsContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
+          id="newsContainer" data-animate="fade-up" 
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10 opacity-0 transition-all duration-[2000ms] ease-out"
         >
           <!-- Cards will be injected by JS -->
         </div>
 
         <div class="mt-8">
           <a
-            href="./services.html"
+            href="./latestNews.html"
             class="text-blue-600 font-semibold hover:underline"
           >
             View All News →
@@ -875,10 +917,11 @@
 
           newsCard.innerHTML = `
         <!-- Service Image Wrapper -->
+        <a href="latestNews-details.html?id=${news.id}">
         <div class="relative h-56 w-full overflow-hidden group">
           <img src="${news.img}" alt="${news.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
         </div>
-
+        </a>
         <!-- Service Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
           <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${news.title}</h3>
@@ -903,7 +946,7 @@
     <!-- HOSPITAL DEPARTMENTS -->
     <section>
       <div class="text-center my-10 container max-w-6xl mx-auto px-4">
-        <h2 class="text-3xl text-flourish-500 font-bold">
+        <h2 data-animate="fade-up" class="text-3xl text-flourish-500 font-bold opacity-0 transition-all duration-[2000ms] ease-out">
           HOSPITAL DEPARTMENTS
         </h2>
 
@@ -911,8 +954,8 @@
 
         <!--  Cards Grid -->
         <div
-          id="departmentsContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"
+          id="departmentsContainer" data-animate="fade-right"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10 opacity-0 transition-all duration-[2000ms] ease-out"
         >
           <!-- Cards will be injected by JS -->
         </div>
@@ -941,9 +984,11 @@
 
           departmentCard.innerHTML = `
         <!-- department Image Wrapper -->
-        <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${department.img}" alt="${department.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-        </div>
+        <a href="service-details.html?id=${department.id}">
+          <div class="relative h-56 w-full overflow-hidden group">
+            <img src="${department.img}" alt="${department.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          </div>
+        </a>
 
         <!-- department Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
@@ -958,6 +1003,50 @@
 
           departmentsContainer.appendChild(departmentCard);
         });
+      });
+    </script>
+
+
+    <!-- Scroll Animations -->
+    <script>
+      const elements = document.querySelectorAll("[data-animate]");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              const anim = el.dataset.animate;
+
+              el.classList.remove("opacity-0");
+
+              if (anim === "fade-up") {
+                el.classList.add("opacity-100", "translate-y-0");
+                el.classList.remove("translate-y-10");
+              } else if (anim === "fade-left") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("-translate-x-10");
+              } else if (anim === "fade-right") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("translate-x-10");
+              } else if (anim === "fade-in") {
+                el.classList.add("opacity-100");
+              }
+
+              observer.unobserve(el); // run animation once
+            }
+          });
+        },
+        { threshold: 0.2 } // trigger when 20% visible
+      );
+
+      // Initial positions before animation
+      elements.forEach((el) => {
+        const anim = el.dataset.animate;
+        if (anim === "fade-up") el.classList.add("translate-y-10");
+        if (anim === "fade-left") el.classList.add("-translate-x-10");
+        if (anim === "fade-right") el.classList.add("translate-x-10");
+        observer.observe(el);
       });
     </script>
 

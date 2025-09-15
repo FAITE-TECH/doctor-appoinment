@@ -3,8 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="SPC Hospital offers 24/7 emergency services, expert doctors, and modern facilities in  Navatkudah, Battialoa. Book your appointment online."
+    />
+    <meta
+      name="keywords"
+      content="hospital, doctor, appointment, Navatkudah, Batticaloa, Sri Lanka, SPC Hospital"
+    />
+    <meta name="author" content="SPC General Hospital" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SPC General Hospital" />
+    <meta
+      name="twitter:description"
+      content="Book your appointment online today."
+    />
+    <meta
+      name="twitter:image"
+      content="https://yourdomain.com/images/hospital.jpg"
+    />
+
+    <meta
+      property="og:title"
+      content="SPC General Hospital - Online Appointments"
+    />
+    <meta
+      property="og:description"
+      content="Easily book appointments with our trusted doctors in Navatkudah."
+    />
+    <meta
+      property="og:image"
+      content="https://yourdomain.com/images/hospital.jpg"
+    />
+    <meta property="og:url" content="https://yourdomain.com/book-appointment" />
+    <meta property="og:type" content="website" />
     <title>Doctor Details</title>
-      <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script
@@ -17,56 +51,56 @@
     />
   </head>
   <body class="bg-gray-50">
-
-
     <!--  Import Header -->
 
     <div id="header"></div>
-   <script>
-  fetch("header.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("header").innerHTML = data;
+    <script>
+      fetch("header.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("header").innerHTML = data;
 
-      // === Mobile menu toggle ===
-      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-      const mobileMenu = document.getElementById("mobileMenu");
+          // === Mobile menu toggle ===
+          const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+          const mobileMenu = document.getElementById("mobileMenu");
 
-      if (mobileMenuToggle && mobileMenu) {
-        mobileMenuToggle.addEventListener("click", () => {
-          mobileMenu.classList.toggle("hidden");
-        });
-      }
+          if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener("click", () => {
+              mobileMenu.classList.toggle("hidden");
+            });
+          }
 
-      // === Main Doctor dropdown ===
-      document.querySelectorAll("[data-dropdown]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const menu = button.nextElementSibling;
-          menu.classList.toggle("hidden");
-        });
-      });
-
-      // === Submenus ===
-      document.querySelectorAll("[data-submenu]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const submenu = button.nextElementSibling;
-
-          // Close other submenus first
-          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
-            if (menu !== submenu) menu.classList.add("hidden");
+          // === Main Doctor dropdown ===
+          document.querySelectorAll("[data-dropdown]").forEach((button) => {
+            button.addEventListener("click", () => {
+              const menu = button.nextElementSibling;
+              menu.classList.toggle("hidden");
+            });
           });
 
-          // Toggle clicked submenu
-          submenu.classList.toggle("hidden");
+          // === Submenus ===
+          document.querySelectorAll("[data-submenu]").forEach((button) => {
+            button.addEventListener("click", () => {
+              const submenu = button.nextElementSibling;
+
+              // Close other submenus first
+              document
+                .querySelectorAll("[data-submenu-menu]")
+                .forEach((menu) => {
+                  if (menu !== submenu) menu.classList.add("hidden");
+                });
+
+              // Toggle clicked submenu
+              submenu.classList.toggle("hidden");
+            });
+          });
         });
-      });
-    });
-</script>
+    </script>
 
     <div class="container mx-auto p-6">
       <div
-        id="doctorDetail"
-        class="flex flex-col mt-6 justify-center align-center"
+        id="doctorDetail" data-animate="fade-up"
+        class="flex flex-col mt-6 justify-center align-center opacity-0 transition-all duration-[2000ms] ease-out"
       ></div>
     </div>
 
@@ -93,8 +127,7 @@
     </div>
     <script src="doctors-data.js"></script>
 
-
- <!-- Filter -->
+    <!-- Filter -->
 
     <section id="doctors">
       <div class="text-center my-10 container mx-auto max-w-6xl px-4">
@@ -109,7 +142,7 @@
           >
             All
             <div
-              class="underline  w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+              class="underline w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
             ></div>
           </button>
           <button
@@ -198,8 +231,6 @@
           btn.addEventListener("click", () => {
             const filter = btn.dataset.filter;
 
-            
-
             if (filter === "All") {
               renderDoctors(doctors);
             } else {
@@ -212,7 +243,6 @@
         });
       });
     </script>
-
 
     <!-- Doctor Data -->
     <script>
@@ -315,7 +345,6 @@
       tableBody.appendChild(row);
     </script>
 
-
     <!-- Filter Underline -->
 
     <script>
@@ -351,74 +380,116 @@
       }
     </style>
 
-
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-  fetch("footer.html")
-    .then((res) => res.text())
-    .then((data) => {
-      document.getElementById("footer").innerHTML = data;
+      fetch("footer.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("footer").innerHTML = data;
 
-      // Now the footer exists, so set the year
-      const yearSpan = document.getElementById("currentYear");
-      if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-      }
-    });
-</script>
+          // Now the footer exists, so set the year
+          const yearSpan = document.getElementById("currentYear");
+          if (yearSpan) {
+            yearSpan.textContent = new Date().getFullYear();
+          }
+        });
+    </script>
 
+    <!-- Scroll Animations -->
+    <script>
+      const elements = document.querySelectorAll("[data-animate]");
 
- <!-- Placeholder for spinner -->
-<div id="spinner"></div>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              const anim = el.dataset.animate;
 
-<script>
-  // Load spinner markup
-  fetch("spinner.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("spinner").innerHTML = data;
+              el.classList.remove("opacity-0");
 
-      // Now spinner is in DOM -> attach JS logic
-      const spinner = document.getElementById("spinner-overlay");
+              if (anim === "fade-up") {
+                el.classList.add("opacity-100", "translate-y-0");
+                el.classList.remove("translate-y-10");
+              } else if (anim === "fade-left") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("-translate-x-10");
+              } else if (anim === "fade-right") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("translate-x-10");
+              } else if (anim === "fade-in") {
+                el.classList.add("opacity-100");
+              }
 
-      function showSpinner() {
-        spinner.classList.remove("hidden");
-      }
-      function hideSpinner() {
-        spinner.classList.add("hidden");
-      }
+              observer.unobserve(el); // run animation once
+            }
+          });
+        },
+        { threshold: 0.2 } // trigger when 20% visible
+      );
 
-      // Show on links
-    document.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => {
-        if (link.getAttribute("href") !== "#" && !link.getAttribute("href")?.startsWith("javascript")) {
-          showSpinner();
-          setTimeout(hideSpinner, 10000); // works now
-        }
+      // Initial positions before animation
+      elements.forEach((el) => {
+        const anim = el.dataset.animate;
+        if (anim === "fade-up") el.classList.add("translate-y-10");
+        if (anim === "fade-left") el.classList.add("-translate-x-10");
+        if (anim === "fade-right") el.classList.add("translate-x-10");
+        observer.observe(el);
       });
-    });
+    </script>
+    <!-- Placeholder for spinner -->
+    <div id="spinner"></div>
 
-    // Show on .show-spinner buttons
-    document.querySelectorAll("button.show-spinner").forEach(btn => {
-      btn.addEventListener("click", () => {
-        showSpinner();
-        setTimeout(hideSpinner, 10000); // works now
-      });
-    });
+    <script>
+      // Load spinner markup
+      fetch("spinner.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("spinner").innerHTML = data;
 
-    // Show on form submit
-    document.querySelectorAll("form").forEach(form => {
-      form.addEventListener("submit", () => {
-        showSpinner();
-        setTimeout(hideSpinner, 10000); // works now
-      });
-    });
+          // Now spinner is in DOM -> attach JS logic
+          const spinner = document.getElementById("spinner-overlay");
 
-    // Optional: hide spinner after page load (auto)
-    setTimeout(() => hideSpinner(), 10000);
-    });
-</script>
+          function showSpinner() {
+            spinner.classList.remove("hidden");
+          }
+          function hideSpinner() {
+            spinner.classList.add("hidden");
+          }
 
+          // Show on links
+          document.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+              if (
+                link.getAttribute("href") !== "#" &&
+                !link.getAttribute("href")?.startsWith("javascript")
+              ) {
+                showSpinner();
+                setTimeout(hideSpinner, 10000); // works now
+              }
+            });
+          });
+
+          // Show on .show-spinner buttons
+          document.querySelectorAll("button.show-spinner").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000); // works now
+            });
+          });
+
+          // Show on form submit
+          document.querySelectorAll("form").forEach((form) => {
+            form.addEventListener("submit", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000); // works now
+            });
+          });
+
+          // Optional: hide spinner after page load (auto)
+          setTimeout(() => hideSpinner(), 10000);
+        });
+    </script>
   </body>
 </html>

@@ -3,6 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="SPC Hospital offers 24/7 emergency services, expert doctors, and modern facilities in  Navatkudah, Battialoa. Book your appointment online."
+    />
+    <meta
+      name="keywords"
+      content="hospital, doctor, appointment, Navatkudah, Batticaloa, Sri Lanka, SPC Hospital"
+    />
+    <meta name="author" content="SPC General Hospital" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SPC General Hospital" />
+    <meta
+      name="twitter:description"
+      content="Book your appointment online today."
+    />
+    <meta
+      name="twitter:image"
+      content="https://yourdomain.com/images/hospital.jpg"
+    />
+
+    <meta
+      property="og:title"
+      content="SPC General Hospital - Online Appointments"
+    />
+    <meta
+      property="og:description"
+      content="Easily book appointments with our trusted doctors in Navatkudah."
+    />
+    <meta
+      property="og:image"
+      content="https://yourdomain.com/images/hospital.jpg"
+    />
+    <meta property="og:url" content="https://yourdomain.com/book-appointment" />
+    <meta property="og:type" content="website" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -12,7 +46,7 @@
 
     <title>Gallery</title>
   </head>
-  <body>
+  <body >
     <!-- Header -->
     <div id="header"></div>
     <script>
@@ -83,12 +117,12 @@
       <span>&gt;</span>
     </div>
 
-    <section id="doctors">
-      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+    <section id="doctors" >
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4 ">
         <!-- Filter Buttons -->
         <div
-          id="doctorFilter"
-          class="flex flex-wrap justify-center gap-4 mb-10"
+          id="doctorFilter"  data-animate="fade-right"
+          class="flex flex-wrap justify-center gap-4 mb-10 opacity-0 transition-all duration-[2000ms] ease-out"
         >
           <button
             class="filter-btn relative px-4 py-2 text-black transition"
@@ -130,8 +164,8 @@
 
         <!-- Cards Grid -->
         <div
-          id="cardsContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500"
+          id="cardsContainer"  data-animate="fade-left"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 opacity-0 transition-all duration-[2000ms] ease-out"
         ></div>
       </div>
     </section>
@@ -195,13 +229,22 @@
               return;
             }
 
+            const pageMap = {
+              Doctors: "doctor-details.html",
+              Departments: "service-details.html",
+              Services: "service-details.html",
+              "Latest News": "latestNews-details.html",
+            };
+
             data.forEach((item, index) => {
+              const detailsPage = pageMap[type] || "details.html"; // fallback
+
               const card = document.createElement("div");
               card.className =
                 "bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 transform";
 
               card.innerHTML = `
-            <a href="${type.toLowerCase()}-details.html?id=${item.id}">
+        <a href="/Frontend/pages/${detailsPage}?id=${item.id}">
               <div class="relative h-56 w-full overflow-hidden group">
                 <img src="${item.img}" alt="${item.name || item.type}" 
                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
@@ -270,6 +313,49 @@
             yearSpan.textContent = new Date().getFullYear();
           }
         });
+    </script>
+
+        <!-- Scroll Animations -->
+    <script>
+      const elements = document.querySelectorAll("[data-animate]");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              const anim = el.dataset.animate;
+
+              el.classList.remove("opacity-0");
+
+              if (anim === "fade-up") {
+                el.classList.add("opacity-100", "translate-y-0");
+                el.classList.remove("translate-y-10");
+              } else if (anim === "fade-left") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("-translate-x-10");
+              } else if (anim === "fade-right") {
+                el.classList.add("opacity-100", "translate-x-0");
+                el.classList.remove("translate-x-10");
+              } else if (anim === "fade-in") {
+                el.classList.add("opacity-100");
+              }
+
+              observer.unobserve(el); // run animation once
+            }
+          });
+        },
+        { threshold: 0.2 } // trigger when 20% visible
+      );
+
+      // Initial positions before animation
+      elements.forEach((el) => {
+        const anim = el.dataset.animate;
+        if (anim === "fade-up") el.classList.add("translate-y-10");
+        if (anim === "fade-left") el.classList.add("-translate-x-10");
+        if (anim === "fade-right") el.classList.add("translate-x-10");
+        observer.observe(el);
+      });
     </script>
 
     <!--  Spinner -->
