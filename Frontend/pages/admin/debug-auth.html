@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Admin Auth Debug</title>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Admin Authentication Debug</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Authentication Status</h2>
+            <div id="authStatus" class="space-y-2">
+                <p>Checking authentication...</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Admin Login</h2>
+            <form id="testLoginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="testEmail" value="admin@hospital.com" class="w-full px-3 py-2 border rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" id="testPassword" value="admin123" class="w-full px-3 py-2 border rounded-md">
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    Test Login
+                </button>
+            </form>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Actions</h2>
+            <div class="space-x-4">
+                <button onclick="checkAuth()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                    Check Auth
+                </button>
+                <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                    Logout
+                </button>
+                <a href="messages.html" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 inline-block">
+                    Go to Messages
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication status
+        async function checkAuth() {
+            const statusDiv = document.getElementById('authStatus');
+            statusDiv.innerHTML = '<p>Checking authentication...</p>';
+            
+            try {
+                const response = await fetch('../../../Backend/api/auth.php?action=me', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    statusDiv.innerHTML = `
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                            <p><strong>✅ Authenticated</strong></p>
+                            <p>User ID: ${data.user.id}</p>
+                            <p>Name: ${data.user.name}</p>
+                            <p>Email: ${data.user.email}</p>
+                            <p>Role: ${data.user.role}</p>
+                            <p>Can Access Admin: ${data.user.role === 'admin' ? '✅ Yes' : '❌ No'}</p>
+                        </div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                            <p><strong>❌ Not Authenticated</strong></p>
+                            <p>Please log in first.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        <p><strong>❌ Error</strong></p>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Test login
+        document.getElementById('testLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            
+            try {
+                const response = await fetch('../../../Backend/api/auth.php?action=signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Login successful! Check authentication status.');
+                    checkAuth();
+                } else {
+                    alert('Login failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Login error: ' + error.message);
+            }
+        });
+
+        // Logout
+        async function logout() {
+            try {
+                await fetch('../../../Backend/api/auth.php?action=signout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                alert('Logged out successfully!');
+                checkAuth();
+            } catch (error) {
+                alert('Logout error: ' + error.message);
+            }
+        }
+
+        // Check auth on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+    </script>
+</body>
+</html>

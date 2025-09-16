@@ -20,6 +20,7 @@ class AdminPanel {
         await this.checkAdminAuth();
         await this.loadDashboardStats();
         await this.loadRecentAppointments();
+        await this.loadRecentMessages();
         this.setupEventListeners();
     }
 
@@ -113,6 +114,10 @@ class AdminPanel {
                 document.getElementById('totalUsers').textContent = '0';
                 document.getElementById('totalEvents').textContent = '0';
             }
+            
+            // Load message count separately
+            await this.loadMessageCount();
+            await this.loadUnreadMessagesCount();
         } catch (error) {
             console.error('Failed to load dashboard stats:', error);
             // Set default values on error
@@ -120,6 +125,38 @@ class AdminPanel {
             document.getElementById('totalAppointments').textContent = '0';
             document.getElementById('totalUsers').textContent = '0';
             document.getElementById('totalEvents').textContent = '0';
+            document.getElementById('totalMessages').textContent = '0';
+        }
+    }
+
+    async loadMessageCount() {
+        try {
+            const data = await this.handleApiCall('../../../Backend/api/contact.php?page=1&limit=1');
+            if (data.success && data.pagination) {
+                document.getElementById('totalMessages').textContent = data.pagination.total || 0;
+            } else {
+                document.getElementById('totalMessages').textContent = '0';
+            }
+        } catch (error) {
+            console.error('Failed to load message count:', error);
+            document.getElementById('totalMessages').textContent = '0';
+        }
+    }
+
+    async loadUnreadMessagesCount() {
+        try {
+            const data = await this.handleApiCall('../../../Backend/api/contact.php?page=1&limit=1&status=new');
+            const badge = document.getElementById('unreadMessagesBadge');
+            if (data.success && data.pagination && data.pagination.total > 0) {
+                badge.textContent = data.pagination.total;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('Failed to load unread messages count:', error);
+            const badge = document.getElementById('unreadMessagesBadge');
+            if (badge) badge.classList.add('hidden');
         }
     }
 
@@ -152,6 +189,44 @@ class AdminPanel {
                 container.innerHTML = '<p class="text-red-500">Failed to load appointments. Check console for details.</p>';
             }
         }
+    }
+
+    async loadRecentMessages() {
+        try {
+            const data = await this.handleApiCall('../../../Backend/api/contact.php?page=1&limit=5');
+            const container = document.getElementById('recentMessages');
+            
+            if (data.success && data.messages && data.messages.length > 0) {
+                container.innerHTML = data.messages.map(message => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">${message.first_name} ${message.last_name}</p>
+                            <p class="text-sm text-gray-600">${message.subject}</p>
+                            <p class="text-xs text-gray-500">${this.formatDate(message.created_at)}</p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded-full ${
+                            message.status === 'new' ? 'bg-red-100 text-red-800' :
+                            message.status === 'read' ? 'bg-yellow-100 text-yellow-800' :
+                            message.status === 'replied' ? 'bg-green-100 text-green-800' :
+                            'bg-gray-100 text-gray-800'
+                        }">${message.status}</span>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="text-gray-500">No recent messages</p>';
+            }
+        } catch (error) {
+            console.error('Failed to load recent messages:', error);
+            const container = document.getElementById('recentMessages');
+            if (container) {
+                container.innerHTML = '<p class="text-red-500">Failed to load messages. Check console for details.</p>';
+            }
+        }
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     }
 
     setupEventListeners() {

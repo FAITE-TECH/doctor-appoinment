@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Tracking - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="../../public/assets/logo.png">
+    <style>
+        .status-pending { @apply bg-yellow-100 text-yellow-800; }
+        .status-confirmed { @apply bg-green-100 text-green-800; }
+        .status-cancelled { @apply bg-red-100 text-red-800; }
+        .status-completed { @apply bg-blue-100 text-blue-800; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <div id="header"></div>
+    <script>
+        fetch("../shared-nav.html")
+            .then((res) => res.text())
+            .then((data) => {
+                document.getElementById("header").innerHTML = data;
+                if (window.initNavigationAfterLoad) {
+                    window.initNavigationAfterLoad();
+                }
+            });
+    </script>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Page Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">👥 Patient Tracking</h1>
+                    <p class="text-gray-600 mt-2">Track patient appointment history and medical records</p>
+                </div>
+                <div class="flex gap-4">
+                    <button id="refreshBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Search Patients</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <input type="text" id="patientSearch" placeholder="Patient name or email" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Doctor</label>
+                    <select id="doctorFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">All Doctors</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                    <input type="date" id="dateFrom" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="flex items-end">
+                    <button id="searchPatients" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Patients</p>
+                        <p class="text-2xl font-bold text-gray-900" id="totalPatients">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-calendar-check text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Active Appointments</p>
+                        <p class="text-2xl font-bold text-gray-900" id="activeAppointments">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Pending</p>
+                        <p class="text-2xl font-bold text-gray-900" id="pendingAppointments">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Completed</p>
+                        <p class="text-2xl font-bold text-gray-900" id="completedAppointments">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patients List -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">Patients</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Appointments</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Visit</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientsTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Patients will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Details Modal -->
+    <div id="patientModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800">Patient Details</h3>
+                </div>
+                <div class="p-6">
+                    <div id="patientDetails" class="space-y-6">
+                        <!-- Patient details will be loaded here -->
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button id="closePatientModal" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden z-50">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage">Success!</span>
+        </div>
+    </div>
+
+    <script>
+        let patientsData = [];
+        let currentFilters = {};
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDoctors();
+            loadPatients();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Search and filter controls
+            document.getElementById('searchPatients').addEventListener('click', searchPatients);
+            document.getElementById('patientSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchPatients();
+            });
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', loadPatients);
+
+            // Modal controls
+            document.getElementById('closePatientModal').addEventListener('click', closePatientModal);
+
+            // Close modal when clicking outside
+            document.getElementById('patientModal').addEventListener('click', function(e) {
+                if (e.target === this) closePatientModal();
+            });
+        }
+
+        async function loadDoctors() {
+            try {
+                const response = await fetch('/doctor-appoinment/Backend/api/doctors.php?action=doctors');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const doctorSelect = document.getElementById('doctorFilter');
+                    doctorSelect.innerHTML = '<option value="">All Doctors</option>';
+                    
+                    data.data.forEach(doctor => {
+                        const option = document.createElement('option');
+                        option.value = doctor.id;
+                        option.textContent = doctor.name;
+                        doctorSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+            }
+        }
+
+        async function loadPatients() {
+            try {
+                const response = await fetch('/doctor-appoinment/Backend/api/appointments.php?action=list&limit=1000');
+                const data = await response.json();
+                
+                if (data.appointments) {
+                    patientsData = data.appointments;
+                    processPatientData();
+                    renderPatients();
+                    updateStatistics();
+                } else {
+                    showToast('Error loading patients', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading patients:', error);
+                showToast('Network error loading patients', 'error');
+            }
+        }
+
+        function processPatientData() {
+            // Group appointments by patient
+            const patientMap = new Map();
+            
+            patientsData.forEach(appointment => {
+                const patientId = appointment.user_id;
+                
+                if (!patientMap.has(patientId)) {
+                    patientMap.set(patientId, {
+                        id: patientId,
+                        name: appointment.patient_name,
+                        email: appointment.patient_email,
+                        appointments: [],
+                        totalAppointments: 0,
+                        lastVisit: null,
+                        status: 'inactive'
+                    });
+                }
+                
+                const patient = patientMap.get(patientId);
+                patient.appointments.push(appointment);
+                patient.totalAppointments++;
+                
+                // Update last visit
+                const appointmentDate = new Date(appointment.appointment_date);
+                if (!patient.lastVisit || appointmentDate > new Date(patient.lastVisit)) {
+                    patient.lastVisit = appointment.appointment_date;
+                }
+                
+                // Update status based on recent appointments
+                if (appointment.status === 'pending' || appointment.status === 'confirmed') {
+                    patient.status = 'active';
+                }
+            });
+            
+            patientsData = Array.from(patientMap.values());
+        }
+
+        function renderPatients() {
+            const tbody = document.getElementById('patientsTableBody');
+            tbody.innerHTML = '';
+
+            if (patientsData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            No patients found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            patientsData.forEach(patient => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                
+                const lastVisitDate = patient.lastVisit ? new Date(patient.lastVisit).toLocaleDateString() : 'Never';
+                const statusClass = patient.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                                    <span class="text-white font-medium">${patient.name.charAt(0).toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${patient.name}</div>
+                                <div class="text-sm text-gray-500">ID: ${patient.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${patient.email}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${patient.totalAppointments}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${lastVisitDate}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                            ${patient.status.charAt(0).toUpperCase() + patient.status.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewPatientDetails(${patient.id})" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button onclick="viewPatientHistory(${patient.id})" class="text-green-600 hover:text-green-900">
+                            <i class="fas fa-history"></i> History
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStatistics() {
+            const stats = {
+                totalPatients: patientsData.length,
+                activeAppointments: 0,
+                pendingAppointments: 0,
+                completedAppointments: 0
+            };
+
+            patientsData.forEach(patient => {
+                patient.appointments.forEach(appointment => {
+                    if (appointment.status === 'pending') stats.pendingAppointments++;
+                    if (appointment.status === 'confirmed') stats.activeAppointments++;
+                    if (appointment.status === 'completed') stats.completedAppointments++;
+                });
+            });
+
+            document.getElementById('totalPatients').textContent = stats.totalPatients;
+            document.getElementById('activeAppointments').textContent = stats.activeAppointments;
+            document.getElementById('pendingAppointments').textContent = stats.pendingAppointments;
+            document.getElementById('completedAppointments').textContent = stats.completedAppointments;
+        }
+
+        function searchPatients() {
+            const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
+            const doctorFilter = document.getElementById('doctorFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+
+            let filteredPatients = patientsData;
+
+            if (searchTerm) {
+                filteredPatients = filteredPatients.filter(patient => 
+                    patient.name.toLowerCase().includes(searchTerm) ||
+                    patient.email.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (doctorFilter) {
+                filteredPatients = filteredPatients.filter(patient =>
+                    patient.appointments.some(apt => apt.doctor_id == doctorFilter)
+                );
+            }
+
+            if (dateFrom) {
+                filteredPatients = filteredPatients.filter(patient =>
+                    patient.appointments.some(apt => apt.appointment_date >= dateFrom)
+                );
+            }
+
+            // Temporarily replace patientsData with filtered results
+            const originalData = patientsData;
+            patientsData = filteredPatients;
+            renderPatients();
+            patientsData = originalData;
+        }
+
+        function viewPatientDetails(patientId) {
+            const patient = patientsData.find(p => p.id === patientId);
+            if (!patient) return;
+
+            const upcomingAppointments = patient.appointments
+                .filter(apt => apt.status === 'pending' || apt.status === 'confirmed')
+                .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date));
+
+            const recentAppointments = patient.appointments
+                .filter(apt => apt.status === 'completed')
+                .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date))
+                .slice(0, 5);
+
+            document.getElementById('patientDetails').innerHTML = `
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Patient Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                <p class="text-sm text-gray-900">${patient.name}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email</label>
+                                <p class="text-sm text-gray-900">${patient.email}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Total Appointments</label>
+                                <p class="text-sm text-gray-900">${patient.totalAppointments}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Last Visit</label>
+                                <p class="text-sm text-gray-900">${patient.lastVisit ? new Date(patient.lastVisit).toLocaleDateString() : 'Never'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Appointments</h4>
+                        ${upcomingAppointments.length > 0 ? `
+                            <div class="space-y-2">
+                                ${upcomingAppointments.map(apt => {
+                                    const aptDate = new Date(apt.appointment_date + ' ' + apt.appointment_time);
+                                    return `
+                                        <div class="p-3 bg-blue-50 rounded-lg">
+                                            <div class="text-sm font-medium">${apt.doctor_name}</div>
+                                            <div class="text-xs text-gray-600">${aptDate.toLocaleDateString()} at ${aptDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-${apt.status}">
+                                                ${apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                                            </span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : '<p class="text-sm text-gray-500">No upcoming appointments</p>'}
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Recent Appointments</h4>
+                    ${recentAppointments.length > 0 ? `
+                        <div class="space-y-2">
+                            ${recentAppointments.map(apt => {
+                                const aptDate = new Date(apt.appointment_date + ' ' + apt.appointment_time);
+                                return `
+                                    <div class="p-3 bg-gray-50 rounded-lg">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <div class="text-sm font-medium">${apt.doctor_name}</div>
+                                                <div class="text-xs text-gray-600">${aptDate.toLocaleDateString()} at ${aptDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                                                <div class="text-xs text-gray-600">${apt.specialization}</div>
+                                            </div>
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-${apt.status}">
+                                                ${apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : '<p class="text-sm text-gray-500">No recent appointments</p>'}
+                </div>
+            `;
+            
+            document.getElementById('patientModal').classList.remove('hidden');
+        }
+
+        function viewPatientHistory(patientId) {
+            // This would typically open a more detailed history view
+            // For now, we'll just show the patient details
+            viewPatientDetails(patientId);
+        }
+
+        function closePatientModal() {
+            document.getElementById('patientModal').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                toast.className = toast.className.replace('bg-green-500', 'bg-red-500');
+            } else {
+                toast.className = toast.className.replace('bg-red-500', 'bg-green-500');
+            }
+            
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

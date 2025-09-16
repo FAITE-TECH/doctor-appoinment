@@ -154,7 +154,7 @@
         <h1 class="text-xl font-bold text-white mb-4">Book Appointment</h1>
         <div class="w-24 h-0.5 bg-red-400 mb-6"></div>
 
-        <form class="flex flex-col gap-6">
+        <form id="appointmentForm" class="flex flex-col gap-6">
           <!-- Patient Info -->
           <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1 flex flex-col">
@@ -162,6 +162,8 @@
                 >Patient Name</label
               >
               <input
+                id="patientName"
+                name="patient_name"
                 type="text"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
@@ -172,7 +174,9 @@
                 >Phone No</label
               >
               <input
-                type="text"
+                id="patientPhone"
+                name="patient_phone"
+                type="tel"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
@@ -180,6 +184,8 @@
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1">Email</label>
               <input
+                id="patientEmail"
+                name="patient_email"
                 type="email"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
@@ -195,6 +201,7 @@
               >
               <select
                 id="deptSelect"
+                name="department"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               >
@@ -205,6 +212,7 @@
               <label class="text-sm font-medium text-white mb-1">Doctor</label>
               <select
                 id="doctorSelect"
+                name="doctor_id"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               >
@@ -221,6 +229,7 @@
               >
               <input
                 id="datePicker"
+                name="appointment_date"
                 type="text"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
@@ -230,13 +239,26 @@
               <label class="text-sm font-medium text-white mb-1"
                 >Choose Time</label
               >
-              <input
-                id="timePicker"
-                type="text"
+              <select
+                id="timeSelect"
+                name="appointment_time"
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
-              />
+              >
+                <option value="">Select time</option>
+              </select>
             </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="flex flex-col">
+            <label class="text-sm font-medium text-white mb-1">Notes (Optional)</label>
+            <textarea
+              id="appointmentNotes"
+              name="notes"
+              class="border h-20 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md resize-none"
+              placeholder="Any additional information..."
+            ></textarea>
           </div>
           <!-- Flatpickr JS -->
           <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -265,10 +287,11 @@
 
           <button
             type="submit"
-            onclick="showToast()"
-            class="bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition w-full sm:w-auto"
+            id="bookAppointmentBtn"
+            class="bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Book Now
+            <span id="btnText">Book Now</span>
+            <span id="btnSpinner" class="hidden">Booking...</span>
           </button>
         </form>
 
@@ -345,6 +368,8 @@
       document.addEventListener('DOMContentLoaded', function() {
         const deptSelect = document.getElementById('deptSelect');
         const doctorSelect = document.getElementById('doctorSelect');
+        const datePicker = document.getElementById('datePicker');
+        const timeSelect = document.getElementById('timeSelect');
 
         if (deptSelect && doctorSelect) {
           deptSelect.addEventListener('change', function() {
@@ -369,13 +394,125 @@
               });
             }
           });
+
+          // Load time slots when doctor and date are selected
+          doctorSelect.addEventListener('change', loadTimeSlots);
+          datePicker.addEventListener('change', loadTimeSlots);
+
+          function loadTimeSlots() {
+            const selectedDoctor = doctorSelect.value;
+            const selectedDate = datePicker.value;
+            
+            // Clear time slots
+            timeSelect.innerHTML = '<option value="">Select time</option>';
+            
+            if (selectedDoctor && selectedDate) {
+              fetch(`/doctor-appoinment/Backend/api/appointments.php?action=time_slots&doctor_id=${selectedDoctor}&date=${selectedDate}`)
+                .then(response => response.json())
+                .then(data => {
+                  if (data.available_slots && data.available_slots.length > 0) {
+                    data.available_slots.forEach(slot => {
+                      const option = document.createElement('option');
+                      option.value = slot.time;
+                      option.textContent = slot.display;
+                      timeSelect.appendChild(option);
+                    });
+                  } else {
+                    timeSelect.innerHTML = '<option value="">No available slots</option>';
+                  }
+                })
+                .catch(error => {
+                  console.error('Error loading time slots:', error);
+                  timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+                });
+            }
+          }
         }
       });
     </script>
 
     <script>
-      function showToast() {
+      // Form submission handling
+      document.addEventListener('DOMContentLoaded', function() {
+        const appointmentForm = document.getElementById('appointmentForm');
+        const bookBtn = document.getElementById('bookAppointmentBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        if (appointmentForm) {
+          appointmentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(appointmentForm);
+            const appointmentData = {
+              patient_name: formData.get('patient_name'),
+              patient_email: formData.get('patient_email'),
+              patient_phone: formData.get('patient_phone'),
+              doctor_id: formData.get('doctor_id'),
+              appointment_date: formData.get('appointment_date'),
+              appointment_time: formData.get('appointment_time'),
+              notes: formData.get('notes')
+            };
+
+            // Validate required fields
+            if (!appointmentData.patient_name || !appointmentData.patient_email || 
+                !appointmentData.patient_phone || !appointmentData.doctor_id || 
+                !appointmentData.appointment_date || !appointmentData.appointment_time) {
+              showToast('Please fill in all required fields', 'error');
+              return;
+            }
+
+            // Show loading state
+            bookBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnSpinner.classList.remove('hidden');
+
+            try {
+              const response = await fetch('/doctor-appoinment/Backend/api/appointments.php?action=book', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(appointmentData)
+              });
+
+              const result = await response.json();
+
+              if (response.ok) {
+                showToast('Appointment booked successfully!', 'success');
+                appointmentForm.reset();
+                // Clear time slots
+                document.getElementById('timeSelect').innerHTML = '<option value="">Select time</option>';
+              } else {
+                showToast(result.error || 'Failed to book appointment', 'error');
+              }
+            } catch (error) {
+              console.error('Error booking appointment:', error);
+              showToast('Network error. Please try again.', 'error');
+            } finally {
+              // Hide loading state
+              bookBtn.disabled = false;
+              btnText.classList.remove('hidden');
+              btnSpinner.classList.add('hidden');
+            }
+          });
+        }
+      });
+
+      function showToast(message, type = 'success') {
         const toast = document.getElementById("toast");
+        toast.textContent = message;
+        
+        // Update toast styling based on type
+        if (type === 'error') {
+          toast.className = toast.className.replace('bg-black', 'bg-red-600');
+          toast.textContent = '❌ ' + message;
+        } else {
+          toast.className = toast.className.replace('bg-red-600', 'bg-black');
+          toast.textContent = '✅ ' + message;
+        }
+        
         toast.classList.remove("hidden");
         toast.style.opacity = "1";
 
@@ -383,7 +520,7 @@
         setTimeout(() => {
           toast.style.opacity = "0";
           setTimeout(() => toast.classList.add("hidden"), 500); // wait for fade-out
-        }, 1000);
+        }, 3000);
       }
     </script>
     <!-- Best Hospital -->

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="icon" type="image/png" href="../public/assets/logo.png">
+    <title>My Messages - HPC Hospital</title>
+</head>
+<body>
+    <div id="header"></div>
+    <script>
+        fetch("shared-nav.html")
+            .then((res) => res.text())
+            .then((data) => {
+                document.getElementById("header").innerHTML = data;
+                // Initialize navigation after it's loaded
+                if (window.initNavigationAfterLoad) {
+                    window.initNavigationAfterLoad();
+                }
+            });
+    </script>
+
+    <div class="relative w-full h-40 max-w-6xl mx-auto">
+        <img
+            src="../public/assets/eyecare.jpg"
+            alt="messages"
+            class="w-full h-full object-cover rounded-lg"
+        />
+        <h1
+            class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded"
+        >
+            My Messages
+        </h1>
+    </div>
+
+    <!-- Messages Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-6">
+            <!-- Authentication Check -->
+            <div id="authNotice" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 hidden">
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-yellow-600 mr-3"></i>
+                    <div>
+                        <p class="text-yellow-800 font-medium">Sign in to view your messages</p>
+                        <p class="text-yellow-700 text-sm">Please sign in to your account to view your message history and replies.</p>
+                        <div class="mt-2">
+                            <a href="signin.html" class="text-yellow-800 underline hover:text-yellow-900">Sign In</a>
+                            <span class="mx-2">or</span>
+                            <a href="signup.html" class="text-yellow-800 underline hover:text-yellow-900">Create Account</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="mb-6 flex flex-wrap gap-3">
+                <button id="allMessagesBtn" onclick="filterMessages('all')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-list mr-2"></i>All Messages
+                </button>
+                <button id="repliesBtn" onclick="filterMessages('replied')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-reply mr-2"></i>Messages with Replies
+                </button>
+                <button id="pendingBtn" onclick="filterMessages('pending')" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                    <i class="fas fa-clock mr-2"></i>Pending Replies
+                </button>
+            </div>
+
+            <!-- Messages List -->
+            <div id="messagesContainer" class="space-y-6">
+                <div class="text-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p class="text-gray-600">Loading your messages...</p>
+                </div>
+            </div>
+
+            <!-- No Messages State -->
+            <div id="noMessagesState" class="text-center py-12 hidden">
+                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No Messages Yet</h3>
+                <p class="text-gray-500 mb-6">You haven't sent any messages to us yet.</p>
+                <a href="contact.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-envelope mr-2"></i>Send a Message
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reply Detail Modal -->
+    <div id="replyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Reply Details</h3>
+                <button onclick="closeReplyModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="replyModalContent" class="space-y-4">
+                <!-- Reply content will be populated here -->
+            </div>
+            
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" onclick="closeReplyModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                    Close
+                </button>
+                <a href="contact.html" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <i class="fas fa-plus mr-2"></i>Send New Message
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p>&copy; 2024 HPC Hospital. All rights reserved.</p>
+            <p class="mt-2 text-gray-400">Your health, our commitment.</p>
+        </div>
+    </footer>
+
+    <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
+    
+    <script>
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthenticationStatus();
+        });
+
+        // Check if user is authenticated
+        async function checkAuthenticationStatus() {
+            const authNotice = document.getElementById('authNotice');
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            try {
+                const response = await fetch('../../Backend/api/auth.php?action=me', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    // User is authenticated - hide notice and load messages
+                    authNotice.classList.add('hidden');
+                    await loadUserMessages();
+                } else {
+                    // User is not authenticated - show notice
+                    authNotice.classList.remove('hidden');
+                    messagesContainer.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                // On error, show notice to be safe
+                authNotice.classList.remove('hidden');
+                messagesContainer.innerHTML = '';
+            }
+        }
+
+        // Global variables
+        let allMessages = [];
+        let currentFilter = 'all';
+
+        // Load user's messages
+        async function loadUserMessages() {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const noMessagesState = document.getElementById('noMessagesState');
+            
+            try {
+                const response = await fetch('../../Backend/api/contact.php?page=1&limit=50', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success && data.messages && data.messages.length > 0) {
+                    allMessages = data.messages;
+                    displayUserMessages(data.messages);
+                    noMessagesState.classList.add('hidden');
+                } else {
+                    allMessages = [];
+                    messagesContainer.innerHTML = '';
+                    noMessagesState.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                messagesContainer.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-red-600 mr-3"></i>
+                            <div>
+                                <p class="text-red-800 font-medium">Error loading messages</p>
+                                <p class="text-red-700 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Display user's messages
+        function displayUserMessages(messages) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            messagesContainer.innerHTML = messages.map(message => `
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <!-- Message Header -->
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1">${message.subject}</h3>
+                                <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                    <span><i class="fas fa-calendar mr-1"></i>${formatDate(message.created_at)}</span>
+                                    <span class="px-2 py-1 text-xs rounded-full ${getStatusBadgeClass(message.status)}">
+                                        ${getStatusText(message.status)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Original Message -->
+                        <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                            <h4 class="font-medium text-gray-900 mb-2">Your Message:</h4>
+                            <p class="text-gray-700">${message.message}</p>
+                        </div>
+                        
+                        <!-- Admin Reply (if exists) -->
+                        ${message.admin_reply ? `
+                            <div class="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border-l-4 border-green-400 shadow-sm">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-user-md text-green-600 mr-2"></i>
+                                        <h4 class="font-semibold text-green-900">Admin Reply</h4>
+                                        ${message.status === 'replied' ? '<span class="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">New Reply</span>' : ''}
+                                    </div>
+                                    <button onclick="viewReply(${message.id})" class="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
+                                        <i class="fas fa-eye mr-1"></i>View Reply
+                                    </button>
+                                </div>
+                                <div class="bg-white p-3 rounded border mb-3">
+                                    <p class="text-gray-800 whitespace-pre-wrap">${message.admin_reply}</p>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-gray-600">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-user mr-1"></i>
+                                        Replied by ${message.replied_by_name || 'Admin'}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-clock mr-1"></i>
+                                        ${formatDate(message.replied_at)}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                                <div class="flex items-center">
+                                    <i class="fas fa-hourglass-half text-yellow-600 mr-2"></i>
+                                    <p class="text-yellow-800">Your message is being reviewed. We'll get back to you soon!</p>
+                                </div>
+                            </div>
+                        `}
+                        
+                        <!-- Actions -->
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="text-xs text-gray-500">
+                                Message ID: #${message.id}
+                            </div>
+                            <div class="flex space-x-2">
+                                ${message.admin_reply ? `
+                                    <button onclick="markAsRead(${message.id})" class="text-sm text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-check mr-1"></i>Mark as Read
+                                    </button>
+                                ` : ''}
+                                <a href="contact.html" class="text-sm text-gray-600 hover:text-gray-800">
+                                    <i class="fas fa-plus mr-1"></i>Send New Message
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get status badge class
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'new': return 'bg-red-100 text-red-800';
+                case 'read': return 'bg-yellow-100 text-yellow-800';
+                case 'replied': return 'bg-green-100 text-green-800';
+                case 'closed': return 'bg-gray-100 text-gray-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Get status text
+        function getStatusText(status) {
+            switch (status) {
+                case 'new': return 'New';
+                case 'read': return 'Read';
+                case 'replied': return 'Replied';
+                case 'closed': return 'Closed';
+                default: return 'Unknown';
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        // Mark message as read (if user has replied)
+        async function markAsRead(messageId) {
+            try {
+                const response = await fetch('../../Backend/api/contact.php', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        messageId: messageId,
+                        status: 'read'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showAlert('Message marked as read', 'success');
+                    // Reload messages to update status
+                    await loadUserMessages();
+                    // Update unread count in navigation
+                    if (window.loadUserUnreadMessagesCount) {
+                        window.loadUserUnreadMessagesCount();
+                    }
+                } else {
+                    showAlert('Failed to update message status', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating message status:', error);
+                showAlert('Failed to update message status', 'error');
+            }
+        }
+
+        // Filter messages
+        function filterMessages(filter) {
+            currentFilter = filter;
+            
+            // Update button styles
+            document.getElementById('allMessagesBtn').className = 'px-4 py-2 rounded-lg transition-colors ' + 
+                (filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300');
+            document.getElementById('repliesBtn').className = 'px-4 py-2 rounded-lg transition-colors ' + 
+                (filter === 'replied' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300');
+            document.getElementById('pendingBtn').className = 'px-4 py-2 rounded-lg transition-colors ' + 
+                (filter === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300');
+            
+            let filteredMessages = [];
+            
+            switch (filter) {
+                case 'all':
+                    filteredMessages = allMessages;
+                    break;
+                case 'replied':
+                    filteredMessages = allMessages.filter(msg => msg.admin_reply);
+                    break;
+                case 'pending':
+                    filteredMessages = allMessages.filter(msg => !msg.admin_reply);
+                    break;
+            }
+            
+            if (filteredMessages.length > 0) {
+                displayUserMessages(filteredMessages);
+                document.getElementById('noMessagesState').classList.add('hidden');
+            } else {
+                document.getElementById('messagesContainer').innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No Messages Found</h3>
+                        <p class="text-gray-500">No messages match the selected filter.</p>
+                    </div>
+                `;
+                document.getElementById('noMessagesState').classList.add('hidden');
+            }
+        }
+
+        // View reply in modal
+        function viewReply(messageId) {
+            const message = allMessages.find(msg => msg.id == messageId);
+            if (!message || !message.admin_reply) {
+                showAlert('Reply not found', 'error');
+                return;
+            }
+            
+            document.getElementById('replyModalContent').innerHTML = `
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Your Message</label>
+                            <p class="text-gray-900 font-medium">${message.subject}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Message ID</label>
+                            <p class="text-gray-900">#${message.id}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Sent Date</label>
+                            <p class="text-gray-900">${formatDate(message.created_at)}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Reply Date</label>
+                            <p class="text-gray-900">${formatDate(message.replied_at)}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Your Original Message</label>
+                        <div class="bg-white p-3 rounded border text-gray-800 whitespace-pre-wrap">
+                            ${message.message}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Admin Reply</label>
+                        <div class="bg-green-50 p-4 rounded border-l-4 border-green-400">
+                            <p class="text-gray-800 whitespace-pre-wrap">${message.admin_reply}</p>
+                            <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
+                                <div class="flex items-center">
+                                    <i class="fas fa-user-md mr-1"></i>
+                                    Replied by ${message.replied_by_name || 'Admin'}
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    ${formatDate(message.replied_at)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('replyModal').classList.remove('hidden');
+            document.getElementById('replyModal').classList.add('flex');
+        }
+
+        // Close reply modal
+        function closeReplyModal() {
+            document.getElementById('replyModal').classList.add('hidden');
+            document.getElementById('replyModal').classList.remove('flex');
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 max-w-md ${
+                type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+                type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+                'bg-blue-100 text-blue-800 border border-blue-200'
+            }`;
+            
+            alertDiv.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${
+                        type === 'success' ? 'check-circle' : 
+                        type === 'error' ? 'exclamation-circle' :
+                        'info-circle'
+                    } mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
