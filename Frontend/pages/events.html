@@ -114,9 +114,11 @@
 
           eventCard.innerHTML = `
         <!-- Event Image Wrapper -->
-        <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${eventImage}" alt="${eventTitle}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-        </div>
+        <a href="event-details.html?id=${event.id}">
+          <div class="relative h-56 w-full overflow-hidden group">
+            <img src="${eventImage}" alt="${eventTitle}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          </div>
+        </a>
 
         <!-- Event Content -->
         <div class="p-4 sm:p-6 flex flex-col justify-between flex-grow">
@@ -125,9 +127,7 @@
             <i class="fa-solid fa-calendar-days text-gray-300 text-sm"></i>
             <h4 class="text-sm sm:text-md font-semibold text-gray-300 mb-2 text-start">${eventDate}</h4>
           </div>
-
           <p class="text-gray-600 text-sm sm:text-md mb-4 clamp-4 text-start leading-relaxed">${eventDescription}</p>
-
         </div>
       `;
 

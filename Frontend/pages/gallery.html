@@ -114,14 +114,19 @@
         // Render gallery images
         images.forEach((image, index) => {
           const card = document.createElement("div");
-          card.className = "bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1";
+          card.className = "bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer";
 
           card.innerHTML = `
-            <div class="relative group">
+            <div class="relative group" onclick="viewImage('${image.id}')">
               <img src="/doctor-appoinment/uploads/gallery/${image.image_path}" 
                    alt="${image.title}" 
                    class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105">
               <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <div class="bg-white bg-opacity-90 rounded-full p-3">
+                  <i class="fa-solid fa-expand text-gray-700 text-xl"></i>
+                </div>
+              </div>
             </div>
             <div class="p-4">
               <h3 class="text-lg font-semibold text-gray-800 mb-2">${image.title}</h3>
@@ -151,6 +156,11 @@
     // Load gallery on page load
     loadGallery();
   });
+
+  // Function to view image in detail page
+  function viewImage(imageId) {
+    window.location.href = `gallery-details.html?id=${imageId}`;
+  }
 </script>
 
 

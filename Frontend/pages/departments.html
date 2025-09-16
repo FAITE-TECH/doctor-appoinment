@@ -114,18 +114,16 @@
 
           departmentCard.innerHTML = `
         <!-- Department Image Wrapper -->
-        <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${departmentImage}" alt="${departmentName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-        </div>
+        <a href="department-details.html?id=${department.id}">
+          <div class="relative h-56 w-full overflow-hidden group">
+            <img src="${departmentImage}" alt="${departmentName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          </div>
+        </a>
 
         <!-- Department Content -->
         <div class="p-6 flex flex-col justify-between flex-grow">
           <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${departmentName}</h3>
-          
-
           <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${departmentDescription}</p>
-
-      
         </div>
       `;
 
