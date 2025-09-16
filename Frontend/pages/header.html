@@ -82,15 +82,13 @@
                   class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/cardio:opacity-100 group-hover/cardio:visible transition-all duration-300 ease-in-out"
                 >
                   <a
-                    href="./doctor-dr-smith.php"
+                    href="../pages/doctor-details.html?id=1"
                     class="block px-4 py-2 hover:bg-gray-100"
-                    >Dr. Smith</a
-                  >
+                    >Dr. Smith</a>
                   <a
-                    href="./doctor-dr-jones.php"
+                    href="../pages/doctor-details.html?id=2"
                     class="block px-4 py-2 hover:bg-gray-100"
-                    >Dr. Jones</a
-                  >
+                    >Dr. Jones</a>
                 </div>
               </div>
 
@@ -106,15 +104,13 @@
                   class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/neuro:opacity-100 group-hover/neuro:visible transition-all duration-300 ease-in-out"
                 >
                   <a
-                    href="./doctor-dr-williams.php"
+                    href="../pages/doctor-details.html?id=3"
                     class="block px-4 py-2 hover:bg-gray-100"
-                    >Dr. Williams</a
-                  >
+                    >Dr. Williams</a>
                   <a
-                    href="./doctor-dr-miller.php"
+                    href="../pages/doctor-details.html?id=4"
                     class="block px-4 py-2 hover:bg-gray-100"
-                    >Dr. Miller</a
-                  >
+                    >Dr. Miller</a>
                 </div>
               </div>
 
@@ -130,15 +126,13 @@
                   class="absolute left-full top-0 w-56 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover/pedia:opacity-100 group-hover/pedia:visible transition-all duration-300 ease-in-out"
                 >
                   <a
-                    href="./doctor-dr-brown.php"
+                    href="../pages/doctor-details.html?id=5"
                     class="block px-4 py-2 hover:bg-gray-100"
-                    >Dr. Brown</a
-                  >
+                    >Dr. Brown</a>
                   <a
-                    href="./doctor-dr-davis.php"
+                    href="../pages/doctor-details.html?id=6"
                     class="block px-4 py-2 hover:bg-gray-100"
-                    >Dr. Davis</a
-                  >
+                    >Dr. Davis</a>
                 </div>
               </div>
             </div>
@@ -211,6 +205,8 @@
 
         <!-- Mobile Menu Toggle -->
         <button
+          aria-label="Toggle Mobile Menu"
+          type="button"
           id="mobileMenuToggle"
           class="md:hidden text-2xl focus:outline-none"
         >
@@ -396,19 +392,14 @@
       });
 
       // Submenus
-      document.querySelectorAll("[data-submenu]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const submenu = button.nextElementSibling;
-
-          // Close other submenus first
-          document.querySelectorAll("[data-submenu-menu]").forEach((menu) => {
-            if (menu !== submenu) menu.classList.add("hidden");
-          });
-
-          // Toggle clicked submenu
-          submenu.classList.toggle("hidden");
-        });
-      });
+     document.querySelectorAll("[data-dropdown]").forEach((trigger) => {
+  trigger.addEventListener("click", (e) => {
+    // Prevent default for anchor tags
+    if (trigger.tagName === "A") e.preventDefault();
+    const menu = trigger.nextElementSibling;
+    menu.classList.toggle("hidden");
+  });
+});
     </script>
     <script src="../public/js/script.js"></script>
 
