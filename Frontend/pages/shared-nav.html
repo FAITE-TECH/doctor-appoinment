@@ -1,12 +1,12 @@
 <!-- Navigation Header -->
 <header class="bg-white shadow-md fixed w-full top-0 z-50">
-  <div class="w-full flex justify-between items-center px-2 sm:px-4 lg:px-6 py-4">
+  <div class="w-full flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
     <!-- Logo -->
-    <a href="./index.html" class="flex items-center space-x-3">
-      <img src="../public/assets/logo.png" alt="HPC Hospital Logo" class="h-12 w-auto" />
+    <a href="./index.html" class="flex items-center space-x-2 sm:space-x-3">
+      <img src="../public/assets/logo.png" alt="HPC Hospital Logo" class="h-8 sm:h-10 lg:h-12 w-auto" />
       <div class="flex flex-col">
-        <span class="text-xl font-bold text-blue-600 leading-tight">HPC Hospital</span>
-        <span class="text-xs text-gray-500 leading-tight">Speciality Primary Care</span>
+        <span class="text-sm sm:text-lg lg:text-xl font-bold text-blue-600 leading-tight">HPC Hospital</span>
+        <span class="text-xs text-gray-500 leading-tight hidden sm:block">Speciality Primary Care</span>
       </div>
     </a>
 
@@ -22,20 +22,20 @@
     </nav>
 
     <!-- User Authentication -->
-    <div class="flex items-center space-x-3" id="nav-links">
+    <div class="flex items-center space-x-2 sm:space-x-3" id="nav-links">
       <!-- Guest Links -->
-      <a href="./signin.html" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200 px-2 py-1" data-auth="guest">Sign In</a>
-      <a href="./signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium" data-auth="guest">Sign Up</a>
+      <a href="./signin.html" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200 px-1 sm:px-2 py-1 text-sm sm:text-base" data-auth="guest">Sign In</a>
+      <a href="./signup.html" class="bg-blue-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium text-sm sm:text-base" data-auth="guest">Sign Up</a>
       
       <!-- User Links -->
-      <div class="hidden flex items-center space-x-3" data-auth="user">
-        <span id="nav-user-email" class="text-gray-700 font-medium text-sm px-2 py-1"></span>
-        <a href="./home.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">Dashboard</a>
-        <button id="signoutBtn" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors duration-200 font-medium">Sign Out</button>
+      <div class="hidden flex items-center space-x-2 sm:space-x-3" data-auth="user">
+        <span id="nav-user-email" class="text-gray-700 font-medium text-xs sm:text-sm px-1 sm:px-2 py-1 hidden sm:block"></span>
+        <a href="./home.html" class="bg-green-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-green-700 transition-colors duration-200 font-medium text-sm sm:text-base">Dashboard</a>
+        <button id="signoutBtn" class="bg-gray-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-gray-700 transition-colors duration-200 font-medium text-sm sm:text-base">Sign Out</button>
       </div>
 
       <!-- Admin Link -->
-      <a href="./admin/index.html" class="hidden bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200 font-medium" data-auth="admin" id="adminLink">Admin Panel</a>
+      <a href="./admin/index.html" class="hidden bg-red-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-red-700 transition-colors duration-200 font-medium text-sm sm:text-base" data-auth="admin" id="adminLink">Admin</a>
     </div>
 
     <!-- Mobile Menu Toggle -->
@@ -63,4 +63,4 @@
 </header>
 
 <!-- Add top padding to account for fixed header -->
-<div class="pt-24"></div>
+<div class="pt-16 sm:pt-20 lg:pt-24"></div>

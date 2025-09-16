@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<<<<<<< HEAD
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,10 +14,24 @@
 </head>
 
 <body class="bg-gray-50">
+=======
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-50">
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
 
 
   <!--  Import Header -->
 
+<<<<<<< HEAD
   <div id="header"></div>
   <script>
     fetch("header.html")
@@ -34,6 +49,18 @@
             newScript.textContent = oldScript.textContent;
           }
           document.body.appendChild(newScript);
+=======
+    <div id="header"></div>
+    <script>
+      fetch("shared-nav.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("header").innerHTML = data;
+          // Initialize navigation after it's loaded
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
         });
       });
   </script>
@@ -62,6 +89,7 @@
   </div>
   <!-- Filter -->
 
+<<<<<<< HEAD
   <section id="doctors">
     <div class="text-center my-10 container mx-auto max-w-6xl px-4">
       <!-- Filter Buttons -->
@@ -82,8 +110,37 @@
           Pulmonary
           <div class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"></div>
         </button>
+=======
+    <section id="doctors">
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+        <!-- Filter Buttons -->
+        <div
+          id="doctorFilter"
+          class="flex flex-wrap justify-center gap-4 mb-10"
+        >
+          <button
+            class="filter-btn relative px-4 py-2 text-black transition"
+            data-filter="All"
+          >
+            All
+            <div
+              class="underline w-full h-0.5 bg-red-400 absolute bottom-0 left-0"
+            ></div>
+          </button>
+          <!-- Dynamic department buttons will be added here by JavaScript -->
+        </div>
+
+        <!-- Cards Grid -->
+        <div
+          id="doctorContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
       </div>
 
+<<<<<<< HEAD
       <!-- Cards Grid -->
       <div id="doctorContainer"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500">
@@ -119,9 +176,26 @@
           }
         } catch (error) {
           doctorContainer.innerHTML = '<p class="text-center text-gray-500">Unable to load doctors.</p>';
+=======
+    <script>
+      // Global variables
+      let doctors = [];
+      let availableDepartments = new Set();
+      let doctorContainer;
+
+      // Render doctors function (global scope)
+      function renderDoctors(filteredDoctors) {
+        // Clear container
+        doctorContainer.innerHTML = "";
+
+        if (filteredDoctors.length === 0) {
+          doctorContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No doctors found for the selected filter.</p>';
+          return;
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
         }
       }
 
+<<<<<<< HEAD
       function getCategories(doctors) {
         const set = new Set();
         doctors.forEach(d => {
@@ -151,10 +225,151 @@
                 const spec = d.specialization || d.department_name || 'General';
                 return spec === filter;
               });
+=======
+        filteredDoctors.forEach((doctor) => {
+          const doctorCard = document.createElement("div");
+          doctorCard.className =
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
+
+          // Use the image from database or fallback to default
+          let doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
+          // If image_path is absolute, use it as is, otherwise make it relative
+          if (doctor.image_path && !doctor.image_path.startsWith('http') && !doctor.image_path.startsWith('/')) {
+            doctorImage = "../" + doctor.image_path;
+          } else if (doctor.image_path && doctor.image_path.startsWith('/')) {
+            doctorImage = doctor.image_path;
+          }
+          const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
+          const doctorDescription = doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
+
+          doctorCard.innerHTML = `
+            <!-- Doctor Image Wrapper -->
+            <a href="doctor-details.html?id=${doctor.id}">
+              <div class="relative h-56 w-full overflow-hidden group">
+                <img src="${doctorImage}" alt="${doctor.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+              </div>
+            </a>
+
+            <!-- Doctor Content -->
+            <div class="p-6 flex flex-col justify-between flex-grow">
+              <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
+              <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">${doctorSpecialization}</p>
+              <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${doctorDescription}</p>
+            </div>
+          `;
+
+          doctorContainer.appendChild(doctorCard);
+
+          // Animate card fade in
+          requestAnimationFrame(() => {
+            doctorCard.classList.remove("opacity-0");
+          });
+        });
+      }
+
+      // Update filter buttons based on available departments
+      function updateFilterButtons() {
+        const filterContainer = document.getElementById("doctorFilter");
+        
+        // Keep the "All" button and remove others
+        const allButton = filterContainer.querySelector('[data-filter="All"]');
+        filterContainer.innerHTML = '';
+        filterContainer.appendChild(allButton);
+        
+        // Add dynamic department buttons
+        availableDepartments.forEach(department => {
+          const button = document.createElement('button');
+          button.className = 'filter-btn relative px-4 py-2 text-black transition';
+          button.setAttribute('data-filter', department);
+          button.innerHTML = `
+            ${department}
+            <div class="underline hidden w-full h-0.5 bg-red-400 absolute bottom-0 left-0"></div>
+          `;
+          filterContainer.appendChild(button);
+        });
+        
+        // Re-attach event listeners to all filter buttons
+        attachFilterListeners();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        doctorContainer = document.getElementById("doctorContainer");
+
+        // Fetch and render doctors
+        fetchDoctors();
+      });
+
+      // Attach filter listeners to buttons
+      function attachFilterListeners() {
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        
+        filterButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const filter = btn.dataset.filter;
+
+            // Update visual state
+            filterButtons.forEach((b) =>
+              b.querySelector(".underline").classList.add("hidden")
+            );
+            btn.querySelector(".underline").classList.remove("hidden");
+
+            // Filter doctors
+            if (filter === "All") {
+              renderDoctors(doctors);
+            } else {
+              const filteredDoctors = doctors.filter((d) => 
+                d.department_name && d.department_name === filter
+              );
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
               renderDoctors(filteredDoctors);
             }
           });
         });
+<<<<<<< HEAD
+=======
+      }
+    </script>
+
+
+    <!-- Doctor Data -->
+    <script>
+      // Global variable to store current doctor
+      let currentDoctor = null;
+
+      // Fetch doctors from API
+      async function fetchDoctors() {
+        try {
+          const response = await fetch('../../Backend/api/doctors.php?action=doctors');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            doctors = data.data;
+            console.log('Doctors loaded:', doctors.length, 'doctors');
+            console.log('First doctor:', doctors[0]);
+            
+            // Extract unique departments from doctors data
+            availableDepartments.clear();
+            doctors.forEach(doctor => {
+              if (doctor.department_name) {
+                availableDepartments.add(doctor.department_name);
+              }
+            });
+            
+            // Update filter buttons dynamically
+            updateFilterButtons();
+            
+            // Load doctor details and render all doctors
+            loadDoctorDetails();
+            renderDoctors(doctors);
+          } else {
+            console.error('Failed to fetch doctors:', data.message);
+            document.getElementById("doctorDetail").innerHTML = '<p class="text-center text-red-500">Failed to load doctors data: ' + (data.message || 'Unknown error') + '</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching doctors:', error);
+          document.getElementById("doctorDetail").innerHTML = '<p class="text-center text-gray-500">Unable to load doctor details. Please try again later.</p>';
+        }
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
       }
 
       function highlightTab(filter) {
@@ -166,6 +381,7 @@
         });
       }
 
+<<<<<<< HEAD
       function renderDoctors(filteredDoctors) {
         doctorContainer.innerHTML = "";
         filteredDoctors.forEach((doctor) => {
@@ -200,6 +416,35 @@
       fetchDoctorsForFilter();
     });
   </script>
+=======
+        if (!doctorId || isNaN(doctorId)) {
+          document.getElementById("doctorDetail").innerHTML = '<p class="text-center text-red-500 font-semibold">Invalid doctor ID. Please select a doctor from the doctors page.</p>';
+          return;
+        }
+
+        // Check if doctors data is loaded
+        if (!doctors || doctors.length === 0) {
+          document.getElementById("doctorDetail").innerHTML = '<p class="text-center text-yellow-500">Loading doctor data...</p>';
+          return;
+        }
+
+        // Find doctor by id (convert to string for comparison since API returns string IDs)
+        console.log('Looking for doctor ID:', doctorId, 'in', doctors.length, 'doctors');
+        currentDoctor = doctors.find((d) => parseInt(d.id) === doctorId);
+        console.log('Found doctor:', currentDoctor ? currentDoctor.name : 'NOT FOUND');
+
+        if (currentDoctor) {
+          // Use the image from database or fallback to default
+          let doctorImage = currentDoctor.image_path || "../public/assets/doctor1.jpg";
+          // If image_path is absolute, use it as is, otherwise make it relative
+          if (currentDoctor.image_path && !currentDoctor.image_path.startsWith('http') && !currentDoctor.image_path.startsWith('/')) {
+            doctorImage = "../" + currentDoctor.image_path;
+          } else if (currentDoctor.image_path && currentDoctor.image_path.startsWith('/')) {
+            doctorImage = currentDoctor.image_path;
+          }
+          const doctorSpecialization = currentDoctor.specialization || currentDoctor.department_name || "General";
+          const doctorDescription = currentDoctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
 
 
   <!-- Doctor Data -->
@@ -280,6 +525,7 @@
           </div>
         </div>
       `;
+<<<<<<< HEAD
         // Load other doctors in the same specialization
         loadOtherDoctors(doctorSpecialization);
 
@@ -287,6 +533,16 @@
         loadScheduleTable();
       } else {
         document.getElementById("doctorDetail").innerHTML = '<p class="text-red-500 font-semibold">Doctor not found.</p>';
+=======
+          // Load other doctors in the same specialization
+          loadOtherDoctors(doctorSpecialization);
+          
+          // Load schedule table
+          loadScheduleTable();
+        } else {
+          document.getElementById("doctorDetail").innerHTML = '<p class="text-red-500 font-semibold">Doctor not found. The doctor with ID ' + doctorId + ' does not exist.</p>';
+        }
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
       }
     }
 
@@ -294,11 +550,19 @@
       const otherDoctorsContainer = document.querySelector("#other-doctors");
       if (!otherDoctorsContainer) return;
 
+<<<<<<< HEAD
       const otherDoctors = doctors.filter((d) =>
         ((d.specialization && d.specialization.toLowerCase().includes(specialization.toLowerCase())) ||
           (d.department_name && d.department_name.toLowerCase().includes(specialization.toLowerCase()))) &&
         d.name !== currentDoctor.name
       );
+=======
+        const otherDoctors = doctors.filter((d) => 
+          ((d.specialization && d.specialization.toLowerCase().includes(specialization.toLowerCase())) ||
+           (d.department_name && d.department_name.toLowerCase().includes(specialization.toLowerCase()))) &&
+          parseInt(d.id) !== parseInt(currentDoctor.id)
+        );
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c
 
       otherDoctorsContainer.innerHTML = otherDoctors
         .map((d) => `
@@ -407,6 +671,7 @@
   </script>
 
 
+<<<<<<< HEAD
   <!-- Placeholder for spinner -->
   <div id="spinner"></div>
 
@@ -461,3 +726,9 @@
 </body>
 
 </html>
+=======
+    <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
+  </body>
+</html>
+>>>>>>> 4775893a8223a29e7b6708936159eb7d0b57766c

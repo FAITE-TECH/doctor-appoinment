@@ -23,8 +23,8 @@ $email = trim($body['email']);
 $password = trim($body['password']);
 
 try {
-    // Check if user exists
-    $stmt = $conn->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
+    // Check if user exists and get role information
+    $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.password, r.role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.email = ?");
     $stmt->bind_param('s', $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -35,23 +35,25 @@ try {
 
     $user = $result->fetch_assoc();
 
-    // Verify password
-    if (!password_verify($password, $user['password'])) {
+    // Verify password (try both password_verify and MD5 for compatibility)
+    if (!password_verify($password, $user['password']) && md5($password) !== $user['password']) {
         json_response(['error' => 'Invalid email or password'], 401);
     }
 
     // Set session
     $_SESSION['user_id'] = $user['id'];
-    $_SESSION['email']   = $user['email'];
-    $_SESSION['role']    = $user['role']; // admin / user
+    $_SESSION['name'] = $user['name'];
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['role'] = $user['role_name'];
 
     // Return success with role
     json_response([
         'success' => true,
         'user' => [
             'id'    => $user['id'],
+            'name'  => $user['name'],
             'email' => $user['email'],
-            'role'  => $user['role']
+            'role'  => $user['role_name']
         ]
     ]);
 } catch (Exception $e) {

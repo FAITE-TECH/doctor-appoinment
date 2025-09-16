@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>service Details</title>
-      <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+    <title>Service Details</title>
+    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script
-      src="https://kit.fontawesome.com/a076d05399.js"
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"
       crossorigin="anonymous"
     ></script>
     <link
@@ -17,103 +17,223 @@
     />
   </head>
   <body class="bg-gray-50">
-    <!--  Import Header -->
 
+    <!--  Import Header -->
     <div id="header"></div>
     <script>
-      fetch("header.html")
+      fetch("shared-nav.html")
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
+          // Initialize navigation after it's loaded
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
         });
     </script>
 
     <div class="container mx-auto p-6">
-      
       <div
         id="serviceDetail"
         class="flex flex-col mt-6 justify-center align-center"
       ></div>
     </div>
 
-    <script src="services-data.js"></script>
+    <!-- Related Services -->
+    <section id="services">
+      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">Other Services</h2>
+        
+        <!-- Cards Grid -->
+        <div
+          id="serviceContainer"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 transition-all duration-500"
+        >
+          <!-- Cards will be injected by JS -->
+        </div>
+      </div>
+    </section>
+
     <script>
-      // Get service id from URL
-      const params = new URLSearchParams(window.location.search);
-      const serviceId = parseInt(params.get("id"));
+      // Global variables
+      let services = [];
+      let currentService = null;
 
-      // Find service by id
-      const service = services.find((d) => d.id === serviceId);
-
-      if (service) {
-        document.getElementById("serviceDetail").innerHTML = `
-        <div class="relative w-full h-40 max-w-6xl mx-auto">
-            <img src="${service.img}" alt="${service.type}" class="w-full h-full object-cover rounded-lg">
-            <h1 class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
-                ${service.type}
-            </h1>
-        </div>
-
-        <div class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm justify-start max-w-6xl mx-auto ">
-            <a href="home.html#services" class="text-blue-600 hover:underline">Home</a>
-            <span>&gt;</span>
-            <a href="services.html" class="text-blue-600 hover:underline">service</a>
-            <span>&gt;</span>
-            <span class="text-gray-800 font-medium">${service.type}</span>
-        </div>
-
-
-
-        <div class="bg-white  p-6 flex flex-col justify-between max-w-6xl mx-auto md:flex-row gap-6">
-          <img src="${service.img}" alt="${service.type}" class="w-60 h-60 object-cover rounded-lg shadow-md">
+      // Fetch services from API
+      async function fetchServices() {
+        try {
+          const response = await fetch('../../Backend/api/services.php?action=public');
+          const data = await response.json();
           
-          <div class="md:w-1/3">
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">${service.type}</h2>
-            <p class="text-gray-600 leading-relaxed mb-4">${service.description}</p>           
-          </div>
-
-          <div class="mt-4 md:w-1/3 ">
-            <h3 class="text-xl font-bold text-gray-800 mb-2  border-t border-gray-200">Other services</h3>
-           
-           <ul id="other-services" class="divide-y divide-gray-200 border border-gray-200 rounded-lg"></ul>
-
-          </div>
-        </div>
-      `;
-      } else {
-        document.getElementById(
-          "serviceDetail"
-        ).innerHTML = `<p class="text-red-500 font-semibold">service not found.</p>`;
+          if (data.status === 'success') {
+            services = data.data;
+            loadServiceDetails();
+            renderRelatedServices();
+          } else {
+            console.error('Failed to fetch services:', data.message);
+            document.getElementById("serviceDetail").innerHTML = '<p class="text-center text-red-500">Failed to load service data: ' + (data.message || 'Unknown error') + '</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching services:', error);
+          document.getElementById("serviceDetail").innerHTML = '<p class="text-center text-gray-500">Unable to load service details. Please try again later.</p>';
+        }
       }
 
-      const otherservicesContainer = document.querySelector("#other-services");
+      function loadServiceDetails() {
+        // Get service id from URL
+        const params = new URLSearchParams(window.location.search);
+        const serviceId = parseInt(params.get("id"));
 
-      // Filter out only the current service
-      const otherservices = services.filter(
-        (d) => d.type !== service.type && d.id !== service.id
-      );
+        if (!serviceId || isNaN(serviceId)) {
+          document.getElementById("serviceDetail").innerHTML = '<p class="text-center text-red-500 font-semibold">Invalid service ID. Please select a service from the services page.</p>';
+          return;
+        }
 
-      // Clear first (avoid appending twice)
-      otherservicesContainer.innerHTML = "";
+        // Check if services data is loaded
+        if (!services || services.length === 0) {
+          document.getElementById("serviceDetail").innerHTML = '<p class="text-center text-yellow-500">Loading service data...</p>';
+          return;
+        }
 
-      // Render each service once
-      otherservices.forEach((d) => {
-        const li = document.createElement("li");
-        li.className =
-          "flex items-center gap-3 p-3 hover:bg-gray-50 transition cursor-pointer";
-        li.onclick = () =>
-          (window.location.href = `service-details.html?id=${d.id}`);
+        // Find service by id
+        currentService = services.find((s) => parseInt(s.id) === serviceId);
 
-        li.innerHTML = `
-          <img src="${d.img}" alt="${d.type}" class="w-12 h-12 object-cover rounded-md">
-          <div>
-            <h4 class="text-gray-800 font-semibold text-sm">${d.type}</h4>
-          </div>
-        `;
+        if (currentService) {
+          // Use the image from database or fallback to default
+          let serviceImage = currentService.image_path || "../public/assets/eyecare.jpg";
+          // Handle image path properly
+          if (currentService.image_path && !currentService.image_path.startsWith('http') && !currentService.image_path.startsWith('/')) {
+            serviceImage = `/doctor-appoinment/uploads/services/${currentService.image_path}`;
+          } else if (currentService.image_path && currentService.image_path.startsWith('/')) {
+            serviceImage = currentService.image_path;
+          }
+          
+          const serviceName = currentService.name || "Service";
+          const serviceDescription = currentService.description || "Quality healthcare service provided by our experienced team.";
+          const servicePrice = currentService.price ? parseFloat(currentService.price) : 0;
 
-        otherservicesContainer.appendChild(li);
+          document.getElementById("serviceDetail").innerHTML = `
+            <div class="relative w-full h-40 max-w-6xl mx-auto">
+                <img src="${serviceImage}" alt="${serviceName}" class="w-full h-full object-cover rounded-lg">
+                <h1 class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
+                    ${serviceName}
+                </h1>
+            </div>
+
+            <div class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm justify-center max-w-6xl">
+                <a href="home.html#services" class="text-blue-600 hover:underline">Home</a>
+                <span>&gt;</span>
+                <a href="services.html" class="text-blue-600 hover:underline">Services</a>
+                <span>&gt;</span>
+                <span class="text-gray-800 font-medium">${serviceName}</span>
+            </div>
+
+            <div class="bg-white p-6 flex flex-col justify-between max-w-6xl mx-auto md:flex-row gap-6">
+              <img src="${serviceImage}" alt="${serviceName}" class="w-60 h-60 object-cover rounded-lg shadow-md">
+              
+              <div class="md:w-2/3">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">${serviceName}</h2>
+                
+                <div class="mb-6">
+                  <span class="text-3xl font-bold text-green-600">Rs ${servicePrice.toFixed(2)}</span>
+                  <span class="text-gray-500 ml-2">per session</span>
+                </div>
+                
+                <p class="text-gray-600 leading-relaxed mb-4">${serviceDescription}</p>
+                
+                <div class="mt-6">
+                  <h3 class="text-xl font-bold text-gray-800 mb-4">What's Included</h3>
+                  <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>Professional consultation and assessment</li>
+                    <li>Comprehensive treatment plan</li>
+                    <li>Follow-up care and monitoring</li>
+                    <li>24/7 support and assistance</li>
+                    <li>Quality guarantee on all services</li>
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+          `;
+        } else {
+          document.getElementById("serviceDetail").innerHTML = '<p class="text-red-500 font-semibold">Service not found. The service with ID ' + serviceId + ' does not exist.</p>';
+        }
+      }
+
+      function renderRelatedServices() {
+        const serviceContainer = document.getElementById("serviceContainer");
+        if (!serviceContainer) return;
+
+        // Filter out current service
+        const relatedServices = services.filter((s) => 
+          parseInt(s.id) !== parseInt(currentService?.id || 0)
+        );
+
+        if (relatedServices.length === 0) {
+          serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No other services available.</p>';
+          return;
+        }
+
+        // Show only first 4 related services
+        const displayServices = relatedServices.slice(0, 4);
+
+        serviceContainer.innerHTML = displayServices
+          .map((service) => {
+            let serviceImage = service.image_path || "../public/assets/eyecare.jpg";
+            if (service.image_path && !service.image_path.startsWith('http') && !service.image_path.startsWith('/')) {
+              serviceImage = `/doctor-appoinment/uploads/services/${service.image_path}`;
+            } else if (service.image_path && service.image_path.startsWith('/')) {
+              serviceImage = service.image_path;
+            }
+
+            const servicePrice = service.price ? parseFloat(service.price) : 0;
+
+            return `
+              <div class="bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col">
+                <a href="service-details.html?id=${service.id}">
+                  <div class="relative h-56 w-full overflow-hidden group">
+                    <img src="${serviceImage}" alt="${service.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                  </div>
+                </a>
+
+                <div class="p-6 flex flex-col justify-between flex-grow">
+                  <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${service.name}</h3>
+                  
+                  <div class="mb-3">
+                    <span class="text-xl font-bold text-green-600">Rs ${servicePrice.toFixed(2)}</span>
+                  </div>
+
+                  <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${service.description || "Quality healthcare service provided by our experienced team."}</p>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      // Initialize when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        fetchServices();
       });
     </script>
+
+    <style>
+      /* Simple fade-in animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease forwards;
+      }
+    </style>
 
     <!-- Footer -->
     <div id="footer"></div>
@@ -125,56 +245,58 @@
         });
     </script>
 
-     <!-- Placeholder for spinner -->
-<div id="spinner"></div>
+    <!-- Placeholder for spinner -->
+    <div id="spinner"></div>
 
-<script>
-  // Load spinner markup
-  fetch("spinner.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("spinner").innerHTML = data;
+    <script>
+      // Load spinner markup
+      fetch("spinner.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("spinner").innerHTML = data;
 
-      // Now spinner is in DOM -> attach JS logic
-      const spinner = document.getElementById("spinner-overlay");
+          // Now spinner is in DOM -> attach JS logic
+          const spinner = document.getElementById("spinner-overlay");
 
-      function showSpinner() {
-        spinner.classList.remove("hidden");
-      }
-      function hideSpinner() {
-        spinner.classList.add("hidden");
-      }
+          function showSpinner() {
+            spinner.classList.remove("hidden");
+          }
+          function hideSpinner() {
+            spinner.classList.add("hidden");
+          }
 
-      // Show on links
-    document.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => {
-        if (link.getAttribute("href") !== "#" && !link.getAttribute("href")?.startsWith("javascript")) {
-          showSpinner();
-          setTimeout(hideSpinner, 10000); // works now
-        }
-      });
-    });
+          // Show on links
+          document.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+              if (link.getAttribute("href") !== "#" && !link.getAttribute("href")?.startsWith("javascript")) {
+                showSpinner();
+                setTimeout(hideSpinner, 10000);
+              }
+            });
+          });
 
-    // Show on .show-spinner buttons
-    document.querySelectorAll("button.show-spinner").forEach(btn => {
-      btn.addEventListener("click", () => {
-        showSpinner();
-        setTimeout(hideSpinner, 10000); // works now
-      });
-    });
+          // Show on .show-spinner buttons
+          document.querySelectorAll("button.show-spinner").forEach(btn => {
+            btn.addEventListener("click", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000);
+            });
+          });
 
-    // Show on form submit
-    document.querySelectorAll("form").forEach(form => {
-      form.addEventListener("submit", () => {
-        showSpinner();
-        setTimeout(hideSpinner, 10000); // works now
-      });
-    });
+          // Show on form submit
+          document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", () => {
+              showSpinner();
+              setTimeout(hideSpinner, 10000);
+            });
+          });
 
-    // Optional: hide spinner after page load (auto)
-    setTimeout(() => hideSpinner(), 10000);
-    });
-</script>
+          // Optional: hide spinner after page load (auto)
+          setTimeout(() => hideSpinner(), 10000);
+        });
+    </script>
 
+    <script src="../public/js/script.js"></script>
+    <script src="shared-nav.js"></script>
   </body>
 </html>
