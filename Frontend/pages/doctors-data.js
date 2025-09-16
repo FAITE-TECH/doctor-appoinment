@@ -16,15 +16,7 @@ async function fetchDoctorsData() {
         description: doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.",
         email: doctor.email || "contact@hospital.com",
         phone: doctor.phone || "123-456-7890",
-        schedule: {
-          Sunday: "09:00 - 12:00",
-          Monday: "10:00 - 14:00",
-          Tuesday: "10:00 - 14:00",
-          Wednesday: "10:00 - 14:00",
-          Thursday: "11:00 - 15:00",
-          Friday: "10:00 - 14:00",
-          Saturday: "08:00 - 11:00",
-        }
+        schedule: null // Will be loaded dynamically
       }));
       
       // Make doctors available globally

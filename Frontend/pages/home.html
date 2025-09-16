@@ -190,6 +190,13 @@
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
+              <div id="emailSigninPrompt" class="hidden mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm shadow-sm">
+                <div class="flex items-center">
+                  <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
+                  <p class="text-yellow-800 flex-1">Please sign in to auto-fill your email</p>
+                  <a href="./signin.html" class="text-blue-600 hover:underline font-medium ml-2">Sign In</a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -347,13 +354,12 @@
 
       // Only filter when selection changes (no default rendering)
       specialFilter.addEventListener("change", (e) => {
-        const selected = e.target.value;
-        if (selected === "") {
-          doctorCtn.innerHTML = `<p class="text-gray-500">Please select a specialization</p>`;
+        const selectedDeptId = e.target.value;
+        if (selectedDeptId === "") {
+          doctorCtn.innerHTML = `<p class="text-gray-500">Please select a department</p>`;
         } else {
           const filtered = doctors.filter((doc) => 
-            (doc.specialization && doc.specialization.toLowerCase().includes(selected.toLowerCase())) ||
-            (doc.department_name && doc.department_name.toLowerCase().includes(selected.toLowerCase()))
+            doc.department_id == selectedDeptId
           );
           renderFilteredDoctors(filtered);
         }
@@ -372,17 +378,17 @@
         const timeSelect = document.getElementById('timeSelect');
 
         if (deptSelect && doctorSelect) {
+          // Department selection - filter doctors
           deptSelect.addEventListener('change', function() {
-            const selectedDept = this.value;
+            const selectedDeptId = this.value;
             
             // Clear doctor dropdown
             doctorSelect.innerHTML = '<option value="">Select one</option>';
             
-            if (selectedDept) {
-              // Filter doctors by selected department
+            if (selectedDeptId) {
+              // Filter doctors by selected department ID
               const filteredDoctors = doctors.filter(doctor => 
-                (doctor.specialization && doctor.specialization.toLowerCase().includes(selectedDept.toLowerCase())) ||
-                (doctor.department_name && doctor.department_name.toLowerCase().includes(selectedDept.toLowerCase()))
+                doctor.department_id == selectedDeptId
               );
 
               // Add filtered doctors to dropdown
@@ -392,6 +398,21 @@
                 option.textContent = doctor.name;
                 doctorSelect.appendChild(option);
               });
+            }
+          });
+
+          // Doctor selection - auto-fill department
+          doctorSelect.addEventListener('change', function() {
+            const selectedDoctorId = this.value;
+            
+            if (selectedDoctorId) {
+              // Find the selected doctor
+              const selectedDoctor = doctors.find(doctor => doctor.id == selectedDoctorId);
+              
+              if (selectedDoctor && selectedDoctor.department_id) {
+                // Auto-fill the department dropdown
+                deptSelect.value = selectedDoctor.department_id;
+              }
             }
           });
 
@@ -653,8 +674,26 @@
     </section>
 
     <script>
-      // Global variable to store doctors data
+      // Global variables to store data
       let doctors = [];
+      let departments = [];
+
+      // Fetch departments from API
+      async function fetchDepartments() {
+        try {
+          const response = await fetch('/doctor-appoinment/Backend/api/departments.php?action=public');
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            departments = data.data;
+            populateDepartmentDropdowns();
+          } else {
+            console.error('Failed to fetch departments:', data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching departments:', error);
+        }
+      }
 
       // Fetch doctors from API
       async function fetchDoctors() {
@@ -665,7 +704,6 @@
           if (data.status === 'success') {
             doctors = data.data;
             renderDoctors();
-            populateDepartmentDropdowns();
             // Update the filter functionality with real data
             if (window.updateDoctorsForFilter) {
               window.updateDoctorsForFilter(doctors);
@@ -684,19 +722,8 @@
         }
       }
 
-      // Populate department dropdowns based on available doctor specializations
+      // Populate department dropdowns from API data
       function populateDepartmentDropdowns() {
-        const specializations = new Set();
-        
-        doctors.forEach(doctor => {
-          if (doctor.specialization) {
-            specializations.add(doctor.specialization);
-          }
-          if (doctor.department_name) {
-            specializations.add(doctor.department_name);
-          }
-        });
-
         const specialFilter = document.getElementById("specialFilter");
         const deptSelect = document.getElementById("deptSelect");
 
@@ -710,11 +737,11 @@
               select.appendChild(firstOption);
             }
 
-            // Add specialization options
-            specializations.forEach(spec => {
+            // Add department options from API
+            departments.forEach(dept => {
               const option = document.createElement('option');
-              option.value = spec;
-              option.textContent = spec;
+              option.value = dept.id;
+              option.textContent = dept.name;
               select.appendChild(option);
             });
           }
@@ -799,7 +826,92 @@
 
       // Initialize when page loads
       document.addEventListener("DOMContentLoaded", () => {
+        fetchDepartments();
         fetchDoctors();
+        checkUserAuthAndFillEmail();
+      });
+
+      // Function to check user authentication and auto-fill email
+      async function checkUserAuthAndFillEmail() {
+        const emailInput = document.getElementById('patientEmail');
+        const signinPrompt = document.getElementById('emailSigninPrompt');
+        
+        if (!emailInput) return;
+        
+        try {
+          // Check if user is authenticated
+          const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=me', {
+            credentials: 'include'
+          });
+          const data = await response.json();
+          
+          if (data.authenticated && data.user && data.user.email) {
+            // User is signed in, auto-fill email
+            emailInput.value = data.user.email;
+            emailInput.readOnly = true;
+            emailInput.classList.add('bg-gray-100');
+            
+            // Add a small indicator that email was auto-filled
+            const emailLabel = emailInput.previousElementSibling;
+            if (emailLabel) {
+              emailLabel.innerHTML = 'Email <span class="text-green-300 text-xs">(auto-filled)</span>';
+            }
+            
+            // Hide sign-in prompt if it was shown
+            if (signinPrompt) {
+              signinPrompt.classList.add('hidden');
+            }
+          } else {
+            // User is not signed in, show sign-in prompt
+            if (signinPrompt) {
+              signinPrompt.classList.remove('hidden');
+            }
+            
+            // Add focus event to show prompt when user clicks on email field
+            emailInput.addEventListener('focus', () => {
+              if (!emailInput.value && signinPrompt) {
+                signinPrompt.classList.remove('hidden');
+              }
+            });
+            
+            // Hide prompt when user starts typing
+            emailInput.addEventListener('input', () => {
+              if (emailInput.value && signinPrompt) {
+                signinPrompt.classList.add('hidden');
+              }
+            });
+            
+            // Hide prompt when user clicks outside
+            emailInput.addEventListener('blur', () => {
+              setTimeout(() => {
+                if (emailInput.value && signinPrompt) {
+                  signinPrompt.classList.add('hidden');
+                }
+              }, 200);
+            });
+          }
+        } catch (error) {
+          console.error('Error checking authentication:', error);
+          // On error, show sign-in prompt as fallback
+          if (signinPrompt) {
+            signinPrompt.classList.remove('hidden');
+          }
+        }
+      }
+
+      // Function to refresh email field when user returns from sign-in
+      function refreshEmailField() {
+        checkUserAuthAndFillEmail();
+      }
+
+      // Listen for focus events to refresh email field when user returns from sign-in
+      window.addEventListener('focus', refreshEmailField);
+      
+      // Also refresh when page becomes visible again
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          refreshEmailField();
+        }
       });
     </script>
 

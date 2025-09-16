@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email Auto-fill</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Email Auto-fill Test</h1>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold mb-4">Test Instructions:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Go to the <a href="./Frontend/pages/home.html" class="text-blue-600 hover:underline">Home Page</a></li>
+                <li>Look at the appointment form email field</li>
+                <li>If you're not signed in, you should see a yellow prompt asking you to sign in</li>
+                <li>Sign in with one of these test accounts:
+                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                        <li><strong>Patient:</strong> john.doe@example.com / patient123</li>
+                        <li><strong>Patient:</strong> jane.smith@example.com / patient123</li>
+                        <li><strong>Admin:</strong> admin@hospital.com / admin123</li>
+                    </ul>
+                </li>
+                <li>After signing in, return to the home page</li>
+                <li>The email field should be auto-filled with your email and marked as read-only</li>
+            </ol>
+        </div>
+
+        <div class="bg-blue-50 p-6 rounded-lg shadow-md mt-6">
+            <h2 class="text-lg font-semibold mb-4">Expected Behavior:</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                <li><strong>Not signed in:</strong> Email field is empty, yellow prompt appears</li>
+                <li><strong>Signed in:</strong> Email field is auto-filled, read-only, with "(auto-filled)" indicator</li>
+                <li><strong>After sign-in:</strong> Email field updates automatically when you return to the page</li>
+            </ul>
+        </div>
+
+        <div class="bg-blue-50 p-6 rounded-lg shadow-md mt-6">
+            <h2 class="text-lg font-semibold mb-4">Department-Doctor Flow Test:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Go to the <a href="./Frontend/pages/home.html" class="text-blue-600 hover:underline">Home Page</a></li>
+                <li>In the "Book Appointment" form, select a department from the "Department" dropdown</li>
+                <li>Notice that the "Doctor" dropdown now shows only doctors from that department</li>
+                <li>Try selecting a different department - the doctor list should update</li>
+                <li>Now try selecting a doctor first - the department should auto-fill</li>
+                <li>Test the "Check Schedule" section - select a department to see filtered doctors</li>
+            </ol>
+        </div>
+
+        <div class="bg-green-50 p-6 rounded-lg shadow-md mt-6">
+            <h2 class="text-lg font-semibold mb-4">Quick Links:</h2>
+            <div class="space-y-2">
+                <a href="./Frontend/pages/home.html" class="block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Go to Home Page</a>
+                <a href="./Frontend/pages/signin.html" class="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Sign In Page</a>
+                <a href="./Frontend/pages/signup.html" class="block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">Sign Up Page</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

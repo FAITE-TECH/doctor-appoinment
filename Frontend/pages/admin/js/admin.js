@@ -6,22 +6,33 @@ class AdminPanel {
     }
 
     async init() {
-        // Wait for shared auth to initialize if it exists
-        if (typeof sharedAuth !== 'undefined') {
-            await sharedAuth.init();
-            if (!sharedAuth.canAccess()) {
-                // Don't redirect immediately, just show a warning
-                document.getElementById('admin-user-info').textContent = 'Not authenticated';
-                document.getElementById('welcomeMessage').textContent = 'Please log in to access admin features.';
-                return;
+        try {
+            // Wait for shared auth to initialize if it exists
+            if (typeof sharedAuth !== 'undefined') {
+                await sharedAuth.init();
+                if (!sharedAuth.canAccess()) {
+                    // Don't redirect immediately, just show a warning
+                    const userInfoEl = document.getElementById('admin-user-info');
+                    const welcomeEl = document.getElementById('welcomeMessage');
+                    if (userInfoEl) userInfoEl.textContent = 'Not authenticated';
+                    if (welcomeEl) welcomeEl.textContent = 'Please log in to access admin features.';
+                    return;
+                }
             }
+            
+            await this.checkAdminAuth();
+            await this.loadDashboardStats();
+            await this.loadRecentAppointments();
+            await this.loadRecentMessages();
+            this.setupEventListeners();
+        } catch (error) {
+            console.error('AdminPanel initialization failed:', error);
+            // Set error state for user info
+            const userInfoEl = document.getElementById('admin-user-info');
+            const welcomeEl = document.getElementById('welcomeMessage');
+            if (userInfoEl) userInfoEl.textContent = 'Initialization error';
+            if (welcomeEl) welcomeEl.textContent = 'Failed to initialize admin panel. Please refresh the page.';
         }
-        
-        await this.checkAdminAuth();
-        await this.loadDashboardStats();
-        await this.loadRecentAppointments();
-        await this.loadRecentMessages();
-        this.setupEventListeners();
     }
 
     async handleApiCall(url, options = {}) {
@@ -101,18 +112,28 @@ class AdminPanel {
         try {
             const data = await this.handleApiCall(this.apiBase + '?action=dashboard_stats');
             
+            // Helper function to safely set text content
+            const setTextContent = (elementId, value) => {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = value;
+                } else {
+                    console.warn(`Element with id '${elementId}' not found`);
+                }
+            };
+            
             if (data.success) {
-                document.getElementById('totalDoctors').textContent = data.stats.doctors || 0;
-                document.getElementById('totalAppointments').textContent = data.stats.appointments || 0;
-                document.getElementById('totalUsers').textContent = data.stats.users || 0;
-                document.getElementById('totalEvents').textContent = data.stats.events || 0;
+                setTextContent('totalDoctors', data.stats.doctors || 0);
+                setTextContent('totalAppointments', data.stats.appointments || 0);
+                setTextContent('totalUsers', data.stats.users || 0);
+                setTextContent('totalEvents', data.stats.events || 0);
             } else {
                 console.error('Failed to load stats:', data.error);
                 // Set default values
-                document.getElementById('totalDoctors').textContent = '0';
-                document.getElementById('totalAppointments').textContent = '0';
-                document.getElementById('totalUsers').textContent = '0';
-                document.getElementById('totalEvents').textContent = '0';
+                setTextContent('totalDoctors', '0');
+                setTextContent('totalAppointments', '0');
+                setTextContent('totalUsers', '0');
+                setTextContent('totalEvents', '0');
             }
             
             // Load message count separately
@@ -121,25 +142,44 @@ class AdminPanel {
         } catch (error) {
             console.error('Failed to load dashboard stats:', error);
             // Set default values on error
-            document.getElementById('totalDoctors').textContent = '0';
-            document.getElementById('totalAppointments').textContent = '0';
-            document.getElementById('totalUsers').textContent = '0';
-            document.getElementById('totalEvents').textContent = '0';
-            document.getElementById('totalMessages').textContent = '0';
+            const setTextContent = (elementId, value) => {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = value;
+                } else {
+                    console.warn(`Element with id '${elementId}' not found`);
+                }
+            };
+            
+            setTextContent('totalDoctors', '0');
+            setTextContent('totalAppointments', '0');
+            setTextContent('totalUsers', '0');
+            setTextContent('totalEvents', '0');
+            setTextContent('totalMessages', '0');
         }
     }
 
     async loadMessageCount() {
         try {
             const data = await this.handleApiCall('../../../Backend/api/contact.php?page=1&limit=1');
-            if (data.success && data.pagination) {
-                document.getElementById('totalMessages').textContent = data.pagination.total || 0;
+            const element = document.getElementById('totalMessages');
+            if (element) {
+                if (data.success && data.pagination) {
+                    element.textContent = data.pagination.total || 0;
+                } else {
+                    element.textContent = '0';
+                }
             } else {
-                document.getElementById('totalMessages').textContent = '0';
+                console.warn("Element with id 'totalMessages' not found");
             }
         } catch (error) {
             console.error('Failed to load message count:', error);
-            document.getElementById('totalMessages').textContent = '0';
+            const element = document.getElementById('totalMessages');
+            if (element) {
+                element.textContent = '0';
+            } else {
+                console.warn("Element with id 'totalMessages' not found");
+            }
         }
     }
 
@@ -164,6 +204,11 @@ class AdminPanel {
         try {
             const data = await this.handleApiCall(this.apiBase + '?action=recent_appointments');
             const container = document.getElementById('recentAppointments');
+            
+            if (!container) {
+                console.log('Recent appointments container not found on this page');
+                return;
+            }
             
             if (data.success && data.appointments && data.appointments.length > 0) {
                 container.innerHTML = data.appointments.map(appointment => `
@@ -195,6 +240,11 @@ class AdminPanel {
         try {
             const data = await this.handleApiCall('../../../Backend/api/contact.php?page=1&limit=5');
             const container = document.getElementById('recentMessages');
+            
+            if (!container) {
+                console.log('Recent messages container not found on this page');
+                return;
+            }
             
             if (data.success && data.messages && data.messages.length > 0) {
                 container.innerHTML = data.messages.map(message => `
@@ -330,7 +380,10 @@ class AdminUtils {
 
 // Initialize admin panel when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new AdminPanel();
+    // Small delay to ensure all DOM elements are fully loaded
+    setTimeout(() => {
+        new AdminPanel();
+    }, 100);
 });
 
 // Add global error handler for uncaught errors

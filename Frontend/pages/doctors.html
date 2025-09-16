@@ -53,6 +53,50 @@
     </div>
 
 
+    <!-- Schedule Section -->
+    <section id="scheduleSection" class="my-6 sm:my-10 container mx-auto max-w-6xl px-4">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Doctor Schedules - Next 2 Weeks</h2>
+        
+        <!-- Week Navigation -->
+        <div class="flex justify-between items-center mb-6">
+          <button id="prevWeekBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+            <i class="fas fa-chevron-left mr-2"></i>Previous Week
+          </button>
+          <div id="weekRange" class="text-lg font-semibold text-gray-700"></div>
+          <button id="nextWeekBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+            Next Week<i class="fas fa-chevron-right ml-2"></i>
+          </button>
+        </div>
+
+        <!-- Schedule Table -->
+        <div class="overflow-x-auto">
+          <table id="scheduleTable" class="min-w-full border border-gray-300 text-sm">
+            <thead>
+              <tr class="bg-gray-700 text-white h-16 text-center">
+                <th class="border px-2 py-1">Doctor</th>
+                <th class="border px-2 py-1">Specialization</th>
+                <th class="border px-2 py-1">Mon</th>
+                <th class="border px-2 py-1">Tue</th>
+                <th class="border px-2 py-1">Wed</th>
+                <th class="border px-2 py-1">Thu</th>
+                <th class="border px-2 py-1">Fri</th>
+                <th class="border px-2 py-1">Sat</th>
+                <th class="border px-2 py-1">Sun</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableBody">
+              <!-- Schedule data will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-4 text-center text-sm text-gray-600">
+          <p>Schedule automatically updates weekly. Available slots are shown in green.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Filter -->
     <section id="doctors">
       <div class="text-center my-6 sm:my-10 container mx-auto max-w-6xl px-4">
@@ -234,6 +278,265 @@
           });
         });
       }
+    </script>
+
+    <!-- Schedule Management Script -->
+    <script>
+      // Schedule management variables
+      let currentWeekStart = null;
+      let scheduleData = {};
+      let scheduleUpdateInterval = null;
+
+      // Initialize schedule system
+      function initializeSchedule() {
+        // Set current week start to Monday of current week
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Sunday = 0, Monday = 1
+        currentWeekStart = new Date(today);
+        currentWeekStart.setDate(today.getDate() + daysToMonday);
+        currentWeekStart.setHours(0, 0, 0, 0);
+
+        // Load initial schedule
+        loadScheduleData();
+        
+        // Set up week navigation
+        setupWeekNavigation();
+        
+        // Set up automatic weekly rotation
+        setupWeeklyRotation();
+        
+        // Update week range display
+        updateWeekRangeDisplay();
+      }
+
+      // Load schedule data for current two-week period
+      async function loadScheduleData() {
+        try {
+          const tableBody = document.getElementById('scheduleTableBody');
+          tableBody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500">Loading schedules...</td></tr>';
+
+          // Get date range for two weeks
+          const week1Start = new Date(currentWeekStart);
+          const week1End = new Date(week1Start);
+          week1End.setDate(week1Start.getDate() + 6);
+          
+          const week2Start = new Date(week1End);
+          week2Start.setDate(week1End.getDate() + 1);
+          const week2End = new Date(week2Start);
+          week2End.setDate(week2Start.getDate() + 6);
+
+          // Fetch schedules for all doctors for both weeks
+          const schedulePromises = doctors.map(async (doctor) => {
+            try {
+              // Fetch for week 1
+              const week1Response = await fetch(`../../Backend/api/schedules.php?action=get_schedules&doctor_id=${doctor.id}&date=${formatDate(week1Start)}`);
+              const week1Data = await week1Response.json();
+              
+              // Fetch for week 2
+              const week2Response = await fetch(`../../Backend/api/schedules.php?action=get_schedules&doctor_id=${doctor.id}&date=${formatDate(week2Start)}`);
+              const week2Data = await week2Response.json();
+              
+              // Combine both weeks
+              const allSchedules = [];
+              if (week1Data.status === 'success') allSchedules.push(...week1Data.data);
+              if (week2Data.status === 'success') allSchedules.push(...week2Data.data);
+              
+              return { doctor, schedules: allSchedules };
+            } catch (error) {
+              console.error(`Error fetching schedule for doctor ${doctor.id}:`, error);
+              return { doctor, schedules: [] };
+            }
+          });
+
+          const allSchedules = await Promise.all(schedulePromises);
+          
+          // Process and display schedules in table format
+          displaySchedules(allSchedules, week1Start, week2End);
+          
+        } catch (error) {
+          console.error('Error loading schedule data:', error);
+          const tableBody = document.getElementById('scheduleTableBody');
+          tableBody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-red-500">Error loading schedules. Please try again.</td></tr>';
+        }
+      }
+
+      // Display schedules in table format
+      function displaySchedules(allSchedules, week1Start, week2End) {
+        const tableBody = document.getElementById('scheduleTableBody');
+        tableBody.innerHTML = '';
+
+        if (allSchedules.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500">No doctors found.</td></tr>';
+          return;
+        }
+
+        allSchedules.forEach(({ doctor, schedules }) => {
+          const row = document.createElement('tr');
+          row.className = 'hover:bg-gray-50 transition';
+          
+          // Create weekly schedule object
+          const weeklySchedule = createWeeklySchedule(schedules, week1Start);
+          
+          // Doctor name and specialization
+          row.innerHTML = `
+            <td class="border px-2 py-3 text-center font-semibold">
+              <a href="doctor-details.html?id=${doctor.id}" class="text-blue-600 hover:text-blue-800 hover:underline">
+                ${doctor.name}
+              </a>
+            </td>
+            <td class="border px-2 py-3 text-center text-sm text-gray-600">
+              ${doctor.specialization || doctor.department_name || 'General'}
+            </td>
+          `;
+
+          // Add schedule for each day (Monday to Sunday)
+          const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+          days.forEach(day => {
+            const daySchedule = weeklySchedule[day];
+            let scheduleText = '--';
+            let bgClass = 'bg-gray-100';
+            
+            if (daySchedule && daySchedule.length > 0) {
+              // Show up to 2 time slots
+              const displaySlots = daySchedule.slice(0, 2);
+              scheduleText = displaySlots.map(slot => `${convertTo12Hour(slot.start_time)}-${convertTo12Hour(slot.end_time)}`).join('<br>');
+              if (daySchedule.length > 2) {
+                scheduleText += '<br><small class="text-gray-500">...</small>';
+              }
+              bgClass = 'bg-green-100';
+            }
+            
+            row.innerHTML += `<td class="border px-2 py-3 text-center text-xs ${bgClass}">${scheduleText}</td>`;
+          });
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Create weekly schedule object from API data
+      function createWeeklySchedule(schedules, weekStart) {
+        const weeklySchedule = {
+          'Monday': [],
+          'Tuesday': [],
+          'Wednesday': [],
+          'Thursday': [],
+          'Friday': [],
+          'Saturday': [],
+          'Sunday': []
+        };
+
+        schedules.forEach(daySchedule => {
+          const date = new Date(daySchedule.date);
+          const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+          
+          if (weeklySchedule[dayName]) {
+            daySchedule.slots.forEach(slot => {
+              if (slot.is_available) {
+                weeklySchedule[dayName].push({
+                  start_time: slot.start_time,
+                  end_time: slot.end_time,
+                  available: slot.current_appointments < slot.max_appointments
+                });
+              }
+            });
+          }
+        });
+
+        return weeklySchedule;
+      }
+
+
+      // Setup week navigation buttons
+      function setupWeekNavigation() {
+        const prevBtn = document.getElementById('prevWeekBtn');
+        const nextBtn = document.getElementById('nextWeekBtn');
+
+        prevBtn.addEventListener('click', () => {
+          currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+          updateWeekRangeDisplay();
+          loadScheduleData();
+        });
+
+        nextBtn.addEventListener('click', () => {
+          currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+          updateWeekRangeDisplay();
+          loadScheduleData();
+        });
+      }
+
+      // Update week range display
+      function updateWeekRangeDisplay() {
+        const weekRange = document.getElementById('weekRange');
+        const week1End = new Date(currentWeekStart);
+        week1End.setDate(currentWeekStart.getDate() + 6);
+        
+        const week2Start = new Date(week1End);
+        week2Start.setDate(week1End.getDate() + 1);
+        const week2End = new Date(week2Start);
+        week2End.setDate(week2Start.getDate() + 6);
+
+        const formatDate = (date) => {
+          return date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          });
+        };
+
+        weekRange.textContent = `${formatDate(currentWeekStart)} - ${formatDate(week2End)}`;
+      }
+
+      // Convert 24-hour time to 12-hour format
+      function convertTo12Hour(time24) {
+        const [hours, minutes] = time24.split(':');
+        const hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${minutes} ${ampm}`;
+      }
+
+      // Setup automatic weekly rotation
+      function setupWeeklyRotation() {
+        // Clear any existing interval
+        if (scheduleUpdateInterval) {
+          clearInterval(scheduleUpdateInterval);
+        }
+
+        // Check every hour if we need to rotate to next week
+        scheduleUpdateInterval = setInterval(() => {
+          const today = new Date();
+          const currentMonday = new Date(today);
+          const dayOfWeek = today.getDay();
+          const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+          currentMonday.setDate(today.getDate() + daysToMonday);
+          currentMonday.setHours(0, 0, 0, 0);
+
+          // If current week start is more than 7 days old, move to next week
+          const daysDiff = Math.floor((today - currentWeekStart) / (1000 * 60 * 60 * 24));
+          if (daysDiff >= 7) {
+            currentWeekStart = new Date(currentMonday);
+            updateWeekRangeDisplay();
+            loadScheduleData();
+            console.log('Schedule automatically rotated to next week');
+          }
+        }, 60 * 60 * 1000); // Check every hour
+      }
+
+      // Helper function to format date for API
+      function formatDate(date) {
+        return date.toISOString().split('T')[0];
+      }
+
+      // Initialize schedule when doctors are loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        // Wait for doctors to be loaded, then initialize schedule
+        const checkDoctorsLoaded = setInterval(() => {
+          if (doctors && doctors.length > 0) {
+            clearInterval(checkDoctorsLoaded);
+            initializeSchedule();
+          }
+        }, 100);
+      });
     </script>
 
     <style>
