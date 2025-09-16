@@ -14,20 +14,20 @@
     </style>
 </head>
 <body class="bg-gray-100">
-    <!-- Header -->
-    <div id="header"></div>
+    <!-- Admin Navigation -->
+    <div id="adminNav"></div>
     <script>
-        fetch("../shared-nav.html")
+        fetch("./shared/admin-nav.html")
             .then((res) => res.text())
             .then((data) => {
-                document.getElementById("header").innerHTML = data;
-                if (window.initNavigationAfterLoad) {
-                    window.initNavigationAfterLoad();
+                document.getElementById("adminNav").innerHTML = data;
+                // Mark current page as active
+                const currentPage = document.querySelector('a[href="./notifications.html"]');
+                if (currentPage) {
+                    currentPage.className = currentPage.className.replace('text-gray-600 hover:bg-gray-100', 'text-gray-700 bg-blue-100');
                 }
             });
     </script>
-
-    <div class="container mx-auto px-4 py-8">
         <!-- Page Header -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex justify-between items-center">
@@ -524,5 +524,10 @@
             }, 3000);
         }
     </script>
+    </div> <!-- Close main content div -->
+</div> <!-- Close flex container -->
+    <script src="../../public/js/script.js"></script>
+    <script src="./js/shared-auth.js"></script>
+    <script src="./js/admin.js"></script>
 </body>
 </html>
