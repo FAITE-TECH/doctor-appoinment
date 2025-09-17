@@ -17,6 +17,8 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
     />
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <link rel="stylesheet" href="../public/css/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -231,16 +233,43 @@
           <!-- Date & Time -->
           <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1 flex flex-col">
-              <label class="text-sm font-medium text-white mb-1"
-                >Choose Date</label
-              >
-              <input
-                id="datePicker"
-                name="appointment_date"
-                type="text"
-                class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
-                required
-              />
+              <label class="text-sm font-medium text-white mb-1">Choose Date</label>
+              <div class="relative">
+                <input
+                  id="datePicker"
+                  name="appointment_date"
+                  type="text"
+                  class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md w-full cursor-pointer"
+                  placeholder="Select a date"
+                  readonly
+                  required
+                />
+                <!-- Calendar Dropdown -->
+                <div id="calendarDropdown" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg z-50 mt-2 p-6 min-w-[600px] w-full max-w-[700px]">
+                  <!-- Calendar Header -->
+                  <div class="text-center mb-6">
+                    <h4 class="text-xl font-semibold text-gray-800" id="calendarMonthYear"></h4>
+                    <p class="text-sm text-gray-600 mt-1" id="weekRange"></p>
+                  </div>
+
+                  <!-- Calendar Grid -->
+                  <div class="grid grid-cols-7 gap-4 mb-4">
+                    <!-- Calendar Days Header -->
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg text-sm">Sun</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg text-sm">Mon</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg text-sm">Tue</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg text-sm">Wed</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg text-sm">Thu</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg text-sm">Fri</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg text-sm">Sat</div>
+                  </div>
+
+                  <!-- Calendar Weeks Container -->
+                  <div id="appointmentCalendar" class="grid grid-cols-7 gap-4">
+                    <!-- Calendar days will be populated here -->
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="flex-1 flex flex-col">
               <label class="text-sm font-medium text-white mb-1"
@@ -252,7 +281,7 @@
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               >
-                <option value="">Select time</option>
+                <option value="">Select a date first</option>
               </select>
             </div>
           </div>
@@ -267,23 +296,6 @@
               placeholder="Any additional information..."
             ></textarea>
           </div>
-          <!-- Flatpickr JS -->
-          <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-          <script>
-            // Initialize Date Picker
-            flatpickr("#datePicker", {
-              dateFormat: "Y-m-d",
-              minDate: "today", // Disable past dates
-            });
-
-            // Initialize Time Picker
-            flatpickr("#timePicker", {
-              enableTime: true,
-              noCalendar: true,
-              dateFormat: "H:i",
-              time_24hr: true, // 24-hour format, set false for AM/PM
-            });
-          </script>
           <!-- Toast Notification -->
           <div
             id="toast"
@@ -401,53 +413,29 @@
             }
           });
 
-          // Doctor selection - auto-fill department
+          // Doctor selection - auto-fill department and update calendar
           doctorSelect.addEventListener('change', function() {
             const selectedDoctorId = this.value;
+            selectedDoctor = selectedDoctorId;
             
             if (selectedDoctorId) {
               // Find the selected doctor
-              const selectedDoctor = doctors.find(doctor => doctor.id == selectedDoctorId);
+              const selectedDoctorObj = doctors.find(doctor => doctor.id == selectedDoctorId);
               
-              if (selectedDoctor && selectedDoctor.department_id) {
+              if (selectedDoctorObj && selectedDoctorObj.department_id) {
                 // Auto-fill the department dropdown
-                deptSelect.value = selectedDoctor.department_id;
+                deptSelect.value = selectedDoctorObj.department_id;
               }
+              
+              // Update calendar with doctor's schedule
+              updateAppointmentCalendar();
+            } else {
+              // Clear calendar when no doctor is selected
+              selectedDoctor = '';
+              updateAppointmentCalendar();
             }
           });
 
-          // Load time slots when doctor and date are selected
-          doctorSelect.addEventListener('change', loadTimeSlots);
-          datePicker.addEventListener('change', loadTimeSlots);
-
-          function loadTimeSlots() {
-            const selectedDoctor = doctorSelect.value;
-            const selectedDate = datePicker.value;
-            
-            // Clear time slots
-            timeSelect.innerHTML = '<option value="">Select time</option>';
-            
-            if (selectedDoctor && selectedDate) {
-              fetch(`/doctor-appoinment/Backend/api/appointments.php?action=time_slots&doctor_id=${selectedDoctor}&date=${selectedDate}`)
-                .then(response => response.json())
-                .then(data => {
-                  if (data.available_slots && data.available_slots.length > 0) {
-                    data.available_slots.forEach(slot => {
-                      const option = document.createElement('option');
-                      option.value = slot.time;
-                      option.textContent = slot.display;
-                      timeSelect.appendChild(option);
-                    });
-                  } else {
-                    timeSelect.innerHTML = '<option value="">No available slots</option>';
-                  }
-                })
-                .catch(error => {
-                  console.error('Error loading time slots:', error);
-                  timeSelect.innerHTML = '<option value="">Error loading slots</option>';
-                });
-            }
-          }
         }
       });
     </script>
@@ -466,21 +454,52 @@
             
             // Get form data
             const formData = new FormData(appointmentForm);
+            
+            // Fix time format - remove seconds if present
+            let appointmentTime = formData.get('appointment_time');
+            if (appointmentTime && appointmentTime.includes(':')) {
+              // Remove seconds if present (e.g., "17:54:00" -> "17:54")
+              const timeParts = appointmentTime.split(':');
+              if (timeParts.length === 3) {
+                appointmentTime = timeParts[0] + ':' + timeParts[1];
+              }
+            }
+            
             const appointmentData = {
               patient_name: formData.get('patient_name'),
               patient_email: formData.get('patient_email'),
               patient_phone: formData.get('patient_phone'),
               doctor_id: formData.get('doctor_id'),
-              appointment_date: formData.get('appointment_date'),
-              appointment_time: formData.get('appointment_time'),
+              appointment_date: selectedDate, // Use selected date from calendar
+              appointment_time: appointmentTime, // Now in HH:MM format
               notes: formData.get('notes')
             };
+
+            // Debug logging
+            console.log('Appointment data being sent:', appointmentData);
+            console.log('Selected date:', selectedDate);
+            console.log('Original time:', formData.get('appointment_time'));
+            console.log('Corrected time:', appointmentTime);
+            
+            // Validate date format
+            if (selectedDate && !selectedDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              console.error('Invalid date format:', selectedDate);
+              showToast('Invalid date format. Please select a date from the calendar.', 'error');
+              return;
+            }
+            
+            // Validate time format
+            if (appointmentTime && !appointmentTime.match(/^\d{2}:\d{2}$/)) {
+              console.error('Invalid time format:', appointmentTime);
+              showToast('Invalid time format. Please select a time slot.', 'error');
+              return;
+            }
 
             // Validate required fields
             if (!appointmentData.patient_name || !appointmentData.patient_email || 
                 !appointmentData.patient_phone || !appointmentData.doctor_id || 
                 !appointmentData.appointment_date || !appointmentData.appointment_time) {
-              showToast('Please fill in all required fields', 'error');
+              showToast('Please fill in all required fields and select a date from the calendar', 'error');
               return;
             }
 
@@ -490,6 +509,8 @@
             btnSpinner.classList.remove('hidden');
 
             try {
+              console.log('Sending appointment data:', JSON.stringify(appointmentData, null, 2));
+              
               const response = await fetch('/doctor-appoinment/Backend/api/appointments.php?action=book', {
                 method: 'POST',
                 headers: {
@@ -499,13 +520,38 @@
               });
 
               const result = await response.json();
+              console.log('Response status:', response.status);
+              console.log('Response data:', result);
 
               if (response.ok) {
                 showToast('Appointment booked successfully!', 'success');
+                
+                // Get doctor name for PDF
+                const selectedDoctorObj = doctors.find(doctor => doctor.id == appointmentData.doctor_id);
+                const doctorName = selectedDoctorObj ? selectedDoctorObj.name : 'Unknown Doctor';
+                
+                // Add appointment ID from response
+                const pdfData = {
+                  ...appointmentData,
+                  appointment_id: result.appointment_id
+                };
+                
+                // Generate and download PDF
+                setTimeout(() => {
+                  generateAppointmentPDF(pdfData, doctorName);
+                }, 1000); // Small delay to ensure success message is shown
+                
                 appointmentForm.reset();
-                // Clear time slots
-                document.getElementById('timeSelect').innerHTML = '<option value="">Select time</option>';
+                // Clear time slots and calendar selection
+                document.getElementById('timeSelect').innerHTML = '<option value="">Select a date first</option>';
+                document.getElementById('datePicker').value = '';
+                selectedDate = '';
+                // Remove selection from calendar
+                document.querySelectorAll('#appointmentCalendar [class*="border-2 rounded-lg p-4"]').forEach(day => {
+                  day.classList.remove('ring-4', 'ring-blue-500', 'ring-offset-2');
+                });
               } else {
+                console.error('Booking failed:', result);
                 showToast(result.error || 'Failed to book appointment', 'error');
               }
             } catch (error) {
@@ -677,6 +723,10 @@
       // Global variables to store data
       let doctors = [];
       let departments = [];
+      let selectedDoctor = '';
+      let selectedDate = '';
+      let currentStartDate = new Date();
+      let scheduleData = {};
 
       // Fetch departments from API
       async function fetchDepartments() {
@@ -687,6 +737,7 @@
           if (data.status === 'success') {
             departments = data.data;
             populateDepartmentDropdowns();
+            renderDepartments();
           } else {
             console.error('Failed to fetch departments:', data.message);
           }
@@ -824,11 +875,51 @@
         });
       }
 
+      // Render departments on the page
+      function renderDepartments() {
+        const departmentsContainer = document.getElementById("departmentsContainer");
+        if (!departmentsContainer) return; // Exit if container doesn't exist
+        
+        departmentsContainer.innerHTML = ''; // Clear existing content
+
+        if (departments.length === 0) {
+          departmentsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No departments available at the moment.</p>';
+          return;
+        }
+
+        departments.forEach((department) => {
+          const departmentCard = document.createElement("div");
+          departmentCard.className =
+            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
+
+          // Use the image from database or fallback to default
+          const departmentImage = department.image_path ? `/doctor-appoinment/uploads/departments/${department.image_path}` : "../public/assets/nephrology.jpg";
+          const departmentName = department.name || "Department";
+          const departmentDescription = department.description || "Specialized medical department providing quality healthcare services.";
+
+          departmentCard.innerHTML = `
+        <!-- Department Image Wrapper -->
+        <div class="relative h-56 w-full overflow-hidden group">
+          <img src="${departmentImage}" alt="${departmentName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+        </div>
+
+        <!-- Department Content -->
+        <div class="p-6 flex flex-col justify-between flex-grow">
+          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${departmentName}</h3>
+          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${departmentDescription}</p>
+        </div>
+      `;
+
+          departmentsContainer.appendChild(departmentCard);
+        });
+      }
+
       // Initialize when page loads
       document.addEventListener("DOMContentLoaded", () => {
         fetchDepartments();
         fetchDoctors();
         checkUserAuthAndFillEmail();
+        initializeAppointmentCalendar();
       });
 
       // Function to check user authentication and auto-fill email
@@ -913,6 +1004,354 @@
           refreshEmailField();
         }
       });
+
+      // Calendar Functions for Appointment Form
+      function initializeAppointmentCalendar() {
+        // Set to start of current week (Monday)
+        currentStartDate = new Date();
+        const dayOfWeek = currentStartDate.getDay();
+        const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Sunday = 0, Monday = 1
+        currentStartDate.setDate(currentStartDate.getDate() + daysToMonday);
+        currentStartDate.setHours(0, 0, 0, 0);
+        
+        // Setup dropdown functionality
+        setupDatePickerDropdown();
+        
+        // Load initial calendar
+        updateAppointmentCalendar();
+      }
+
+      function setupDatePickerDropdown() {
+        const datePicker = document.getElementById('datePicker');
+        const calendarDropdown = document.getElementById('calendarDropdown');
+        
+        // Show dropdown when input is clicked
+        datePicker.addEventListener('click', function() {
+          if (selectedDoctor) {
+            calendarDropdown.classList.toggle('hidden');
+          } else {
+            showToast('Please select a doctor first', 'error');
+          }
+        });
+        
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+          if (!datePicker.contains(event.target) && !calendarDropdown.contains(event.target)) {
+            calendarDropdown.classList.add('hidden');
+          }
+        });
+      }
+
+      async function updateAppointmentCalendar() {
+        // Update month/year display
+        const endDate = new Date(currentStartDate);
+        endDate.setDate(endDate.getDate() + 13);
+        
+        const monthYearText = currentStartDate.toLocaleDateString('en-US', { 
+          month: 'long',
+          year: 'numeric'
+        });
+        document.getElementById('calendarMonthYear').textContent = monthYearText;
+
+        // Update week range display
+        const weekRangeText = `${currentStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        document.getElementById('weekRange').textContent = weekRangeText;
+
+        // Load schedule data for the two weeks if doctor is selected
+        if (selectedDoctor) {
+          await loadScheduleDataForCalendar(currentStartDate, endDate);
+        }
+
+        // Render calendar
+        renderAppointmentCalendarDays(currentStartDate);
+      }
+
+      async function loadScheduleDataForCalendar(startDate, endDate) {
+        try {
+          const response = await fetch(`/doctor-appoinment/Backend/api/schedules.php?action=get_schedules&doctor_id=${selectedDoctor}&start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`);
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            // Convert the grouped data to our expected format
+            scheduleData = {};
+            data.data.forEach(daySchedule => {
+              scheduleData[daySchedule.date] = daySchedule.slots.filter(slot => slot.is_available);
+            });
+          } else {
+            console.error('Error loading schedule data:', data.message);
+            scheduleData = {};
+          }
+        } catch (error) {
+          console.error('Error loading schedule data:', error);
+          scheduleData = {};
+        }
+      }
+
+      function renderAppointmentCalendarDays(startDate) {
+        const calendarWeeks = document.getElementById('appointmentCalendar');
+        calendarWeeks.innerHTML = '';
+
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 13);
+
+        // Create grid for 14 days (2 weeks)
+        for (let i = 0; i < 14; i++) {
+          const currentDate = new Date(startDate);
+          currentDate.setDate(startDate.getDate() + i);
+          // Use local date format to avoid timezone issues
+          const year = currentDate.getFullYear();
+          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+          const day = String(currentDate.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+          
+          const availableSlots = scheduleData[dateStr] || [];
+          const isAvailable = availableSlots.length > 0;
+          const isPast = currentDate < new Date().setHours(0, 0, 0, 0);
+          const isToday = currentDate.toDateString() === new Date().toDateString();
+
+          const dayElement = document.createElement('div');
+          let bgClass = 'bg-gray-50';
+          let textClass = 'text-gray-400';
+          
+          if (isPast) {
+            bgClass = 'bg-gray-100';
+            textClass = 'text-gray-400';
+          } else if (isAvailable) {
+            bgClass = 'bg-green-50 hover:bg-green-100 cursor-pointer';
+            textClass = 'text-green-600';
+          } else if (isToday) {
+            bgClass = 'bg-blue-50';
+            textClass = 'text-blue-600';
+          }
+          
+          dayElement.className = `border-2 rounded-lg p-4 ${bgClass} transition-all duration-200 min-h-[80px] flex flex-col justify-center text-center hover:shadow-md`;
+          
+          dayElement.innerHTML = `
+            <div class="text-xs text-gray-500 mb-2 font-medium">${currentDate.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+            <div class="text-lg font-bold ${textClass} mb-2">${currentDate.getDate()}</div>
+            ${isAvailable ? `<div class="text-xs text-green-600 font-semibold bg-green-100 px-2 py-1 rounded-full">${availableSlots.length} slots</div>` : ''}
+            ${isToday ? `<div class="text-xs text-blue-600 font-semibold bg-blue-100 px-2 py-1 rounded-full mt-1">Today</div>` : ''}
+          `;
+
+          if (isAvailable && !isPast) {
+            dayElement.addEventListener('click', () => selectAppointmentDate(dateStr, dayElement, availableSlots));
+          }
+
+          calendarWeeks.appendChild(dayElement);
+        }
+      }
+
+      function selectAppointmentDate(date, element, slots) {
+        // Remove previous selection
+        document.querySelectorAll('#appointmentCalendar [class*="border-2 rounded-lg p-4"]').forEach(day => {
+          day.classList.remove('ring-4', 'ring-blue-500', 'ring-offset-2');
+        });
+        
+        // Add selection to clicked date
+        element.classList.add('ring-4', 'ring-blue-500', 'ring-offset-2');
+        selectedDate = date;
+        
+        // Update the input field with selected date
+        const datePicker = document.getElementById('datePicker');
+        // Parse the date string to create a proper Date object
+        const [year, month, day] = date.split('-');
+        const selectedDateObj = new Date(year, month - 1, day); // month is 0-indexed
+        const formattedDate = selectedDateObj.toLocaleDateString('en-US', { 
+          weekday: 'short',
+          month: 'short', 
+          day: 'numeric',
+          year: 'numeric'
+        });
+        datePicker.value = formattedDate;
+        
+        // Hide the dropdown
+        document.getElementById('calendarDropdown').classList.add('hidden');
+        
+        // Load time slots for the selected date
+        loadTimeSlotsForDate(date, slots);
+      }
+
+      function loadTimeSlotsForDate(date, slots) {
+        const timeSelect = document.getElementById('timeSelect');
+        timeSelect.innerHTML = '<option value="">Select time</option>';
+        
+        if (slots && slots.length > 0) {
+          slots.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot.start_time;
+            option.textContent = convertTo12Hour(slot.start_time) + ' - ' + convertTo12Hour(slot.end_time);
+            timeSelect.appendChild(option);
+          });
+        } else {
+          timeSelect.innerHTML = '<option value="">No available slots</option>';
+        }
+      }
+
+      // Convert 24-hour time to 12-hour format
+      function convertTo12Hour(time24) {
+        const [hours, minutes] = time24.split(':');
+        const hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${minutes} ${ampm}`;
+      }
+
+      // Generate and download PDF for appointment booking
+      function generateAppointmentPDF(appointmentData, doctorName) {
+        // Load logo image first, then generate PDF
+        loadLogoAndGeneratePDF(appointmentData, doctorName);
+      }
+      
+      function loadLogoAndGeneratePDF(appointmentData, doctorName) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Try to load the logo image
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        
+        img.onload = function() {
+          console.log('✅ Hospital logo loaded successfully');
+          generatePDFWithLogo(doc, appointmentData, doctorName, img);
+        };
+        
+        img.onerror = function() {
+          console.log('❌ Hospital logo failed to load, using text fallback');
+          // Generate PDF without logo if image fails to load
+          generatePDFWithLogo(doc, appointmentData, doctorName, null);
+        };
+        
+        img.src = '../public/assets/logo.png';
+      }
+      
+      function generatePDFWithLogo(doc, appointmentData, doctorName, logoImg) {
+        
+        // Hospital Information (with proper encoding)
+        const hospitalName = "HPC Hospital";
+        const hospitalAddress = "123 Medical Center Drive, Healthcare City";
+        const hospitalPhone = "+1 (555) 123-4567";
+        const hospitalEmail = "info@hpchospital.com";
+        
+        // Sanitize text inputs to prevent encoding issues
+        const sanitizeText = (text) => {
+          if (!text) return '';
+          return text.toString().replace(/[^\x00-\x7F]/g, '').trim();
+        };
+        
+        // Colors
+        const primaryColor = [0, 102, 204]; // Blue
+        const secondaryColor = [220, 38, 127]; // Red
+        
+        // Header with hospital name and logo
+        doc.setFillColor(...primaryColor);
+        doc.rect(0, 0, 210, 30, 'F');
+        
+        // Hospital name
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text(hospitalName, 20, 20);
+        
+        // Add hospital logo or fallback text
+        if (logoImg) {
+          try {
+            // Add the loaded logo image to PDF
+            doc.addImage(logoImg, 'PNG', 160, 5, 30, 20);
+            console.log('✅ Hospital logo added to PDF successfully');
+          } catch (error) {
+            console.log('❌ Failed to add logo to PDF:', error);
+            // Fallback to text if image addition fails
+            doc.setFontSize(12);
+            doc.text('HPC', 180, 20);
+          }
+        } else {
+          console.log('ℹ️ Using text fallback for hospital logo');
+          // Fallback to text if no logo image
+          doc.setFontSize(12);
+          doc.text('HPC', 180, 20);
+        }
+        
+        // Reset text color
+        doc.setTextColor(0, 0, 0);
+        
+        // Title
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('APPOINTMENT CONFIRMATION', 20, 50);
+        
+        // Line separator
+        doc.setDrawColor(...secondaryColor);
+        doc.setLineWidth(2);
+        doc.line(20, 55, 190, 55);
+        
+        // Appointment details
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        
+        const appointmentDate = new Date(appointmentData.appointment_date);
+        const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        const formattedTime = convertTo12Hour(appointmentData.appointment_time);
+        
+        // Patient Information (with sanitized text)
+        doc.setFont('helvetica', 'bold');
+        doc.text('PATIENT INFORMATION:', 20, 75);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Name: ${sanitizeText(appointmentData.patient_name)}`, 20, 85);
+        doc.text(`Email: ${sanitizeText(appointmentData.patient_email)}`, 20, 95);
+        doc.text(`Phone: ${sanitizeText(appointmentData.patient_phone)}`, 20, 105);
+        
+        // Appointment Details (with sanitized text)
+        doc.setFont('helvetica', 'bold');
+        doc.text('APPOINTMENT DETAILS:', 20, 125);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Doctor: Dr. ${sanitizeText(doctorName)}`, 20, 135);
+        doc.text(`Date: ${formattedDate}`, 20, 145);
+        doc.text(`Time: ${formattedTime}`, 20, 155);
+        doc.text(`Appointment ID: #${appointmentData.appointment_id || 'TBD'}`, 20, 165);
+        
+        // Notes (with sanitized text)
+        if (appointmentData.notes) {
+          doc.setFont('helvetica', 'bold');
+          doc.text('NOTES:', 20, 185);
+          doc.setFont('helvetica', 'normal');
+          const sanitizedNotes = sanitizeText(appointmentData.notes);
+          const splitNotes = doc.splitTextToSize(sanitizedNotes, 170);
+          doc.text(splitNotes, 20, 195);
+        }
+        
+        // Footer
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Please arrive 15 minutes before your appointment time.', 20, 250);
+        doc.text('For any changes or cancellations, please contact us at least 24 hours in advance.', 20, 260);
+        
+        // Hospital contact info
+        doc.text(`${hospitalName} | ${hospitalAddress}`, 20, 270);
+        doc.text(`Phone: ${hospitalPhone} | Email: ${hospitalEmail}`, 20, 280);
+        
+        // Add small logo in footer if available
+        if (logoImg) {
+          try {
+            doc.addImage(logoImg, 'PNG', 20, 285, 15, 10);
+          } catch (error) {
+            // Ignore footer logo errors
+          }
+        }
+        
+        // Generate filename
+        const dateStr = appointmentData.appointment_date.replace(/-/g, '');
+        const timeStr = appointmentData.appointment_time.replace(/:/g, '');
+        const filename = `Appointment_${appointmentData.patient_name.replace(/\s+/g, '_')}_${dateStr}_${timeStr}.pdf`;
+        
+        // Download the PDF
+        doc.save(filename);
+      }
     </script>
 
     <!-- TESTIMONIALS -->
@@ -1248,79 +1687,6 @@
         </div>
       </div>
     </section>
-    <script>
-      // Global variable to store departments data
-      let departments = [];
-
-      // Fetch departments from API
-      async function fetchDepartments() {
-        try {
-          const response = await fetch('/doctor-appoinment/Backend/api/departments.php?action=public');
-          const data = await response.json();
-          
-          if (data.status === 'success') {
-            departments = data.data;
-            renderDepartments();
-          } else {
-            console.error('Failed to fetch departments:', data.message);
-            // Fallback to empty state
-            const departmentsContainer = document.getElementById("departmentsContainer");
-            departmentsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No departments available at the moment.</p>';
-          }
-        } catch (error) {
-          console.error('Error fetching departments:', error);
-          // Fallback to empty state
-          const departmentsContainer = document.getElementById("departmentsContainer");
-          departmentsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load departments. Please try again later.</p>';
-        }
-      }
-
-      // Render departments on the page
-      function renderDepartments() {
-        const departmentsContainer = document.getElementById("departmentsContainer");
-        departmentsContainer.innerHTML = ''; // Clear existing content
-
-        if (departments.length === 0) {
-          departmentsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No departments available at the moment.</p>';
-          return;
-        }
-
-        departments.forEach((department) => {
-          const departmentCard = document.createElement("div");
-          departmentCard.className =
-            "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
-
-          // Use the image from database or fallback to default
-          const departmentImage = department.image_path ? `/doctor-appoinment/uploads/departments/${department.image_path}` : "../public/assets/nephrology.jpg";
-          const departmentName = department.name || "Department";
-          const departmentDescription = department.description || "Specialized medical department providing quality healthcare services.";
-
-          departmentCard.innerHTML = `
-        <!-- Department Image Wrapper -->
-        <div class="relative h-56 w-full overflow-hidden group">
-          <img src="${departmentImage}" alt="${departmentName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-        </div>
-
-        <!-- Department Content -->
-        <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${departmentName}</h3>
-          
-
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${departmentDescription}</p>
-
-        </div>
-        </div>
-      `;
-
-          departmentsContainer.appendChild(departmentCard);
-        });
-      }
-
-      // Initialize when page loads
-      document.addEventListener("DOMContentLoaded", () => {
-        fetchDepartments();
-      });
-    </script>
 
     <!-- Footer -->
     <div id="footer"></div>

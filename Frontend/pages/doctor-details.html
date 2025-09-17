@@ -41,26 +41,72 @@
       ></div>
     </div>
 
-    <!-- Schedule Table -->
-    <div class="overflow-x-auto p-6 max-w-6xl mx-auto">
-      <table
-        id="scheduleTable"
-        class="min-w-full border border-gray-300 text-sm"
-      >
-        <thead>
-          <tr class="bg-gray-700 text-white h-20 text-center">
-            <th class="border px-2 py-1">Doctor Name</th>
-            <th class="border px-2 py-1">Sunday</th>
-            <th class="border px-2 py-1">Monday</th>
-            <th class="border px-2 py-1">Tuesday</th>
-            <th class="border px-2 py-1">Wednesday</th>
-            <th class="border px-2 py-1">Thursday</th>
-            <th class="border px-2 py-1">Friday</th>
-            <th class="border px-2 py-1">Saturday</th>
-          </tr>
-        </thead>
-        <tbody class="p-5"></tbody>
-      </table>
+    <!-- Doctor Schedule Calendar -->
+    <div class="max-w-6xl mx-auto p-6">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">Doctor Schedule</h2>
+          <div class="flex items-center gap-4">
+            <div class="text-sm text-gray-600">
+              <i class="fas fa-info-circle mr-1"></i>
+              Schedule rotates automatically with date changes
+            </div>
+            <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+              <i class="fas fa-sync-alt mr-1"></i>
+              Auto-rotating
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar Header -->
+        <div class="mb-4">
+          <h3 id="calendarMonthYear" class="text-xl font-semibold text-gray-700 text-center"></h3>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="grid grid-cols-7 gap-2 mb-4">
+          <!-- Day Headers -->
+          <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Sun</div>
+          <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Mon</div>
+          <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Tue</div>
+          <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Wed</div>
+          <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Thu</div>
+          <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Fri</div>
+          <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Sat</div>
+        </div>
+
+        <!-- Calendar Days Container -->
+        <div id="calendarDays" class="grid grid-cols-7 gap-2">
+          <!-- Loading state -->
+          <div id="calendarLoading" class="col-span-7 text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p class="mt-2 text-gray-600">Loading schedule...</p>
+          </div>
+        </div>
+
+        <!-- Time Slots Modal -->
+        <div id="timeSlotsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+          <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+              <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Available Time Slots</h3>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-600 text-xl">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="p-6">
+                <div id="timeSlots" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <!-- Time slots will be populated here -->
+                </div>
+                <div id="noSlotsMessage" class="text-center text-gray-500 py-8 hidden">
+                  <i class="fas fa-calendar-times text-4xl mb-2"></i>
+                  <p>No available time slots for this day</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
  <!-- Filter -->
 
@@ -93,63 +139,7 @@
       </div>
     </section>
 
-      <!-- Detailed Schedule Modal -->
-    <div id="scheduleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-gray-800">Schedule - ${currentDoctor ? currentDoctor.name : 'Doctor'}</h3>
-            <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-gray-600">
-              <i class="fas fa-times text-xl"></i>
-            </button>
-          </div>
-          <div class="p-6">
-            <!-- Calendar Navigation -->
-            <div class="flex justify-between items-center mb-6">
-              <div>
-                <h4 class="text-lg font-medium text-gray-800" id="calendarMonthYear"></h4>
-              </div>
-              <div class="flex gap-4 items-center">
-                <button id="prevTwoWeeks" class="bg-gray-100 p-2 rounded-lg hover:bg-gray-200 transition">
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <button id="currentWeeks" class="bg-blue-100 px-3 py-1 rounded-lg hover:bg-blue-200 transition text-sm">
-                  Current Weeks
-                </button>
-                <button id="nextTwoWeeks" class="bg-gray-100 p-2 rounded-lg hover:bg-gray-200 transition">
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- Calendar Grid -->
-            <div class="grid grid-cols-7 gap-2">
-              <!-- Calendar Days Header -->
-              <div class="text-center font-medium text-gray-500 py-2">Sun</div>
-              <div class="text-center font-medium text-gray-500 py-2">Mon</div>
-              <div class="text-center font-medium text-gray-500 py-2">Tue</div>
-              <div class="text-center font-medium text-gray-500 py-2">Wed</div>
-              <div class="text-center font-medium text-gray-500 py-2">Thu</div>
-              <div class="text-center font-medium text-gray-500 py-2">Fri</div>
-              <div class="text-center font-medium text-gray-500 py-2">Sat</div>
-            </div>
-
-            <!-- Calendar Weeks Container -->
-            <div id="calendarWeeks" class="grid grid-cols-7 gap-2">
-              <!-- Calendar days will be populated here -->
-            </div>
-
-            <!-- Selected Day Schedule -->
-            <div id="selectedDaySchedule" class="mt-6 border-t pt-6">
-              <h4 class="text-lg font-medium text-gray-800 mb-4">Available Time Slots</h4>
-              <div id="timeSlots" class="grid grid-cols-3 gap-3">
-                <!-- Time slots will be populated here -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>    <script>
+    <script>
       // Global variables
       let doctors = [];
       let availableDepartments = new Set();
@@ -370,7 +360,6 @@
 
             <div class="flex gap-2 mt-4">
               <button onclick="window.location.href='./home.html#appointment-form'" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Book Appointment</button>
-              <button onclick="showDetailedSchedule()" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">View Detailed Schedule</button>
             </div>
           </div>
 
@@ -385,8 +374,8 @@
           // Load other doctors in the same specialization
           loadOtherDoctors(doctorSpecialization);
           
-          // Load schedule table
-          loadScheduleTable();
+          // Load schedule calendar
+          loadScheduleCalendar();
         } else {
           document.getElementById("doctorDetail").innerHTML = '<p class="text-red-500 font-semibold">Doctor not found. The doctor with ID ' + doctorId + ' does not exist.</p>';
         }
@@ -413,254 +402,224 @@
           .join("");
       }
 
-      async function loadScheduleTable() {
-        const tableBody = document.querySelector("#scheduleTable tbody");
-        if (!tableBody) return;
-
-        // Clear existing content
-        tableBody.innerHTML = '';
-
-        try {
-          // Get current month for schedule display
-          const currentDate = new Date();
-          const currentMonth = currentDate.toISOString().slice(0, 7); // YYYY-MM format
-          
-          // Fetch doctor's schedule for current month
-          const response = await fetch(`../../Backend/api/schedules.php?action=get_schedules&doctor_id=${currentDoctor.id}&month=${currentMonth}`);
-          const data = await response.json();
-          
-          if (data.status === 'success' && data.data.length > 0) {
-            // Group schedules by day of week
-            const weeklySchedule = {
-              "Sunday": [],
-              "Monday": [],
-              "Tuesday": [],
-              "Wednesday": [],
-              "Thursday": [],
-              "Friday": [],
-              "Saturday": []
-            };
-            
-            // Process schedule data
-            data.data.forEach(daySchedule => {
-              const date = new Date(daySchedule.date);
-              const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-              
-              if (weeklySchedule[dayName]) {
-                daySchedule.slots.forEach(slot => {
-                  if (slot.is_available) {
-                    weeklySchedule[dayName].push(`${convertTo12Hour(slot.start_time)} - ${convertTo12Hour(slot.end_time)}`);
-                  }
-                });
-              }
-            });
-            
-            // Create table row
-            const row = document.createElement("tr");
-            row.innerHTML = `<td class="border px-2 py-1 font-semibold text-center text-gray-400 h-20">${currentDoctor.name}</td>`;
-            
-            // Add schedule for each day
-            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            days.forEach((day) => {
-              const daySchedules = weeklySchedule[day];
-              let scheduleText = "--";
-              let bgClass = "";
-              
-              if (daySchedules.length > 0) {
-                // Show up to 2 time slots, add "..." if more
-                if (daySchedules.length <= 2) {
-                  scheduleText = daySchedules.join("<br>");
-                } else {
-                  scheduleText = daySchedules.slice(0, 2).join("<br>") + "<br><small>...</small>";
-                }
-                bgClass = "bg-green-100";
-              }
-              
-              row.innerHTML += `<td class="border px-2 py-1 text-center text-sm ${bgClass}">${scheduleText}</td>`;
-            });
-            
-            tableBody.appendChild(row);
-          } else {
-            // No schedule data available, show default message
-            const row = document.createElement("tr");
-            row.innerHTML = `<td class="border px-2 py-1 font-semibold text-center text-gray-400 h-20">${currentDoctor.name}</td>`;
-            
-            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            days.forEach((day) => {
-              row.innerHTML += `<td class="border px-2 py-1 text-center text-gray-500">Schedule not available</td>`;
-            });
-            
-            tableBody.appendChild(row);
-          }
-        } catch (error) {
-          console.error('Error loading schedule:', error);
-          
-          // Show error message
-          const row = document.createElement("tr");
-          row.innerHTML = `<td class="border px-2 py-1 font-semibold text-center text-gray-400 h-20">${currentDoctor.name}</td>`;
-          
-          const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-          days.forEach((day) => {
-            row.innerHTML += `<td class="border px-2 py-1 text-center text-red-500">Error loading</td>`;
-          });
-          
-          tableBody.appendChild(row);
-        }
-      }
-
-      // Detailed Schedule Modal Functions
+      // Calendar functionality
       let currentStartDate = new Date();
       let scheduleData = {};
       let autoRotateInterval;
+      let lastCheckedDate = new Date().toDateString();
 
-      function showDetailedSchedule() {
-        if (!currentDoctor) {
-          alert('Doctor information not loaded');
-          return;
-        }
+      async function loadScheduleCalendar() {
+        if (!currentDoctor) return;
         
-        // Set to start of current week
-        currentStartDate = new Date();
-        currentStartDate.setDate(currentStartDate.getDate() - currentStartDate.getDay());
+        // Load initial calendar for current month
+        await updateCalendar();
         
-        // Show modal
-        document.getElementById('scheduleModal').classList.remove('hidden');
-        
-        // Load initial calendar
-        updateCalendar();
-        
-        // Setup event listeners
-        setupCalendarEventListeners();
-        
-        // Start auto-rotation
+        // Start auto-rotation based on date changes
         startAutoRotate();
-      }
-      
-      function closeScheduleModal() {
-        document.getElementById('scheduleModal').classList.add('hidden');
-        // Stop auto-rotation
-        if (autoRotateInterval) {
-          clearInterval(autoRotateInterval);
-        }
-      }
-
-      function setupCalendarEventListeners() {
-        document.getElementById('prevTwoWeeks').addEventListener('click', () => {
-          currentStartDate.setDate(currentStartDate.getDate() - 14);
-          updateCalendar();
-        });
-
-        document.getElementById('nextTwoWeeks').addEventListener('click', () => {
-          currentStartDate.setDate(currentStartDate.getDate() + 14);
-          updateCalendar();
-        });
-
-        document.getElementById('currentWeeks').addEventListener('click', () => {
-          currentStartDate = new Date();
-          currentStartDate.setDate(currentStartDate.getDate() - currentStartDate.getDay());
-          updateCalendar();
-        });
       }
 
       function startAutoRotate() {
         if (autoRotateInterval) {
           clearInterval(autoRotateInterval);
         }
+        
+        // Check for date changes every minute
         autoRotateInterval = setInterval(() => {
-          currentStartDate.setDate(currentStartDate.getDate() + 14);
-          updateCalendar();
-        }, 10000); // Rotate every 10 seconds
+          const currentDate = new Date().toDateString();
+          
+          // If date has changed, update the calendar to show current month
+          if (currentDate !== lastCheckedDate) {
+            lastCheckedDate = currentDate;
+            updateCalendar();
+          }
+        }, 60000); // Check every minute
+        
+        // Also check immediately on page focus (in case user left tab open)
+        window.addEventListener('focus', () => {
+          const currentDate = new Date().toDateString();
+          if (currentDate !== lastCheckedDate) {
+            lastCheckedDate = currentDate;
+            updateCalendar();
+          }
+        });
       }
 
       async function updateCalendar() {
-        // Update month/year display
-        const endDate = new Date(currentStartDate);
-        endDate.setDate(endDate.getDate() + 13);
-        
-        const monthYearText = currentStartDate.toLocaleDateString('en-US', { 
-          month: 'long',
-          year: 'numeric'
-        });
-        document.getElementById('calendarMonthYear').textContent = monthYearText;
-
-        // Load schedule data for the two weeks
-        await loadScheduleData(currentStartDate, endDate);
-
-        // Render calendar
-        renderCalendarDays(currentStartDate);
-      }
-
-      async function loadScheduleData(startDate, endDate) {
         try {
-          const response = await fetch(`../../Backend/api/schedules.php?action=get_schedules&doctor_id=${currentDoctor.id}&start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`);
-          const data = await response.json();
+          // Update month/year display to show current two weeks
+          const today = new Date();
+          const startDate = new Date(today);
+          startDate.setDate(startDate.getDate() - startDate.getDay());
+          const endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + 13);
           
-          if (data.status === 'success') {
-            // Transform data into a more usable format
-            scheduleData = {};
-            data.data.forEach(day => {
-              scheduleData[day.date] = day.slots.filter(slot => slot.is_available);
-            });
-          }
+          const monthYearText = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+          
+          document.getElementById('calendarMonthYear').textContent = monthYearText;
+
+          // Load schedule data for the two-week period
+          await loadScheduleDataForTwoWeeks(startDate, endDate);
+
+          // Render calendar for two weeks
+          renderCalendarDays();
+          
         } catch (error) {
-          console.error('Error loading schedule data:', error);
+          console.error('Error updating calendar:', error);
         }
       }
 
-      function renderCalendarDays(startDate) {
-        const calendarWeeks = document.getElementById('calendarWeeks');
-        calendarWeeks.innerHTML = '';
+      async function loadScheduleDataForTwoWeeks(startDate, endDate) {
+        try {
+          // Get the month range for the two weeks
+          const startMonth = startDate.toISOString().slice(0, 7);
+          const endMonth = endDate.toISOString().slice(0, 7);
+          
+          // Load data for both months if they're different
+          const monthsToLoad = [...new Set([startMonth, endMonth])];
+          scheduleData = {};
+          
+          for (const month of monthsToLoad) {
+            const response = await fetch(`../../Backend/api/schedules.php?action=get_schedules&doctor_id=${currentDoctor.id}&month=${month}`);
+            const data = await response.json();
+            
+            if (data.status === 'success' && data.data) {
+              data.data.forEach(day => {
+                const dayDate = new Date(day.date);
+                // Only include dates within our two-week range
+                if (dayDate >= startDate && dayDate <= endDate) {
+                  if (day.slots && Array.isArray(day.slots)) {
+                    scheduleData[day.date] = day.slots.filter(slot => slot.is_available);
+                  } else {
+                    scheduleData[day.date] = [];
+                  }
+                }
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error loading schedule data:', error);
+          scheduleData = {};
+        }
+      }
 
+      function renderCalendarDays() {
+        const calendarDays = document.getElementById('calendarDays');
+        if (!calendarDays) return;
+        
+        // Hide loading state
+        const loadingElement = document.getElementById('calendarLoading');
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+        
+        calendarDays.innerHTML = '';
+
+        // Get current date and set to start of current week
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Start from Sunday of current week
+        const startDate = new Date(today);
+        startDate.setDate(startDate.getDate() - startDate.getDay());
+        
+        // End at Saturday of next week (14 days total)
         const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + 14);
+        endDate.setDate(endDate.getDate() + 13);
 
-        // Create grid for days
+        // Create grid for 14 days (2 weeks)
+        const currentDate = new Date(startDate);
         for (let i = 0; i < 14; i++) {
-          const currentDate = new Date(startDate);
-          currentDate.setDate(currentDate.getDate() + i);
           const dateStr = currentDate.toISOString().split('T')[0];
           
           const availableSlots = scheduleData[dateStr] || [];
           const isAvailable = availableSlots.length > 0;
-          const isPast = currentDate < new Date().setHours(0, 0, 0, 0);
+          const isPast = currentDate < today;
+          const isToday = currentDate.toDateString() === today.toDateString();
 
           const dayElement = document.createElement('div');
-          dayElement.className = `border rounded-lg p-3 ${isPast ? 'bg-gray-100' : isAvailable ? 'bg-green-50 hover:bg-green-100 cursor-pointer' : 'bg-gray-50'} transition`;
+          
+          // Styling based on availability and date
+          dayElement.className = `calendar-day border rounded-lg p-3 min-h-[80px] flex flex-col justify-center items-center transition-all duration-200 ${
+            isPast ? 'bg-gray-100 text-gray-400' : 
+            isToday ? 'bg-blue-50 border-blue-300 text-blue-700' :
+            isAvailable ? 'bg-green-50 border-green-300 text-green-700 hover:bg-green-100 cursor-pointer' : 
+            'bg-gray-50 border-gray-200 text-gray-500'
+          }`;
           
           dayElement.innerHTML = `
             <div class="text-center">
-              <div class="text-sm text-gray-600">${currentDate.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-              <div class="text-lg font-medium ${isAvailable ? 'text-green-600' : 'text-gray-400'}">${currentDate.getDate()}</div>
-              ${isAvailable ? `<div class="text-xs text-green-600">${availableSlots.length} slots</div>` : ''}
+              <div class="text-sm font-medium">${currentDate.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+              <div class="text-lg font-bold">${currentDate.getDate()}</div>
+              ${isAvailable ? `<div class="text-xs text-green-600 font-medium">${availableSlots.length} slots</div>` : ''}
             </div>
           `;
 
           if (isAvailable && !isPast) {
-            dayElement.addEventListener('click', () => showTimeSlots(dateStr, availableSlots));
+            dayElement.addEventListener('click', () => showTimeSlotsModal(dateStr, availableSlots, currentDate));
           }
 
-          calendarWeeks.appendChild(dayElement);
+          calendarDays.appendChild(dayElement);
+          currentDate.setDate(currentDate.getDate() + 1);
         }
       }
 
-      function showTimeSlots(date, slots) {
-        const timeSlotsDiv = document.getElementById('timeSlots');
-        const dateObj = new Date(date);
+      function showTimeSlotsModal(date, slots, dateObj) {
+        const modal = document.getElementById('timeSlotsModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const timeSlots = document.getElementById('timeSlots');
+        const noSlotsMessage = document.getElementById('noSlotsMessage');
+        
+        if (!modal || !modalTitle || !timeSlots || !noSlotsMessage) return;
+        
         const dateStr = dateObj.toLocaleDateString('en-US', { 
           weekday: 'long',
           month: 'long',
-          day: 'numeric'
+          day: 'numeric',
+          year: 'numeric'
         });
 
-        document.querySelector('#selectedDaySchedule h4').textContent = `Available Time Slots - ${dateStr}`;
+        modalTitle.textContent = `Available Time Slots - ${dateStr}`;
 
-        timeSlotsDiv.innerHTML = slots.map(slot => `
-          <div class="border border-green-200 rounded-lg p-3 bg-green-50 hover:bg-green-100 cursor-pointer transition">
-            <div class="font-medium text-green-800">${convertTo12Hour(slot.start_time)} - ${convertTo12Hour(slot.end_time)}</div>
-            <div class="text-sm text-green-600">${slot.current_appointments}/${slot.max_appointments} booked</div>
-          </div>
-        `).join('');
+        if (slots && slots.length > 0) {
+          timeSlots.innerHTML = slots.map(slot => `
+            <div class="border border-green-200 rounded-lg p-4 bg-white hover:bg-green-50 cursor-pointer transition-all duration-200 shadow-sm">
+              <div class="font-semibold text-green-800 text-lg">${convertTo12Hour(slot.start_time)} - ${convertTo12Hour(slot.end_time)}</div>
+              <div class="text-sm text-green-600 mt-1">
+                <i class="fas fa-check-circle mr-1"></i>
+                Available time
+              </div>
+            </div>
+          `).join('');
+          noSlotsMessage.classList.add('hidden');
+          timeSlots.classList.remove('hidden');
+        } else {
+          timeSlots.classList.add('hidden');
+          noSlotsMessage.classList.remove('hidden');
+        }
+        
+        modal.classList.remove('hidden');
       }
+
+      // Modal event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('timeSlotsModal');
+        const closeModal = document.getElementById('closeModal');
+        
+        if (closeModal) {
+          closeModal.addEventListener('click', () => {
+            modal.classList.add('hidden');
+          });
+        }
+        
+        if (modal) {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              modal.classList.add('hidden');
+            }
+          });
+        }
+      });
+
 
       // Convert 24-hour time to 12-hour format
       function convertTo12Hour(time24) {
@@ -710,6 +669,38 @@
 
       .animate-fadeIn {
         animation: fadeIn 0.5s ease forwards;
+      }
+
+      /* Calendar day hover effects */
+      .calendar-day {
+        transition: all 0.2s ease;
+      }
+
+      .calendar-day:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Loading spinner animation */
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .animate-spin {
+        animation: spin 1s linear infinite;
+      }
+
+      /* Calendar grid responsive adjustments */
+      @media (max-width: 768px) {
+        .calendar-day {
+          min-height: 60px;
+          padding: 0.5rem;
+        }
       }
     </style>
 

@@ -8,15 +8,75 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" type="image/png" href="../../public/assets/logo.png">
     <style>
-        .calendar-day { @apply border border-gray-300 p-2 min-h-[100px] cursor-pointer transition-colors; }
-        .calendar-day:hover { @apply bg-gray-50; }
-        .calendar-day.selected { @apply bg-blue-100 border-blue-500; }
-        .calendar-day.has-schedule { @apply bg-green-50 border-green-300; }
-        .calendar-day.other-month { @apply bg-gray-100 text-gray-400; }
-        .calendar-day.past-date { @apply bg-gray-200 text-gray-500 cursor-not-allowed; }
-        .calendar-day.past-date:hover { @apply bg-gray-200; }
-        .time-slot { @apply bg-blue-100 border border-blue-300 rounded px-2 py-1 text-sm mb-1 flex justify-between items-center; }
-        .time-slot:hover { @apply bg-blue-200; }
+        /* Colorful calendar day styling */
+        .calendar-day { 
+            @apply border-2 rounded-lg p-3 min-h-[80px] flex flex-col justify-center items-center transition-all duration-300;
+            font-weight: 600;
+        }
+        .calendar-day:hover { 
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .calendar-day.selected { 
+            @apply bg-blue-200 border-blue-600 text-blue-800; 
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        .calendar-day.has-schedule { 
+            @apply bg-green-200 border-green-500 text-green-800 hover:bg-green-300 cursor-pointer; 
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+        }
+        .calendar-day.has-schedule:hover { 
+            @apply bg-green-300 border-green-600;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .calendar-day.other-month { 
+            @apply bg-gray-100 text-gray-400 border-gray-200; 
+        }
+        .calendar-day.past-date { 
+            @apply bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed; 
+        }
+        .calendar-day.past-date:hover { 
+            @apply bg-gray-200;
+            transform: none;
+            box-shadow: none;
+        }
+        .calendar-day.today { 
+            @apply bg-blue-200 border-blue-500 text-blue-800; 
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .calendar-day.available { 
+            @apply bg-green-200 border-green-500 text-green-800 hover:bg-green-300 cursor-pointer; 
+        }
+        .calendar-day.no-schedule { 
+            @apply bg-red-100 border-red-400 text-red-700 hover:bg-red-200 cursor-pointer; 
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15);
+        }
+        .calendar-day.no-schedule:hover { 
+            @apply bg-red-200 border-red-500;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+        }
+        
+        .time-slot { 
+            @apply bg-blue-100 border border-blue-300 rounded px-2 py-1 text-sm mb-1 flex justify-between items-center; 
+        }
+        .time-slot:hover { 
+            @apply bg-blue-200; 
+        }
+
+        /* Loading spinner animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin { animation: spin 1s linear infinite; }
+
+        /* Calendar grid responsive adjustments */
+        @media (max-width: 768px) {
+            .calendar-day {
+                min-height: 60px;
+                padding: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -143,24 +203,75 @@
         </div>
 
             <!-- Calendar View -->
-            <div id="calendarSection" class="bg-white rounded-lg shadow-md p-6 hidden">
-            <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800" id="calendarTitle">Calendar</h3>
-                <div class="flex gap-2">
-                        <button id="prevMonth" class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                        <button id="nextMonth" class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+            <div id="calendarSection" class="bg-white rounded-lg shadow-lg p-6 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800" id="calendarTitle">Doctor Schedule</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="text-sm text-gray-600">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Click on dates to manage time slots
+                        </div>
+                        <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                            <i class="fas fa-calendar-check mr-1"></i>
+                            Schedule Management
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Calendar Header -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center">
+                        <button id="prevMonth" class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h4 id="calendarMonthYear" class="text-xl font-semibold text-gray-700"></h4>
+                        <button id="nextMonth" class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Calendar Grid -->
-                <div id="calendarGrid" class="grid grid-cols-7 gap-1">
-                    <!-- Calendar will be generated here -->
+                <div class="grid grid-cols-7 gap-2 mb-4">
+                    <!-- Day Headers -->
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Sun</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Mon</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Tue</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Wed</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Thu</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Fri</div>
+                    <div class="text-center font-semibold text-gray-600 py-3 bg-gray-100 rounded-lg">Sat</div>
+                </div>
+
+                <!-- Calendar Days Container -->
+                <div id="calendarDays" class="grid grid-cols-7 gap-2">
+                    <!-- Loading state -->
+                    <div id="calendarLoading" class="col-span-7 text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        <p class="mt-2 text-gray-600">Loading schedule...</p>
+                    </div>
+                </div>
+                
+                <!-- Color Legend -->
+                <div class="mt-6 flex flex-wrap justify-center gap-4 text-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-green-200 border-2 border-green-500 rounded"></div>
+                        <span class="text-green-800 font-medium">Has Time Slots</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-red-100 border-2 border-red-400 rounded"></div>
+                        <span class="text-red-700 font-medium">No Time Slots</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-blue-200 border-2 border-blue-500 rounded"></div>
+                        <span class="text-blue-800 font-medium">Today</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-gray-200 border-2 border-gray-300 rounded"></div>
+                        <span class="text-gray-500 font-medium">Past Dates</span>
+                    </div>
+                </div>
             </div>
-        </div>
 
             <!-- Time Slots Management Modal -->
             <div id="timeSlotsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
@@ -240,9 +351,16 @@
             document.getElementById('monthSelect').addEventListener('change', function() {
                 selectedMonth = this.value;
                 if (selectedMonth) {
-                    loadScheduleData();
-                    generateCalendar();
+                    // Show loading state
+                    const loadingElement = document.getElementById('calendarLoading');
+                    if (loadingElement) {
+                        loadingElement.style.display = 'block';
+                    }
+                    
                     document.getElementById('calendarSection').classList.remove('hidden');
+                    loadScheduleData().then(() => {
+                        generateCalendar();
+                    });
                 } else {
                     document.getElementById('calendarSection').classList.add('hidden');
                 }
@@ -254,8 +372,16 @@
                 currentMonth.setMonth(currentMonth.getMonth() - 1);
                 selectedMonth = currentMonth.toISOString().slice(0, 7);
                 document.getElementById('monthSelect').value = selectedMonth;
-                loadScheduleData();
-                generateCalendar();
+                
+                // Show loading state
+                const loadingElement = document.getElementById('calendarLoading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'block';
+                }
+                
+                loadScheduleData().then(() => {
+                    generateCalendar();
+                });
             });
 
             document.getElementById('nextMonth').addEventListener('click', function() {
@@ -263,8 +389,16 @@
                 currentMonth.setMonth(currentMonth.getMonth() + 1);
                 selectedMonth = currentMonth.toISOString().slice(0, 7);
                 document.getElementById('monthSelect').value = selectedMonth;
-                loadScheduleData();
-                generateCalendar();
+                
+                // Show loading state
+                const loadingElement = document.getElementById('calendarLoading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'block';
+                }
+                
+                loadScheduleData().then(() => {
+                    generateCalendar();
+                });
             });
 
             // Modal controls
@@ -304,16 +438,25 @@
                 const response = await fetch(`/doctor-appoinment/Backend/api/schedules.php?action=get_schedules&doctor_id=${selectedDoctor}&month=${selectedMonth}`);
                 const data = await response.json();
                 
+                console.log('Schedule data response:', data); // Debug log
+                
                 if (data.status === 'success') {
                     // Convert the grouped data to our expected format
                     scheduleData = {};
-                    data.data.forEach(daySchedule => {
-                        scheduleData[daySchedule.date] = daySchedule.slots.map(slot => ({
-                            id: slot.id,
-                            start: slot.start_time,
-                            end: slot.end_time
-                        }));
-                    });
+                    if (data.data && Array.isArray(data.data)) {
+                        data.data.forEach(daySchedule => {
+                            if (daySchedule.slots && Array.isArray(daySchedule.slots)) {
+                                scheduleData[daySchedule.date] = daySchedule.slots.map(slot => ({
+                                    id: slot.id,
+                                    start: slot.start_time,
+                                    end: slot.end_time
+                                }));
+                            } else {
+                                scheduleData[daySchedule.date] = [];
+                            }
+                        });
+                    }
+                    console.log('Processed schedule data:', scheduleData); // Debug log
                 } else {
                     console.error('Error loading schedule data:', data.message);
                     scheduleData = {};
@@ -331,11 +474,18 @@
         }
 
         function generateCalendar() {
-            const calendarGrid = document.getElementById('calendarGrid');
+            const calendarDays = document.getElementById('calendarDays');
             const calendarTitle = document.getElementById('calendarTitle');
+            const calendarMonthYear = document.getElementById('calendarMonthYear');
+            
+            // Hide loading state
+            const loadingElement = document.getElementById('calendarLoading');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
             
             // Clear previous calendar
-            calendarGrid.innerHTML = '';
+            calendarDays.innerHTML = '';
 
             // Set calendar title
             const monthDate = new Date(selectedMonth + '-01');
@@ -343,15 +493,13 @@
                 month: 'long', 
                 year: 'numeric' 
             });
-
-            // Add day headers
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'font-semibold text-gray-700 p-2 text-center bg-gray-100 rounded';
-                header.textContent = day;
-                calendarGrid.appendChild(header);
+            calendarMonthYear.textContent = monthDate.toLocaleDateString('en-US', { 
+                month: 'long', 
+                year: 'numeric' 
             });
+            
+            console.log('Generating calendar for month:', selectedMonth);
+            console.log('Schedule data available:', scheduleData);
 
             // Get first day of month and number of days
             const firstDay = new Date(selectedMonth + '-01');
@@ -371,7 +519,8 @@
                 // Determine if this day is in the current month
                 const isCurrentMonth = currentDay.getMonth() === firstDay.getMonth();
                 
-                dayElement.className = `calendar-day ${!isCurrentMonth ? 'other-month' : ''}`;
+                // Base styling
+                dayElement.className = 'calendar-day';
                 
                 if (isCurrentMonth) {
                     // Check if this date is in the past
@@ -382,28 +531,41 @@
                     
                     if (cellDateObj < today) {
                         dayElement.classList.add('past-date');
-                        dayElement.style.cursor = 'not-allowed';
-                        dayElement.style.opacity = '0.5';
                         dayElement.title = 'Cannot create schedules for past dates';
+                    } else if (cellDateObj.toDateString() === today.toDateString()) {
+                        dayElement.classList.add('today');
+                        dayElement.addEventListener('click', () => selectDate(dateString, dayElement));
                     } else {
                         // Check if this date has schedule data
                         if (scheduleData[dateString] && scheduleData[dateString].length > 0) {
                             dayElement.classList.add('has-schedule');
+                        } else {
+                            dayElement.classList.add('no-schedule');
                         }
                         
                         dayElement.addEventListener('click', () => selectDate(dateString, dayElement));
                     }
+                } else {
+                    dayElement.classList.add('other-month');
                 }
                 
+                // Create day content with slot count display
+                const availableSlots = scheduleData[dateString] || [];
+                const slotCount = availableSlots.length;
+                
                 dayElement.innerHTML = `
-                    <div class="font-medium">${dayNumber}</div>
-                    ${isCurrentMonth && scheduleData[dateString] ? 
-                        `<div class="text-xs text-gray-600">${scheduleData[dateString].length} slot(s)</div>` : 
-                        ''
-                    }
+                    <div class="text-center">
+                        <div class="text-sm font-medium">${currentDay.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                        <div class="text-lg font-bold">${dayNumber}</div>
+                        ${isCurrentMonth && slotCount > 0 ? 
+                            `<div class="text-xs font-bold text-green-800 bg-green-300 px-2 py-1 rounded-full">${slotCount} slot${slotCount > 1 ? 's' : ''}</div>` : 
+                            isCurrentMonth && !dayElement.classList.contains('past-date') ? 
+                            `<div class="text-xs font-bold text-red-800 bg-red-300 px-2 py-1 rounded-full">No slots</div>` : ''
+                        }
+                    </div>
                 `;
                 
-                calendarGrid.appendChild(dayElement);
+                calendarDays.appendChild(dayElement);
             }
         }
 
@@ -534,6 +696,7 @@
                     document.getElementById('endTime').value = '';
                     
                     showToast('Time slot added successfully');
+                    console.log('Time slot added, calendar refreshed');
                 } else {
                     showToast(data.message || 'Error adding time slot', 'error');
                 }
@@ -652,6 +815,7 @@
                         loadTimeSlots();
                         generateCalendar();
                         showToast('Time slot deleted successfully');
+                        console.log('Time slot deleted, calendar refreshed');
                     } else {
                         showToast(data.message || 'Error deleting time slot', 'error');
                     }

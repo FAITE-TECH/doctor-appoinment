@@ -25,7 +25,7 @@ error_log
 .env.production
 
 # Database files
-*.sql
+schedule_database_update.sql
 *.db
 *.sqlite
 
