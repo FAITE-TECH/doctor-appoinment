@@ -83,20 +83,20 @@ if ($method === 'POST' && $action === 'book') {
         json_response(['error' => 'Invalid date or time format'], 422);
     }
     
-    // Check if appointment slot is available
-    $checkSql = "SELECT id FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ? AND status != 'cancelled'";
+    // Check if the current user has already booked this time slot
+    $checkSql = "SELECT id FROM appointments WHERE user_id = ? AND doctor_id = ? AND appointment_date = ? AND appointment_time = ? AND status != 'cancelled'";
     $checkStmt = $conn->prepare($checkSql);
     if (!$checkStmt) {
         json_response(['error' => 'Database error'], 500);
     }
     
-    $checkStmt->bind_param('iss', $doctorId, $appointmentDate, $appointmentTime);
+    $checkStmt->bind_param('iiss', $userId, $doctorId, $appointmentDate, $appointmentTime);
     $checkStmt->execute();
     $checkStmt->store_result();
     
     if ($checkStmt->num_rows > 0) {
         $checkStmt->close();
-        json_response(['error' => 'Appointment slot not available'], 409);
+        json_response(['error' => 'You have already booked an appointment for this time slot'], 409);
     }
     $checkStmt->close();
     

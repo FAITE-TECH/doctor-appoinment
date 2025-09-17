@@ -72,17 +72,7 @@ if ($method === 'POST' && $action === 'book') {
         json_response(['error' => 'Doctor not found'], 404);
     }
     
-    // Check for conflicting appointments
-    $stmt = $conn->prepare('SELECT id FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ? AND status != "cancelled"');
-    $stmt->bind_param('iss', $doctor_id, $appointment_date, $appointment_time);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        json_response(['error' => 'Time slot is already booked'], 409);
-    }
-    $stmt->close();
-    
-    // Create or find patient user
+    // Create or find patient user first
     $stmt = $conn->prepare('SELECT id FROM users WHERE email = ?');
     $stmt->bind_param('s', $patient_email);
     $stmt->execute();
@@ -101,6 +91,16 @@ if ($method === 'POST' && $action === 'book') {
     } else {
         $user_id = $user['id'];
     }
+    
+    // Check if this patient has already booked this time slot
+    $stmt = $conn->prepare('SELECT id FROM appointments WHERE user_id = ? AND doctor_id = ? AND appointment_date = ? AND appointment_time = ? AND status != "cancelled"');
+    $stmt->bind_param('iiss', $user_id, $doctor_id, $appointment_date, $appointment_time);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        json_response(['error' => 'You have already booked an appointment for this time slot'], 409);
+    }
+    $stmt->close();
     
     // Create appointment
     $stmt = $conn->prepare('INSERT INTO appointments (user_id, doctor_id, appointment_date, appointment_time, status, notes) VALUES (?, ?, ?, ?, "pending", ?)');
@@ -138,18 +138,8 @@ if ($method === 'GET' && $action === 'time_slots') {
         json_response(['error' => 'Invalid date format'], 400);
     }
     
-    // Get booked time slots for the doctor on the specified date
-    $stmt = $conn->prepare('SELECT appointment_time FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND status != "cancelled"');
-    $stmt->bind_param('is', $doctor_id, $date);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $booked_times = [];
-    while ($row = $result->fetch_assoc()) {
-        $booked_times[] = $row['appointment_time'];
-    }
-    $stmt->close();
-    
     // Generate available time slots (9 AM to 5 PM, 30-minute intervals)
+    // Since multiple users can now book the same time slot, all slots are available
     $available_slots = [];
     $start_time = new DateTime($date . ' 09:00');
     $end_time = new DateTime($date . ' 17:00');
@@ -158,12 +148,10 @@ if ($method === 'GET' && $action === 'time_slots') {
     $current_time = clone $start_time;
     while ($current_time < $end_time) {
         $time_str = $current_time->format('H:i');
-        if (!in_array($time_str, $booked_times)) {
-            $available_slots[] = [
-                'time' => $time_str,
-                'display' => $current_time->format('g:i A')
-            ];
-        }
+        $available_slots[] = [
+            'time' => $time_str,
+            'display' => $current_time->format('g:i A')
+        ];
         $current_time->add($interval);
     }
     

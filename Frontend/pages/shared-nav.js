@@ -1,5 +1,7 @@
 // Shared navigation functionality
 (function() {
+  const apiBase = '../../Backend/api/auth.php';
+
   // Mobile menu toggle
   function initMobileMenu() {
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
@@ -29,12 +31,32 @@
     });
   }
 
+  // Handle sign out functionality
+  function initSignOut() {
+    const signoutBtn = document.getElementById('signoutBtn');
+    if (signoutBtn) {
+      // Remove any existing event listeners to avoid duplicates
+      signoutBtn.replaceWith(signoutBtn.cloneNode(true));
+      const newSignoutBtn = document.getElementById('signoutBtn');
+      
+      newSignoutBtn.addEventListener('click', async function() {
+        try {
+          await fetch(apiBase + '?action=signout', { method: 'POST', credentials: 'include' });
+        } catch (e) {
+          console.error('Signout error:', e);
+        }
+        window.location.href = './index.html';
+      });
+    }
+  }
+
   // Initialize navigation when DOM is loaded
   document.addEventListener('DOMContentLoaded', () => {
     // Wait a bit for dynamic content to load
     setTimeout(() => {
       initMobileMenu();
       setActiveNavLink();
+      initSignOut();
     }, 100);
   });
 
@@ -43,6 +65,7 @@
     setTimeout(() => {
       initMobileMenu();
       setActiveNavLink();
+      initSignOut();
     }, 100);
   }
 
