@@ -54,7 +54,7 @@ class SharedAdminAuth {
     async checkAuth() {
         try {
             console.log('Checking authentication...');
-            const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=me', {
+            const response = await fetch('../../../Backend/api/auth.php?action=me', {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
             });
@@ -115,7 +115,7 @@ class SharedAdminAuth {
 
     async logout() {
         try {
-            await fetch('/doctor-appoinment/Backend/api/auth.php?action=signout', {
+            await fetch('../../../Backend/api/auth.php?action=signout', {
                 method: 'POST',
                 credentials: 'include'
             });

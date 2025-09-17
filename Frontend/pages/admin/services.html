@@ -111,6 +111,70 @@
                 </button>
             </div>
 
+            <!-- Search Component -->
+            <div id="searchContainer" class="mb-6">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex flex-col md:flex-row gap-4 items-center">
+                        <!-- Search Input -->
+                        <div class="flex-1 relative">
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="pageSearchInput" 
+                                    placeholder="Search services by name, description, or price..." 
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    autocomplete="off"
+                                >
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <button 
+                                    id="clearPageSearchBtn" 
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 hidden"
+                                >
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Button -->
+                        <button 
+                            id="pageSearchBtn" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+                        >
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Search
+                        </button>
+                    </div>
+                    
+                    <!-- Search Results Summary -->
+                    <div id="pageSearchResultsSummary" class="mt-4 hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-600">
+                                <span id="pageSearchResultsCount">0</span> results found for "<span id="pageSearchQueryText"></span>"
+                            </div>
+                            <button 
+                                id="clearAllPageSearchBtn" 
+                                class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                                Clear Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results Container -->
+            <div id="pageSearchResults" class="hidden mb-6">
+                <!-- Search results will be displayed here -->
+            </div>
+
             <!-- Services List -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="overflow-x-auto">
@@ -178,6 +242,8 @@
 
     <script src="../../public/js/script.js"></script>
     <script src="./js/shared-auth.js"></script>
+    <script src="./js/search.js"></script>
+    <script src="./js/page-search.js"></script>
     <script>
         // Service management functionality
         let services = [];
@@ -346,6 +412,6 @@
     </script>
     <script src="../../public/js/script.js"></script>
     <script src="./js/shared-auth.js"></script>
-    <script src="./js/admin.js"></script>
+    <script src="./js/search.js"></script>    <script src="./js/admin.js"></script>
 </body>
 </html>
