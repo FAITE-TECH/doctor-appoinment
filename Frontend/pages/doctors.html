@@ -57,6 +57,27 @@
     <!-- Filter -->
     <section id="doctors">
       <div class="text-center my-6 sm:my-10 container mx-auto max-w-6xl px-4">
+        <!-- Search Bar -->
+        <div class="mb-6 sm:mb-8">
+          <div class="relative max-w-md mx-auto">
+            <input
+              type="text"
+              id="doctorSearch"
+              placeholder="Search doctors by name, email, phone, or specialization..."
+              class="w-full px-4 py-3 pl-12 pr-4 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+              <i class="fas fa-search text-gray-400"></i>
+            </div>
+            <button
+              id="clearSearch"
+              class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 hidden"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
         <!-- Filter Buttons -->
         <div
           id="doctorFilter"
@@ -89,11 +110,18 @@
       let doctors = [];
       let availableDepartments = new Set();
       let doctorContainer;
+      let currentSearchTerm = '';
+      let currentFilter = 'All';
 
       // Fetch doctors from API
-      async function fetchDoctors() {
+      async function fetchDoctors(searchTerm = '') {
         try {
-          const response = await fetch('../../Backend/api/doctors.php?action=doctors');
+          let url = '../../Backend/api/doctors.php?action=doctors';
+          if (searchTerm) {
+            url += '&search=' + encodeURIComponent(searchTerm);
+          }
+          
+          const response = await fetch(url);
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -110,7 +138,8 @@
             // Update filter buttons dynamically
             updateFilterButtons();
             
-            renderDoctors(doctors);
+            // Apply current filter to the fetched doctors
+            applyCurrentFilter();
           } else {
             console.error('Failed to fetch doctors:', data.message);
             // Fallback to empty state
@@ -201,9 +230,58 @@
         attachFilterListeners();
       }
 
+      // Apply current filter to doctors
+      function applyCurrentFilter() {
+        let filteredDoctors = doctors;
+        
+        // Apply department filter if not "All"
+        if (currentFilter !== 'All') {
+          filteredDoctors = doctors.filter((d) => 
+            d.department_name && d.department_name === currentFilter
+          );
+        }
+        
+        renderDoctors(filteredDoctors);
+      }
+
+      // Handle search functionality
+      function setupSearchFunctionality() {
+        const searchInput = document.getElementById('doctorSearch');
+        const clearButton = document.getElementById('clearSearch');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', (e) => {
+          const searchTerm = e.target.value.trim();
+          currentSearchTerm = searchTerm;
+          
+          // Show/hide clear button
+          if (searchTerm) {
+            clearButton.classList.remove('hidden');
+          } else {
+            clearButton.classList.add('hidden');
+          }
+          
+          // Debounce search to avoid too many API calls
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            fetchDoctors(searchTerm);
+          }, 300);
+        });
+
+        clearButton.addEventListener('click', () => {
+          searchInput.value = '';
+          currentSearchTerm = '';
+          clearButton.classList.add('hidden');
+          fetchDoctors('');
+        });
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         doctorContainer = document.getElementById("doctorContainer");
         const filterButtons = document.querySelectorAll(".filter-btn");
+
+        // Setup search functionality
+        setupSearchFunctionality();
 
         // Fetch and render doctors
         fetchDoctors();
@@ -216,6 +294,7 @@
         filterButtons.forEach((btn) => {
           btn.addEventListener("click", () => {
             const filter = btn.dataset.filter;
+            currentFilter = filter;
 
             // Update visual state
             filterButtons.forEach((b) =>
@@ -223,15 +302,8 @@
             );
             btn.querySelector(".underline").classList.remove("hidden");
 
-            // Filter doctors
-            if (filter === "All") {
-              renderDoctors(doctors);
-            } else {
-              const filteredDoctors = doctors.filter((d) => 
-                d.department_name && d.department_name === filter
-              );
-              renderDoctors(filteredDoctors);
-            }
+            // Apply the filter to current doctors
+            applyCurrentFilter();
           });
         });
       }

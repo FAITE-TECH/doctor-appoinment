@@ -15,11 +15,32 @@ if ($action === 'doctors') {
 
     // ---------------- LIST DOCTORS ----------------
     if ($method === 'GET') {
-        $sql = "SELECT d.*, dept.name as department_name 
-                FROM doctors d 
-                LEFT JOIN departments dept ON d.department_id = dept.id 
-                ORDER BY d.id DESC";
-        $result = $conn->query($sql);
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        
+        if (!empty($search)) {
+            // Search functionality - filter by name, email, phone, or specialization
+            $searchTerm = '%' . $search . '%';
+            $sql = "SELECT d.*, dept.name as department_name 
+                    FROM doctors d 
+                    LEFT JOIN departments dept ON d.department_id = dept.id 
+                    WHERE d.name LIKE ? 
+                       OR d.email LIKE ? 
+                       OR d.phone LIKE ? 
+                       OR d.specialization LIKE ?
+                    ORDER BY d.id DESC";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssss", $searchTerm, $searchTerm, $searchTerm, $searchTerm);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            // No search - return all doctors
+            $sql = "SELECT d.*, dept.name as department_name 
+                    FROM doctors d 
+                    LEFT JOIN departments dept ON d.department_id = dept.id 
+                    ORDER BY d.id DESC";
+            $result = $conn->query($sql);
+        }
+        
         $doctors = [];
         while ($row = $result->fetch_assoc()) {
             $doctors[] = $row;

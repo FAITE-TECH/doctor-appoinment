@@ -8,65 +8,6 @@
     <link rel="stylesheet" href="../../public/css/styles.css">
     <script src="/shared/admin-nav.js"></script>
     <style>
-        .search-result-item {
-            @apply border border-gray-200 rounded-lg p-4 mb-4 hover:shadow-md transition-shadow duration-200;
-        }
-
-        .search-result-item:hover {
-            @apply border-blue-300;
-        }
-
-        .search-result-type {
-            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-        }
-
-        .search-result-type.user {
-            @apply bg-blue-100 text-blue-800;
-        }
-
-        .search-result-type.doctor {
-            @apply bg-green-100 text-green-800;
-        }
-
-        .search-result-type.department {
-            @apply bg-purple-100 text-purple-800;
-        }
-
-        .search-result-type.appointment {
-            @apply bg-yellow-100 text-yellow-800;
-        }
-
-        .search-result-type.event {
-            @apply bg-indigo-100 text-indigo-800;
-        }
-
-        .search-result-type.service {
-            @apply bg-pink-100 text-pink-800;
-        }
-
-        .search-result-type.gallery {
-            @apply bg-gray-100 text-gray-800;
-        }
-
-        .search-result-type.message {
-            @apply bg-red-100 text-red-800;
-        }
-
-        .search-result-type.schedule {
-            @apply bg-orange-100 text-orange-800;
-        }
-
-        .search-highlight {
-            @apply bg-yellow-200 font-semibold;
-        }
-
-        .suggestion-item {
-            @apply px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0;
-        }
-
-        .suggestion-item:hover {
-            @apply bg-blue-50;
-        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -176,68 +117,29 @@
                 </div>
             </div>
 
-            <!-- Page-Specific Search Component -->
+            <!-- Search Bar -->
             <div class="mb-6">
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <div class="flex flex-col md:flex-row gap-4 items-center">
-                        <!-- Search Input -->
-                        <div class="flex-1 relative">
-                            <div class="relative">
-                                <input 
-                                    type="text" 
-                                    id="pageSearchInput" 
-                                    placeholder="Search users by name, email, or role..." 
-                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    autocomplete="off"
-                                >
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                                <button 
-                                    id="clearPageSearchBtn" 
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 hidden"
-                                >
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Search Button -->
-                        <button 
-                            id="pageSearchBtn" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            Search
-                        </button>
+                <div class="relative max-w-md">
+                    <input
+                        type="text"
+                        id="userSearch"
+                        placeholder="Search users by name, email, or role..."
+                        class="w-full px-4 py-2 pl-10 pr-10 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
                     </div>
-                    
-                    <!-- Search Results Summary -->
-                    <div id="pageSearchResultsSummary" class="mt-4 hidden">
-                        <div class="flex items-center justify-between">
-                            <div class="text-sm text-gray-600">
-                                <span id="pageSearchResultsCount">0</span> results found for "<span id="pageSearchQueryText"></span>"
-                            </div>
-                            <button 
-                                id="clearAllPageSearchBtn" 
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
-                                Clear Search
-                            </button>
-                        </div>
-                    </div>
+                    <button
+                        id="clearUserSearch"
+                        class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 hidden"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
-            </div>
-
-            <!-- Search Results Container -->
-            <div id="pageSearchResults" class="hidden mb-6">
-                <!-- Search results will be displayed here -->
             </div>
 
             <!-- Users Table -->
@@ -299,13 +201,14 @@
 
     <script src="../../public/js/script.js"></script>
     <script src="./js/shared-auth.js"></script>
-    <script src="./js/page-search.js"></script>
     <script>
         // Users management functionality
         let users = [];
+        let currentSearchTerm = '';
+        let searchTimeout = null;
 
         // Load users from API
-        async function loadUsers() {
+        async function loadUsers(searchTerm = '') {
             try {
                 // Check if user is authenticated
                 if (typeof sharedAuth !== 'undefined' && !sharedAuth.canAccess()) {
@@ -313,7 +216,12 @@
                     return;
                 }
 
-                const response = await fetch('../../../Backend/api/users.php', {
+                let url = '../../../Backend/api/users.php';
+                if (searchTerm) {
+                    url += '?search=' + encodeURIComponent(searchTerm);
+                }
+
+                const response = await fetch(url, {
                     credentials: 'include'
                 });
                 
@@ -439,8 +347,50 @@
             usersTable.classList.remove('hidden');
         }
 
+        // Setup search functionality
+        function setupSearchFunctionality() {
+            const searchInput = document.getElementById('userSearch');
+            const clearButton = document.getElementById('clearUserSearch');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.trim();
+                    currentSearchTerm = searchTerm;
+                    
+                    // Show/hide clear button
+                    if (clearButton) {
+                        if (searchTerm) {
+                            clearButton.classList.remove('hidden');
+                        } else {
+                            clearButton.classList.add('hidden');
+                        }
+                    }
+                    
+                    // Debounce search to avoid too many API calls
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        loadUsers(searchTerm);
+                    }, 300);
+                });
+            }
+
+            if (clearButton) {
+                clearButton.addEventListener('click', () => {
+                    if (searchInput) {
+                        searchInput.value = '';
+                        currentSearchTerm = '';
+                        clearButton.classList.add('hidden');
+                        loadUsers('');
+                    }
+                });
+            }
+        }
+
         // Load users on page load
-        document.addEventListener('DOMContentLoaded', loadUsers);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            setupSearchFunctionality();
+        });
     </script>
     <script src="../../public/js/script.js"></script>
     <script src="./js/shared-auth.js"></script>

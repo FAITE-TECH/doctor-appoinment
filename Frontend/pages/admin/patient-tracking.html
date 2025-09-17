@@ -125,31 +125,31 @@
             </div>
         </div>
 
-        <!-- Search and Filters -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Search Patients</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
-                    <input type="text" id="patientSearch" placeholder="Patient name or email" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <div class="relative max-w-md">
+                <input
+                    type="text"
+                    id="patientSearch"
+                    placeholder="Search patients by name, email, or ID..."
+                    class="w-full px-4 py-2 pl-10 pr-10 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Doctor</label>
-                    <select id="doctorFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">All Doctors</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-                    <input type="date" id="dateFrom" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                <div class="flex items-end">
-                    <button id="searchPatients" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                        Search
-                    </button>
-                </div>
+                <button
+                    id="clearPatientSearch"
+                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 hidden"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
             </div>
         </div>
+
 
         <!-- Patient Statistics -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -257,21 +257,17 @@
     <script>
         let patientsData = [];
         let currentFilters = {};
+        let currentSearchTerm = '';
+        let searchTimeout = null;
 
         // Load data on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadDoctors();
             loadPatients();
             setupEventListeners();
+            setupSearchFunctionality();
         });
 
         function setupEventListeners() {
-            // Search and filter controls
-            document.getElementById('searchPatients').addEventListener('click', searchPatients);
-            document.getElementById('patientSearch').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') searchPatients();
-            });
-
             // Refresh button
             document.getElementById('refreshBtn').addEventListener('click', loadPatients);
 
@@ -284,30 +280,54 @@
             });
         }
 
-        async function loadDoctors() {
-            try {
-                const response = await fetch('/doctor-appoinment/Backend/api/doctors.php?action=doctors');
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    const doctorSelect = document.getElementById('doctorFilter');
-                    doctorSelect.innerHTML = '<option value="">All Doctors</option>';
+        // Setup search functionality
+        function setupSearchFunctionality() {
+            const searchInput = document.getElementById('patientSearch');
+            const clearButton = document.getElementById('clearPatientSearch');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.trim();
+                    currentSearchTerm = searchTerm;
                     
-                    data.data.forEach(doctor => {
-                        const option = document.createElement('option');
-                        option.value = doctor.id;
-                        option.textContent = doctor.name;
-                        doctorSelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading doctors:', error);
+                    // Show/hide clear button
+                    if (clearButton) {
+                        if (searchTerm) {
+                            clearButton.classList.remove('hidden');
+                        } else {
+                            clearButton.classList.add('hidden');
+                        }
+                    }
+                    
+                    // Debounce search to avoid too many API calls
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        loadPatients(searchTerm);
+                    }, 300);
+                });
+            }
+
+            if (clearButton) {
+                clearButton.addEventListener('click', () => {
+                    if (searchInput) {
+                        searchInput.value = '';
+                        currentSearchTerm = '';
+                        clearButton.classList.add('hidden');
+                        loadPatients('');
+                    }
+                });
             }
         }
 
-        async function loadPatients() {
+
+        async function loadPatients(searchTerm = '') {
             try {
-                const response = await fetch('/doctor-appoinment/Backend/api/appointments.php?action=list&limit=1000');
+                let url = '/doctor-appoinment/Backend/api/appointments.php?action=list&limit=1000';
+                if (searchTerm) {
+                    url += '&search=' + encodeURIComponent(searchTerm);
+                }
+                
+                const response = await fetch(url);
                 const data = await response.json();
                 
                 if (data.appointments) {
@@ -362,22 +382,23 @@
             patientsData = Array.from(patientMap.values());
         }
 
-        function renderPatients() {
+
+        function renderPatients(patientsToRender = patientsData) {
             const tbody = document.getElementById('patientsTableBody');
             tbody.innerHTML = '';
 
-            if (patientsData.length === 0) {
+            if (patientsToRender.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                            No patients found
+                            ${currentSearchTerm ? 'No patients found matching your search' : 'No patients found'}
                         </td>
                     </tr>
                 `;
                 return;
             }
 
-            patientsData.forEach(patient => {
+            patientsToRender.forEach(patient => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50';
                 
@@ -448,38 +469,6 @@
             document.getElementById('completedAppointments').textContent = stats.completedAppointments;
         }
 
-        function searchPatients() {
-            const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
-            const doctorFilter = document.getElementById('doctorFilter').value;
-            const dateFrom = document.getElementById('dateFrom').value;
-
-            let filteredPatients = patientsData;
-
-            if (searchTerm) {
-                filteredPatients = filteredPatients.filter(patient => 
-                    patient.name.toLowerCase().includes(searchTerm) ||
-                    patient.email.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            if (doctorFilter) {
-                filteredPatients = filteredPatients.filter(patient =>
-                    patient.appointments.some(apt => apt.doctor_id == doctorFilter)
-                );
-            }
-
-            if (dateFrom) {
-                filteredPatients = filteredPatients.filter(patient =>
-                    patient.appointments.some(apt => apt.appointment_date >= dateFrom)
-                );
-            }
-
-            // Temporarily replace patientsData with filtered results
-            const originalData = patientsData;
-            patientsData = filteredPatients;
-            renderPatients();
-            patientsData = originalData;
-        }
 
         function viewPatientDetails(patientId) {
             const patient = patientsData.find(p => p.id === patientId);
@@ -599,6 +588,6 @@
 </div> <!-- Close flex container -->
     <script src="../../public/js/script.js"></script>
     <script src="./js/shared-auth.js"></script>
-    <script src="./js/search.js"></script>    <script src="./js/admin.js"></script>
+    <script src="./js/admin.js"></script>
 </body>
 </html>

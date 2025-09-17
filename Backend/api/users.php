@@ -18,11 +18,29 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     json_response(['error' => 'Forbidden: Admins only'], 403);
 }
 
-$sql = "SELECT u.id, u.name, u.email, u.created_at, r.role_name 
-        FROM users u 
-        JOIN roles r ON u.role_id = r.id 
-        ORDER BY u.created_at DESC";
-$result = $conn->query($sql);
+// Get search parameter
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+if (!empty($search)) {
+    // Search in name, email, and role
+    $searchTerm = '%' . $search . '%';
+    $sql = "SELECT u.id, u.name, u.email, u.created_at, r.role_name 
+            FROM users u 
+            JOIN roles r ON u.role_id = r.id 
+            WHERE u.name LIKE ? OR u.email LIKE ? OR r.role_name LIKE ?
+            ORDER BY u.created_at DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    // Get all users
+    $sql = "SELECT u.id, u.name, u.email, u.created_at, r.role_name 
+            FROM users u 
+            JOIN roles r ON u.role_id = r.id 
+            ORDER BY u.created_at DESC";
+    $result = $conn->query($sql);
+}
 
 if (!$result) {
     json_response(['error' => 'Database error: ' . $conn->error], 500);

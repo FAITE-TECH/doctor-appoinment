@@ -14,8 +14,19 @@ $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 // Public endpoints (no authentication required)
 if ($method === 'GET' && $action === 'public') {
-    // Get all departments for public use
-    $stmt = $conn->prepare('SELECT * FROM departments ORDER BY created_at DESC');
+    // Get all departments for public use with optional search
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+    
+    if (!empty($search)) {
+        // Search in name and description
+        $searchTerm = '%' . $search . '%';
+        $stmt = $conn->prepare('SELECT * FROM departments WHERE name LIKE ? OR description LIKE ? ORDER BY created_at DESC');
+        $stmt->bind_param("ss", $searchTerm, $searchTerm);
+    } else {
+        // Get all departments
+        $stmt = $conn->prepare('SELECT * FROM departments ORDER BY created_at DESC');
+    }
+    
     $stmt->execute();
     $result = $stmt->get_result();
     $departments = [];
@@ -50,8 +61,19 @@ switch ($method) {
                 json_response(['error' => 'Department not found'], 404);
             }
         } else {
-            // Get all departments
-            $stmt = $conn->prepare('SELECT * FROM departments ORDER BY created_at DESC');
+            // Get all departments with optional search
+            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+            
+            if (!empty($search)) {
+                // Search in name and description
+                $searchTerm = '%' . $search . '%';
+                $stmt = $conn->prepare('SELECT * FROM departments WHERE name LIKE ? OR description LIKE ? ORDER BY created_at DESC');
+                $stmt->bind_param("ss", $searchTerm, $searchTerm);
+            } else {
+                // Get all departments
+                $stmt = $conn->prepare('SELECT * FROM departments ORDER BY created_at DESC');
+            }
+            
             $stmt->execute();
             $result = $stmt->get_result();
             $departments = [];

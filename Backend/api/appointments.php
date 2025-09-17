@@ -178,6 +178,7 @@ switch ($method) {
             $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
             $doctor_filter = isset($_GET['doctor_id']) ? intval($_GET['doctor_id']) : 0;
             $date_filter = isset($_GET['date']) ? $_GET['date'] : '';
+            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
             
             $where_conditions = [];
             $params = [];
@@ -201,6 +202,16 @@ switch ($method) {
                 $param_types .= 's';
             }
             
+            if ($search) {
+                $searchTerm = '%' . $search . '%';
+                $where_conditions[] = "(u.name LIKE ? OR u.email LIKE ? OR d.name LIKE ? OR d.specialization LIKE ?)";
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $param_types .= 'ssss';
+            }
+            
             $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
             
             $sql = "SELECT a.*, u.name as patient_name, u.email as patient_email, d.name as doctor_name, d.specialization, dept.name as department_name
@@ -212,6 +223,7 @@ switch ($method) {
                     ORDER BY a.appointment_date DESC, a.appointment_time DESC
                     LIMIT ? OFFSET ?";
             
+            // Add limit and offset parameters
             $params[] = $limit;
             $params[] = $offset;
             $param_types .= 'ii';
@@ -229,11 +241,38 @@ switch ($method) {
             $stmt->close();
             
             // Get total count for pagination
-            $count_sql = "SELECT COUNT(*) as total FROM appointments a $where_clause";
+            $count_sql = "SELECT COUNT(*) as total FROM appointments a
+                         JOIN users u ON a.user_id = u.id
+                         JOIN doctors d ON a.doctor_id = d.id
+                         LEFT JOIN departments dept ON d.department_id = dept.id
+                         $where_clause";
             $count_stmt = $conn->prepare($count_sql);
             if (!empty($where_conditions)) {
-                $count_params = array_slice($params, 0, -2); // Remove limit and offset
-                $count_param_types = substr($param_types, 0, -2);
+                // Create separate parameters for count query (without limit/offset)
+                $count_params = [];
+                $count_param_types = '';
+                
+                if ($status_filter) {
+                    $count_params[] = $status_filter;
+                    $count_param_types .= 's';
+                }
+                if ($doctor_filter) {
+                    $count_params[] = $doctor_filter;
+                    $count_param_types .= 'i';
+                }
+                if ($date_filter) {
+                    $count_params[] = $date_filter;
+                    $count_param_types .= 's';
+                }
+                if ($search) {
+                    $searchTerm = '%' . $search . '%';
+                    $count_params[] = $searchTerm;
+                    $count_params[] = $searchTerm;
+                    $count_params[] = $searchTerm;
+                    $count_params[] = $searchTerm;
+                    $count_param_types .= 'ssss';
+                }
+                
                 $count_stmt->bind_param($count_param_types, ...$count_params);
             }
             $count_stmt->execute();

@@ -1,9 +1,14 @@
 // Fetch doctors data from API
 let doctors = [];
 
-async function fetchDoctorsData() {
+async function fetchDoctorsData(searchTerm = '') {
   try {
-    const response = await fetch('../../Backend/api/doctors.php?action=doctors');
+    let url = '../../Backend/api/doctors.php?action=doctors';
+    if (searchTerm) {
+      url += '&search=' + encodeURIComponent(searchTerm);
+    }
+    
+    const response = await fetch(url);
     const data = await response.json();
     
     if (data.status === 'success') {

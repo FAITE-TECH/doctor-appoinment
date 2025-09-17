@@ -14,8 +14,19 @@ $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 // Public endpoints (no authentication required)
 if ($method === 'GET' && $action === 'public') {
-    // Get all events for public use
-    $stmt = $conn->prepare('SELECT * FROM events ORDER BY event_date DESC, event_time ASC');
+    // Get all events for public use with optional search
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+    
+    if (!empty($search)) {
+        // Search in title, description, location, and date
+        $searchTerm = '%' . $search . '%';
+        $stmt = $conn->prepare('SELECT * FROM events WHERE title LIKE ? OR description LIKE ? OR location LIKE ? OR event_date LIKE ? ORDER BY event_date DESC, event_time ASC');
+        $stmt->bind_param("ssss", $searchTerm, $searchTerm, $searchTerm, $searchTerm);
+    } else {
+        // Get all events
+        $stmt = $conn->prepare('SELECT * FROM events ORDER BY event_date DESC, event_time ASC');
+    }
+    
     $stmt->execute();
     $result = $stmt->get_result();
     $events = [];
@@ -50,8 +61,19 @@ switch ($method) {
                 json_response(['error' => 'Event not found'], 404);
             }
         } else {
-            // Get all events
-            $stmt = $conn->prepare('SELECT * FROM events ORDER BY event_date DESC, event_time ASC');
+            // Get all events with optional search
+            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+            
+            if (!empty($search)) {
+                // Search in title, description, location, and date
+                $searchTerm = '%' . $search . '%';
+                $stmt = $conn->prepare('SELECT * FROM events WHERE title LIKE ? OR description LIKE ? OR location LIKE ? OR event_date LIKE ? ORDER BY event_date DESC, event_time ASC');
+                $stmt->bind_param("ssss", $searchTerm, $searchTerm, $searchTerm, $searchTerm);
+            } else {
+                // Get all events
+                $stmt = $conn->prepare('SELECT * FROM events ORDER BY event_date DESC, event_time ASC');
+            }
+            
             $stmt->execute();
             $result = $stmt->get_result();
             $events = [];

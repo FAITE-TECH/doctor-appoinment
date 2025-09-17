@@ -14,8 +14,19 @@ $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 // Public endpoints (no authentication required)
 if ($method === 'GET' && $action === 'public') {
-    // Get all services for public use
-    $stmt = $conn->prepare('SELECT * FROM services ORDER BY created_at DESC');
+    // Get all services for public use with optional search
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+    
+    if (!empty($search)) {
+        // Search in name, description, and price
+        $searchTerm = '%' . $search . '%';
+        $stmt = $conn->prepare('SELECT * FROM services WHERE name LIKE ? OR description LIKE ? OR CAST(price AS CHAR) LIKE ? ORDER BY created_at DESC');
+        $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+    } else {
+        // Get all services
+        $stmt = $conn->prepare('SELECT * FROM services ORDER BY created_at DESC');
+    }
+    
     $stmt->execute();
     $result = $stmt->get_result();
     $services = [];
@@ -50,8 +61,19 @@ switch ($method) {
                 json_response(['error' => 'Service not found'], 404);
             }
         } else {
-            // Get all services
-            $stmt = $conn->prepare('SELECT * FROM services ORDER BY created_at DESC');
+            // Get all services with optional search
+            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+            
+            if (!empty($search)) {
+                // Search in name, description, and price
+                $searchTerm = '%' . $search . '%';
+                $stmt = $conn->prepare('SELECT * FROM services WHERE name LIKE ? OR description LIKE ? OR CAST(price AS CHAR) LIKE ? ORDER BY created_at DESC');
+                $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+            } else {
+                // Get all services
+                $stmt = $conn->prepare('SELECT * FROM services ORDER BY created_at DESC');
+            }
+            
             $stmt->execute();
             $result = $stmt->get_result();
             $services = [];

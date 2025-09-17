@@ -140,10 +140,30 @@ function getTableData($table, $orderBy = 'id') {
     }
     
     try {
-        $sql = "SELECT * FROM $table ORDER BY $orderBy";
-        $stmt = $GLOBALS['conn']->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        
+        if (!empty($search) && $table === 'doctors') {
+            // Special search handling for doctors table
+            $searchTerm = '%' . $search . '%';
+            $sql = "SELECT d.*, dept.name as department_name 
+                    FROM doctors d 
+                    LEFT JOIN departments dept ON d.department_id = dept.id 
+                    WHERE d.name LIKE ? 
+                       OR d.email LIKE ? 
+                       OR d.phone LIKE ? 
+                       OR d.specialization LIKE ?
+                    ORDER BY d.$orderBy DESC";
+            $stmt = $GLOBALS['conn']->prepare($sql);
+            $stmt->bind_param("ssss", $searchTerm, $searchTerm, $searchTerm, $searchTerm);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            // Default query for other tables or no search
+            $sql = "SELECT * FROM $table ORDER BY $orderBy";
+            $stmt = $GLOBALS['conn']->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        }
         
         $rows = [];
         while ($row = $result->fetch_assoc()) {
