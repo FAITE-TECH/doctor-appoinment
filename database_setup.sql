@@ -2,6 +2,12 @@
 -- Complete Database Setup - Consolidated Version
 -- Includes all tables, sample data, and doctor schedule management system
 -- This file replaces both database_setup.sql and schedule_database_update.sql
+--
+-- UPDATED: Enhanced with robust schedule management system
+-- - Added doctor_schedules table for time slot management
+-- - Enhanced appointments table with schedule_id foreign key
+-- - Added comprehensive indexes for better performance
+-- - Made all operations idempotent (safe to run multiple times)
 
 -- Create database
 CREATE DATABASE IF NOT EXISTS doctor;
@@ -211,25 +217,81 @@ CREATE INDEX idx_schedule_availability ON doctor_schedules(schedule_date, is_ava
 
 -- Update appointments table to link with doctor_schedules
 -- Add a new column to track which schedule slot the appointment uses
-ALTER TABLE appointments 
-ADD COLUMN schedule_id INT NULL,
-ADD FOREIGN KEY (schedule_id) REFERENCES doctor_schedules(id) ON DELETE SET NULL;
+-- Check if schedule_id column exists before adding it
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'appointments' 
+     AND COLUMN_NAME = 'schedule_id') = 0,
+    'ALTER TABLE appointments ADD COLUMN schedule_id INT NULL',
+    'SELECT "Column schedule_id already exists" as message'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
--- Add indexes for better performance
-CREATE INDEX idx_appointment_schedule ON appointments(schedule_id);
-CREATE INDEX idx_appointment_doctor_date ON appointments(doctor_id, appointment_date);
-CREATE INDEX idx_appointment_user_date ON appointments(user_id, appointment_date);
-CREATE INDEX idx_appointment_status ON appointments(status);
-CREATE INDEX idx_contact_messages_status ON contact_messages(status);
-CREATE INDEX idx_contact_messages_user ON contact_messages(user_id);
-CREATE INDEX idx_doctors_department ON doctors(department_id);
-CREATE INDEX idx_doctors_specialization ON doctors(specialization);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role_id);
+-- Add foreign key constraint if it doesn't exist
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'appointments' 
+     AND COLUMN_NAME = 'schedule_id' 
+     AND REFERENCED_TABLE_NAME = 'doctor_schedules') = 0,
+    'ALTER TABLE appointments ADD FOREIGN KEY (schedule_id) REFERENCES doctor_schedules(id) ON DELETE SET NULL',
+    'SELECT "Foreign key constraint already exists" as message'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Add indexes for better performance (with IF NOT EXISTS check)
+-- Note: MySQL doesn't support IF NOT EXISTS for indexes, so we'll use a different approach
+-- Create indexes only if they don't exist
+
+-- Function to create index if it doesn't exist
+DELIMITER $$
+CREATE PROCEDURE CreateIndexIfNotExists(
+    IN table_name VARCHAR(128),
+    IN index_name VARCHAR(128),
+    IN index_columns VARCHAR(512)
+)
+BEGIN
+    DECLARE index_count INT DEFAULT 0;
+    
+    SELECT COUNT(*) INTO index_count
+    FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = table_name
+    AND INDEX_NAME = index_name;
+    
+    IF index_count = 0 THEN
+        SET @sql = CONCAT('CREATE INDEX ', index_name, ' ON ', table_name, '(', index_columns, ')');
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+DELIMITER ;
+
+-- Create indexes using the procedure
+CALL CreateIndexIfNotExists('appointments', 'idx_appointment_schedule', 'schedule_id');
+CALL CreateIndexIfNotExists('appointments', 'idx_appointment_doctor_date', 'doctor_id, appointment_date');
+CALL CreateIndexIfNotExists('appointments', 'idx_appointment_user_date', 'user_id, appointment_date');
+CALL CreateIndexIfNotExists('appointments', 'idx_appointment_status', 'status');
+CALL CreateIndexIfNotExists('contact_messages', 'idx_contact_messages_status', 'status');
+CALL CreateIndexIfNotExists('contact_messages', 'idx_contact_messages_user', 'user_id');
+CALL CreateIndexIfNotExists('doctors', 'idx_doctors_department', 'department_id');
+CALL CreateIndexIfNotExists('doctors', 'idx_doctors_specialization', 'specialization');
+CALL CreateIndexIfNotExists('users', 'idx_users_email', 'email');
+CALL CreateIndexIfNotExists('users', 'idx_users_role', 'role_id');
+
+-- Drop the procedure after use
+DROP PROCEDURE IF EXISTS CreateIndexIfNotExists;
 
 -- Insert sample schedule data for testing (using existing doctor IDs)
 -- Sample schedules for the next 7 days starting from today
-INSERT INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is_available, max_appointments) VALUES
+-- Only insert if no schedules exist yet
+INSERT IGNORE INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is_available, max_appointments) VALUES
 -- Sample schedules for Doctor ID 6 (Dr. Michael Brown - Orthopedics)
 (6, CURDATE(), '09:00:00', '10:00:00', TRUE, 1),
 (6, CURDATE(), '10:00:00', '11:00:00', TRUE, 1),

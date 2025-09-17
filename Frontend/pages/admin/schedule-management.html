@@ -63,6 +63,31 @@
             @apply bg-blue-200; 
         }
 
+        /* Enhanced time slot styling */
+        .time-slot-card {
+            @apply bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200;
+        }
+
+        .time-slot-card:hover {
+            @apply border-blue-300;
+        }
+
+        .time-slot-actions {
+            @apply flex gap-2;
+        }
+
+        .time-slot-action-btn {
+            @apply px-3 py-1 rounded transition-colors duration-200;
+        }
+
+        .time-slot-edit-btn {
+            @apply text-blue-600 hover:text-blue-800 hover:bg-blue-50;
+        }
+
+        .time-slot-delete-btn {
+            @apply text-red-600 hover:text-red-800 hover:bg-red-50;
+        }
+
         /* Loading spinner animation */
         @keyframes spin {
             from { transform: rotate(0deg); }
@@ -336,35 +361,72 @@
             <!-- Time Slots Management Modal -->
             <div id="timeSlotsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full">
                     <div class="px-6 py-4 border-b border-gray-200">
                             <h3 class="text-lg font-semibold text-gray-800" id="modalTitle">Manage Time Slots</h3>
                     </div>
                     <div class="p-6">
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Add New Time Slot</label>
-                                <div class="flex gap-2">
-                                    <input type="time" id="startTime" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <span class="flex items-center text-gray-500">to</span>
-                                    <input type="time" id="endTime" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <button id="addTimeSlot" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                                        <i class="fas fa-plus"></i>
-                            </button>
-                            </div>
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Add New Time Slot</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Start Time</label>
+                                        <input type="time" id="startTime" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">End Time</label>
+                                        <input type="time" id="endTime" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                    </div>
+                                    <div>
+                                        <button id="addTimeSlot" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center justify-center gap-2">
+                                            <i class="fas fa-plus"></i>
+                                            Add Slot
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Existing Time Slots</label>
-                                <div id="timeSlotsList" class="space-y-2 max-h-40 overflow-y-auto">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Existing Time Slots</label>
+                                <div id="timeSlotsList" class="space-y-3 max-h-60 overflow-y-auto">
                                     <!-- Time slots will be listed here -->
                             </div>
                             </div>
 
                             <div class="flex justify-end gap-3">
-                                <button id="closeModal" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                <button id="closeModal" class="px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                                     Close
                                 </button>
                             </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Time Slot Modal -->
+        <div id="editTimeSlotModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800">Edit Time Slot</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                            <input type="time" id="editStartTime" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                            <input type="time" id="editEndTime" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button id="cancelEdit" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                Cancel
+                            </button>
+                            <button id="saveEdit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                                Save Changes
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -464,10 +526,16 @@
             // Modal controls
             document.getElementById('addTimeSlot').addEventListener('click', addTimeSlot);
             document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('saveEdit').addEventListener('click', saveTimeSlotEdit);
+            document.getElementById('cancelEdit').addEventListener('click', cancelTimeSlotEdit);
 
             // Close modal when clicking outside
             document.getElementById('timeSlotsModal').addEventListener('click', function(e) {
                 if (e.target === this) closeModal();
+            });
+            
+            document.getElementById('editTimeSlotModal').addEventListener('click', function(e) {
+                if (e.target === this) cancelTimeSlotEdit();
             });
         }
 
@@ -508,8 +576,8 @@
                             if (daySchedule.slots && Array.isArray(daySchedule.slots)) {
                                 scheduleData[daySchedule.date] = daySchedule.slots.map(slot => ({
                                     id: slot.id,
-                                    start: slot.start_time,
-                                    end: slot.end_time
+                                    start_time: slot.start_time,
+                                    end_time: slot.end_time
                                 }));
                             } else {
                                 scheduleData[daySchedule.date] = [];
@@ -666,20 +734,33 @@
             if (scheduleData[selectedDate]) {
                 scheduleData[selectedDate].forEach((slot, index) => {
                     const slotElement = document.createElement('div');
-                    slotElement.className = 'time-slot';
+                    slotElement.className = 'time-slot-card flex justify-between items-center';
                     slotElement.innerHTML = `
-                        <span>${convertTo12Hour(slot.start)} - ${convertTo12Hour(slot.end)}</span>
-                        <div class="flex gap-1">
-                            <button onclick="editTimeSlot(${index})" class="text-blue-600 hover:text-blue-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <div>
+                                <div class="font-medium text-gray-800">${convertTo12Hour(slot.start_time)} - ${convertTo12Hour(slot.end_time)}</div>
+                                <div class="text-sm text-gray-500">Available</div>
+                            </div>
+                        </div>
+                        <div class="time-slot-actions">
+                            <button onclick="editTimeSlot(${index})" class="time-slot-action-btn time-slot-edit-btn" title="Edit time slot">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button onclick="deleteTimeSlot(${index})" class="text-red-600 hover:text-red-800">
+                            <button onclick="deleteTimeSlot(${index})" class="time-slot-action-btn time-slot-delete-btn" title="Delete time slot">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     `;
                     timeSlotsList.appendChild(slotElement);
                 });
+            } else {
+                timeSlotsList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-calendar-times text-4xl mb-2"></i>
+                        <p>No time slots scheduled for this date</p>
+                    </div>
+                `;
             }
         }
 
@@ -766,68 +847,95 @@
             }
         }
 
-        async function editTimeSlot(index) {
+        let editingSlotIndex = -1;
+        let editingSlotId = null;
+
+        function editTimeSlot(index) {
             const slot = scheduleData[selectedDate][index];
-            const newStartTime = prompt('Enter new start time (HH:MM):', slot.start);
-            const newEndTime = prompt('Enter new end time (HH:MM):', slot.end);
+            editingSlotIndex = index;
+            editingSlotId = slot.id;
             
-            if (newStartTime && newEndTime) {
-                if (newStartTime >= newEndTime) {
-                    showToast('End time must be after start time', 'error');
+            // Set the current values in the edit modal
+            document.getElementById('editStartTime').value = slot.start_time;
+            document.getElementById('editEndTime').value = slot.end_time;
+            
+            // Show the edit modal
+            document.getElementById('editTimeSlotModal').classList.remove('hidden');
+        }
+
+        async function saveTimeSlotEdit() {
+            const newStartTime = document.getElementById('editStartTime').value;
+            const newEndTime = document.getElementById('editEndTime').value;
+            
+            if (!newStartTime || !newEndTime) {
+                showToast('Please select both start and end times', 'error');
+                return;
+            }
+            
+            if (newStartTime >= newEndTime) {
+                showToast('End time must be after start time', 'error');
+                return;
+            }
+            
+            // Check if the selected date is in the past
+            const today = new Date();
+            const selectedDateObj = new Date(selectedDate);
+            today.setHours(0, 0, 0, 0);
+            selectedDateObj.setHours(0, 0, 0, 0);
+            
+            if (selectedDateObj < today) {
+                showToast('Cannot modify schedules for past dates', 'error');
+                return;
+            }
+            
+            // If it's today, check if the time is in the past
+            if (selectedDateObj.getTime() === today.getTime()) {
+                const currentTime = new Date();
+                const currentTimeStr = currentTime.getHours().toString().padStart(2, '0') + ':' + 
+                                     currentTime.getMinutes().toString().padStart(2, '0');
+                
+                if (newStartTime <= currentTimeStr) {
+                    showToast('Cannot modify schedules for past times on the same day', 'error');
                     return;
-                }
-                
-                // Check if the selected date is in the past
-                const today = new Date();
-                const selectedDateObj = new Date(selectedDate);
-                today.setHours(0, 0, 0, 0);
-                selectedDateObj.setHours(0, 0, 0, 0);
-                
-                if (selectedDateObj < today) {
-                    showToast('Cannot modify schedules for past dates', 'error');
-                    return;
-                }
-                
-                // If it's today, check if the time is in the past
-                if (selectedDateObj.getTime() === today.getTime()) {
-                    const currentTime = new Date();
-                    const currentTimeStr = currentTime.getHours().toString().padStart(2, '0') + ':' + 
-                                         currentTime.getMinutes().toString().padStart(2, '0');
-                    
-                    if (newStartTime <= currentTimeStr) {
-                        showToast('Cannot modify schedules for past times on the same day', 'error');
-                        return;
-                    }
-                }
-                
-                try {
-                    const formData = new FormData();
-                    formData.append('action', 'update_schedule');
-                    formData.append('schedule_id', slot.id);
-                    formData.append('start_time', newStartTime);
-                    formData.append('end_time', newEndTime);
-                    
-                    const response = await fetch('/doctor-appoinment/Backend/api/schedules.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.status === 'success') {
-                        // Reload schedule data and refresh UI
-                        await loadScheduleData();
-                        loadTimeSlots();
-                        generateCalendar();
-                        showToast('Time slot updated successfully');
-                    } else {
-                        showToast(data.message || 'Error updating time slot', 'error');
-                    }
-                } catch (error) {
-                    console.error('Error updating time slot:', error);
-                    showToast('Network error updating time slot', 'error');
                 }
             }
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'update_schedule');
+                formData.append('schedule_id', editingSlotId);
+                formData.append('start_time', newStartTime);
+                formData.append('end_time', newEndTime);
+                
+                const response = await fetch('/doctor-appoinment/Backend/api/schedules.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Close the edit modal
+                    document.getElementById('editTimeSlotModal').classList.add('hidden');
+                    
+                    // Reload schedule data and refresh UI
+                    await loadScheduleData();
+                    loadTimeSlots();
+                    generateCalendar();
+                    showToast('Time slot updated successfully');
+                } else {
+                    showToast(data.message || 'Error updating time slot', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating time slot:', error);
+                showToast('Network error updating time slot', 'error');
+            }
+        }
+
+        function cancelTimeSlotEdit() {
+            document.getElementById('editTimeSlotModal').classList.add('hidden');
+            editingSlotIndex = -1;
+            editingSlotId = null;
         }
 
         async function deleteTimeSlot(index) {
@@ -850,13 +958,13 @@
                 const currentTimeStr = currentTime.getHours().toString().padStart(2, '0') + ':' + 
                                      currentTime.getMinutes().toString().padStart(2, '0');
                 
-                if (slot.start <= currentTimeStr) {
+                if (slot.start_time <= currentTimeStr) {
                     showToast('Cannot delete schedules for past times on the same day', 'error');
                     return;
                 }
             }
             
-            if (confirm('Are you sure you want to delete this time slot?')) {
+            if (confirm(`Are you sure you want to delete the time slot ${convertTo12Hour(slot.start_time)} - ${convertTo12Hour(slot.end_time)}?`)) {
                 try {
                     const formData = new FormData();
                     formData.append('action', 'delete_schedule');
