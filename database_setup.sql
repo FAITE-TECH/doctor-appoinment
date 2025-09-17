@@ -1,6 +1,7 @@
 -- Doctor Appointment System with Role-Based Access
--- Updated to match the current admin panel functionality
--- Includes support for image uploads, department linking, and enhanced data structure
+-- Complete Database Setup - Consolidated Version
+-- Includes all tables, sample data, and doctor schedule management system
+-- This file replaces both database_setup.sql and schedule_database_update.sql
 
 -- Create database
 CREATE DATABASE IF NOT EXISTS doctor;
@@ -219,10 +220,9 @@ CREATE INDEX idx_appointment_schedule ON appointments(schedule_id);
 CREATE INDEX idx_appointment_doctor_date ON appointments(doctor_id, appointment_date);
 
 -- Insert sample schedule data for testing (using existing doctor IDs)
--- Get the first few doctors from the database and create sample schedules
--- Note: These dates should be updated to current/future dates for testing
+-- Sample schedules for the next 7 days starting from today
 INSERT INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is_available, max_appointments) VALUES
--- Sample schedules for existing doctors (Doctor ID 6)
+-- Sample schedules for Doctor ID 6 (Dr. Michael Brown - Orthopedics)
 (6, CURDATE(), '09:00:00', '10:00:00', TRUE, 1),
 (6, CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
 (6, CURDATE(), '11:00:00', '12:00:00', TRUE, 1),
@@ -241,7 +241,7 @@ INSERT INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is
 (6, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:00:00', '15:00:00', TRUE, 1),
 (6, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '15:00:00', '16:00:00', TRUE, 1),
 
--- Sample schedules for Doctor ID 7
+-- Sample schedules for Doctor ID 7 (Dr. Emily Davis - Neurology)
 (7, CURDATE(), '08:00:00', '09:00:00', TRUE, 1),
 (7, CURDATE(), '09:00:00', '10:00:00', TRUE, 1),
 (7, CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
@@ -260,7 +260,7 @@ INSERT INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is
 (7, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '13:00:00', '14:00:00', TRUE, 1),
 (7, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:00:00', '15:00:00', TRUE, 1),
 
--- Sample schedules for Doctor ID 8
+-- Sample schedules for Doctor ID 8 (Dr. Robert Wilson - Dermatology)
 (8, CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
 (8, CURDATE(), '11:00:00', '12:00:00', TRUE, 1),
 (8, CURDATE(), '15:00:00', '16:00:00', TRUE, 1),
@@ -274,12 +274,39 @@ INSERT INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is
 (8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '10:00:00', '11:00:00', TRUE, 1),
 (8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '11:00:00', '12:00:00', TRUE, 1),
 (8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '15:00:00', '16:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '16:00:00', '17:00:00', TRUE, 1);
+(8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '16:00:00', '17:00:00', TRUE, 1),
+
+-- Additional schedules for the next 4 days to provide more availability
+(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '09:00:00', '10:00:00', TRUE, 1),
+(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '10:00:00', '11:00:00', TRUE, 1),
+(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '14:00:00', '15:00:00', TRUE, 1),
+(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '15:00:00', '16:00:00', TRUE, 1),
+
+(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '08:00:00', '09:00:00', TRUE, 1),
+(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '09:00:00', '10:00:00', TRUE, 1),
+(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '13:00:00', '14:00:00', TRUE, 1),
+(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '14:00:00', '15:00:00', TRUE, 1),
+
+(8, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '10:00:00', '11:00:00', TRUE, 1),
+(8, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '11:00:00', '12:00:00', TRUE, 1),
+(8, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '15:00:00', '16:00:00', TRUE, 1),
+
+-- Weekend schedules (Saturday and Sunday)
+(6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
+(6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '11:00:00', '12:00:00', TRUE, 1),
+(6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '14:00:00', '15:00:00', TRUE, 1),
+
+(7, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '09:00:00', '10:00:00', TRUE, 1),
+(7, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
+(7, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '13:00:00', '14:00:00', TRUE, 1),
+
+(8, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
+(8, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '15:00:00', '16:00:00', TRUE, 1);
 
 -- ========================================
 -- SETUP INSTRUCTIONS
 -- ========================================
--- 1. Run this SQL script to create the database and tables
+-- 1. Run this SQL script to create the complete database and all tables
 -- 2. Ensure the uploads directory structure exists:
 --    mkdir -p /path/to/doctor-appoinment/uploads/{doctors,departments,services,events,gallery}
 -- 3. Set proper permissions on uploads directory:
@@ -291,9 +318,11 @@ INSERT INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is
 -- 5. The system supports both user-linked doctors and standalone doctors
 -- 6. All tables include created_at and updated_at timestamps for audit trails
 -- 7. Image uploads are handled through the admin panel with automatic path generation
--- 8. Doctor schedule management system is included with 12-hour time format display
--- 9. Use the Schedule Management section in admin panel to create doctor schedules
--- 10. The schedule system supports two-week rotation and automatic updates
+-- 8. Doctor schedule management system is included with comprehensive scheduling
+-- 9. Sample schedules are created for 5 days starting from today
+-- 10. Use the Schedule Management section in admin panel to create additional doctor schedules
+-- 11. The schedule system supports flexible time slots and appointment management
+-- 12. This file replaces both database_setup.sql and schedule_database_update.sql
 
 -- ========================================
 -- KNOWN API INCONSISTENCIES TO FIX
