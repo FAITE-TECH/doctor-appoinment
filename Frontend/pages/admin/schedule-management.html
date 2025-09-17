@@ -773,6 +773,41 @@
             return `${hour12}:${minutes} ${ampm}`;
         }
 
+        // Format time to HH:MM format (24-hour)
+        function formatTimeToHHMM(timeString) {
+            if (!timeString) return '';
+            
+            // If already in HH:MM format, return as is
+            if (/^\d{2}:\d{2}$/.test(timeString)) {
+                return timeString;
+            }
+            
+            // If in HH:MM:SS format, remove seconds
+            if (/^\d{2}:\d{2}:\d{2}$/.test(timeString)) {
+                return timeString.substring(0, 5);
+            }
+            
+            // If in H:MM format, pad with zero
+            if (/^\d{1}:\d{2}$/.test(timeString)) {
+                return '0' + timeString;
+            }
+            
+            // Try to parse as Date and format
+            try {
+                const date = new Date('2000-01-01T' + timeString);
+                if (!isNaN(date.getTime())) {
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
+            } catch (e) {
+                console.error('Error parsing time:', timeString, e);
+            }
+            
+            // Fallback: return original string
+            return timeString;
+        }
+
         async function addTimeSlot() {
             const startTime = document.getElementById('startTime').value;
             const endTime = document.getElementById('endTime').value;
@@ -782,7 +817,11 @@
                 return;
             }
             
-            if (startTime >= endTime) {
+            // Ensure time format is HH:MM (24-hour format)
+            const formattedStartTime = formatTimeToHHMM(startTime);
+            const formattedEndTime = formatTimeToHHMM(endTime);
+            
+            if (formattedStartTime >= formattedEndTime) {
                 showToast('End time must be after start time', 'error');
                 return;
             }
@@ -804,7 +843,7 @@
                 const currentTimeStr = currentTime.getHours().toString().padStart(2, '0') + ':' + 
                                      currentTime.getMinutes().toString().padStart(2, '0');
                 
-                if (startTime <= currentTimeStr) {
+                if (formattedStartTime <= currentTimeStr) {
                     showToast('Cannot create schedules for past times on the same day', 'error');
                     return;
                 }
@@ -815,8 +854,8 @@
                 formData.append('action', 'add_schedule');
                 formData.append('doctor_id', selectedDoctor);
                 formData.append('schedule_date', selectedDate);
-                formData.append('start_time', startTime);
-                formData.append('end_time', endTime);
+                formData.append('start_time', formattedStartTime);
+                formData.append('end_time', formattedEndTime);
                 formData.append('max_appointments', 1);
                 
                 const response = await fetch('/doctor-appoinment/Backend/api/schedules.php', {
@@ -872,7 +911,11 @@
                 return;
             }
             
-            if (newStartTime >= newEndTime) {
+            // Ensure time format is HH:MM (24-hour format)
+            const formattedStartTime = formatTimeToHHMM(newStartTime);
+            const formattedEndTime = formatTimeToHHMM(newEndTime);
+            
+            if (formattedStartTime >= formattedEndTime) {
                 showToast('End time must be after start time', 'error');
                 return;
             }
@@ -894,7 +937,7 @@
                 const currentTimeStr = currentTime.getHours().toString().padStart(2, '0') + ':' + 
                                      currentTime.getMinutes().toString().padStart(2, '0');
                 
-                if (newStartTime <= currentTimeStr) {
+                if (formattedStartTime <= currentTimeStr) {
                     showToast('Cannot modify schedules for past times on the same day', 'error');
                     return;
                 }
@@ -904,8 +947,8 @@
                 const formData = new FormData();
                 formData.append('action', 'update_schedule');
                 formData.append('schedule_id', editingSlotId);
-                formData.append('start_time', newStartTime);
-                formData.append('end_time', newEndTime);
+                formData.append('start_time', formattedStartTime);
+                formData.append('end_time', formattedEndTime);
                 
                 const response = await fetch('/doctor-appoinment/Backend/api/schedules.php', {
                     method: 'POST',

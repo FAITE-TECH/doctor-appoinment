@@ -126,9 +126,12 @@ function addDoctorSchedule() {
         throw new Exception('Invalid date format. Use YYYY-MM-DD');
     }
     
-    // Validate time format
-    if (!preg_match('/^\d{2}:\d{2}$/', $start_time) || !preg_match('/^\d{2}:\d{2}$/', $end_time)) {
-        throw new Exception('Invalid time format. Use HH:MM');
+    // Validate and normalize time format
+    $start_time = normalizeTimeFormat($start_time);
+    $end_time = normalizeTimeFormat($end_time);
+    
+    if (!$start_time || !$end_time) {
+        throw new Exception('Invalid time format. Use HH:MM (24-hour format)');
     }
     
     // Check if the date is in the past
@@ -212,12 +215,18 @@ function updateDoctorSchedule() {
     $max_appointments = $max_appointments ?: $current_schedule['max_appointments'];
     $is_available = $is_available !== null ? (bool)$is_available : $current_schedule['is_available'];
     
-    // Validate time format if provided
-    if ($start_time && !preg_match('/^\d{2}:\d{2}$/', $start_time)) {
-        throw new Exception('Invalid start time format. Use HH:MM');
+    // Validate and normalize time format if provided
+    if ($start_time) {
+        $start_time = normalizeTimeFormat($start_time);
+        if (!$start_time) {
+            throw new Exception('Invalid start time format. Use HH:MM (24-hour format)');
+        }
     }
-    if ($end_time && !preg_match('/^\d{2}:\d{2}$/', $end_time)) {
-        throw new Exception('Invalid end time format. Use HH:MM');
+    if ($end_time) {
+        $end_time = normalizeTimeFormat($end_time);
+        if (!$end_time) {
+            throw new Exception('Invalid end time format. Use HH:MM (24-hour format)');
+        }
     }
     
     // Check if the date is in the past
@@ -364,5 +373,59 @@ function getAvailableSlots() {
         'status' => 'success',
         'data' => $slots
     ]);
+}
+
+/**
+ * Normalize time format to HH:MM (24-hour format)
+ * Handles various input formats and converts them to HH:MM
+ */
+function normalizeTimeFormat($timeString) {
+    if (empty($timeString)) {
+        return false;
+    }
+    
+    // Remove any whitespace
+    $timeString = trim($timeString);
+    
+    // If already in HH:MM format, validate and return
+    if (preg_match('/^\d{2}:\d{2}$/', $timeString)) {
+        // Validate that it's a valid time
+        $parts = explode(':', $timeString);
+        $hours = (int)$parts[0];
+        $minutes = (int)$parts[1];
+        
+        if ($hours >= 0 && $hours <= 23 && $minutes >= 0 && $minutes <= 59) {
+            return $timeString;
+        }
+    }
+    
+    // If in HH:MM:SS format, remove seconds
+    if (preg_match('/^(\d{2}):(\d{2}):\d{2}$/', $timeString, $matches)) {
+        $hours = (int)$matches[1];
+        $minutes = (int)$matches[2];
+        
+        if ($hours >= 0 && $hours <= 23 && $minutes >= 0 && $minutes <= 59) {
+            return $matches[1] . ':' . $matches[2];
+        }
+    }
+    
+    // If in H:MM format, pad with zero
+    if (preg_match('/^(\d{1}):(\d{2})$/', $timeString, $matches)) {
+        $hours = (int)$matches[1];
+        $minutes = (int)$matches[2];
+        
+        if ($hours >= 0 && $hours <= 23 && $minutes >= 0 && $minutes <= 59) {
+            return str_pad($matches[1], 2, '0', STR_PAD_LEFT) . ':' . $matches[2];
+        }
+    }
+    
+    // Try to parse with strtotime
+    $timestamp = strtotime($timeString);
+    if ($timestamp !== false) {
+        return date('H:i', $timestamp);
+    }
+    
+    // If all else fails, return false
+    return false;
 }
 ?>
