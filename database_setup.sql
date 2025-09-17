@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 );
 
 -- Insert sample gallery images
--- Note: These are placeholder paths. Actual images should be uploaded through the admin panel
+-- Note: These are placeholder filenames. Actual images should be uploaded through the admin panel
 -- The uploads directory structure should be:
 -- /doctor-appoinment/uploads/doctors/ (for doctor profile images)
 -- /doctor-appoinment/uploads/departments/ (for department images)
@@ -179,11 +179,11 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 -- /doctor-appoinment/uploads/events/ (for event images)
 -- /doctor-appoinment/uploads/gallery/ (for gallery images)
 INSERT INTO gallery (title, description, image_path) VALUES
-('Modern Hospital Facility', 'Our state-of-the-art hospital building with advanced medical equipment', '/doctor-appoinment/uploads/gallery/hospital-building.jpg'),
-('Emergency Department', '24/7 emergency care facility with dedicated medical staff', '/doctor-appoinment/uploads/gallery/emergency-dept.jpg'),
-('Surgery Suite', 'Advanced operating rooms equipped with latest surgical technology', '/doctor-appoinment/uploads/gallery/surgery-suite.jpg'),
-('Patient Recovery Room', 'Comfortable recovery rooms for post-surgical care', '/doctor-appoinment/uploads/gallery/recovery-room.jpg'),
-('Medical Laboratory', 'Fully equipped laboratory for diagnostic testing', '/doctor-appoinment/uploads/gallery/laboratory.jpg');
+('Modern Hospital Facility', 'Our state-of-the-art hospital building with advanced medical equipment', 'hospital-building.jpg'),
+('Emergency Department', '24/7 emergency care facility with dedicated medical staff', 'emergency-dept.jpg'),
+('Surgery Suite', 'Advanced operating rooms equipped with latest surgical technology', 'surgery-suite.jpg'),
+('Patient Recovery Room', 'Comfortable recovery rooms for post-surgical care', 'recovery-room.jpg'),
+('Medical Laboratory', 'Fully equipped laboratory for diagnostic testing', 'laboratory.jpg');
 
 -- ========================================
 -- DOCTOR SCHEDULE MANAGEMENT SYSTEM
@@ -215,9 +215,17 @@ ALTER TABLE appointments
 ADD COLUMN schedule_id INT NULL,
 ADD FOREIGN KEY (schedule_id) REFERENCES doctor_schedules(id) ON DELETE SET NULL;
 
--- Add index for better performance
+-- Add indexes for better performance
 CREATE INDEX idx_appointment_schedule ON appointments(schedule_id);
 CREATE INDEX idx_appointment_doctor_date ON appointments(doctor_id, appointment_date);
+CREATE INDEX idx_appointment_user_date ON appointments(user_id, appointment_date);
+CREATE INDEX idx_appointment_status ON appointments(status);
+CREATE INDEX idx_contact_messages_status ON contact_messages(status);
+CREATE INDEX idx_contact_messages_user ON contact_messages(user_id);
+CREATE INDEX idx_doctors_department ON doctors(department_id);
+CREATE INDEX idx_doctors_specialization ON doctors(specialization);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role_id);
 
 -- Insert sample schedule data for testing (using existing doctor IDs)
 -- Sample schedules for the next 7 days starting from today
@@ -317,28 +325,37 @@ INSERT INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is
 --    Password: admin123
 -- 5. The system supports both user-linked doctors and standalone doctors
 -- 6. All tables include created_at and updated_at timestamps for audit trails
--- 7. Image uploads are handled through the admin panel with automatic path generation
+-- 7. Image uploads are handled through the admin panel with automatic filename generation
 -- 8. Doctor schedule management system is included with comprehensive scheduling
 -- 9. Sample schedules are created for 5 days starting from today
 -- 10. Use the Schedule Management section in admin panel to create additional doctor schedules
 -- 11. The schedule system supports flexible time slots and appointment management
 -- 12. This file replaces both database_setup.sql and schedule_database_update.sql
+-- 13. All image paths in the database store only filenames (not full paths)
+-- 14. Frontend constructs full paths when displaying images
 
 -- ========================================
--- KNOWN API INCONSISTENCIES TO FIX
+-- DATABASE SCHEMA NOTES
 -- ========================================
--- 1. Backend/api/login.php line 27: 
---    SELECTs 'role' column from users table, but should JOIN with roles table
---    Current: "SELECT id, name, email, password, role FROM users WHERE email = ?"
---    Should be: "SELECT u.id, u.name, u.email, u.password, r.role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.email = ?"
+-- 1. Image Path Storage:
+--    - All APIs now store only filenames in the database (not full paths)
+--    - Full paths are constructed in the frontend when needed
+--    - This approach is more flexible and portable across different environments
 --
--- 2. Backend/api/admin.php line 80:
---    JOINs doctors with users table, but doctors.user_id can be NULL
---    Current: "JOIN users du ON d.user_id = du.id"
---    Should be: "LEFT JOIN users du ON d.user_id = du.id"
---    Or use doctors.name directly instead of du.name
+-- 2. User Authentication:
+--    - login.php correctly uses JOIN with roles table to get role_name
+--    - All authentication is properly handled with role-based access control
 --
--- 3. Image path storage inconsistency:
---    Some APIs store full paths (/doctor-appoinment/uploads/...)
---    Others store just filenames
---    Consider standardizing to one approach
+-- 3. Doctor Management:
+--    - doctors.user_id is nullable to allow admin-created doctors without linked users
+--    - All JOINs with users table use LEFT JOIN to handle NULL user_id values
+--
+-- 4. Schedule Management:
+--    - doctor_schedules table provides flexible scheduling system
+--    - appointments can optionally link to specific schedule slots
+--    - System supports both scheduled and unscheduled appointments
+--
+-- 5. Performance Optimizations:
+--    - Added comprehensive indexes for frequently queried columns
+--    - Foreign key constraints ensure data integrity
+--    - Proper cascade rules for data cleanup
