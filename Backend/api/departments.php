@@ -112,6 +112,10 @@ switch ($method) {
             json_response(['error' => 'Department name is required'], 422);
         }
 
+        if (strlen($description) < 20) {
+            json_response(['error' => 'Department description must be at least 20 characters long'], 422);
+        }
+
         $imagePath = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $allowed = ['image/jpeg','image/png','image/gif'];

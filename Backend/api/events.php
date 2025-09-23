@@ -118,6 +118,10 @@ switch ($method) {
             json_response(['error' => 'Event title is required'], 422);
         }
         
+        if (strlen($description) < 20) {
+            json_response(['error' => 'Event description must be at least 20 characters long'], 422);
+        }
+        
         if (empty($eventDate)) {
             json_response(['error' => 'Event date is required'], 422);
         }

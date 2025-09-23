@@ -123,13 +123,11 @@
         </a>
 
         <!-- Service Content -->
-        <div class="p-4 sm:p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-lg sm:text-xl font-semibold text-blue-800 mb-2 text-start">${serviceName}</h3>
-          
-          <div class="mb-3">
-            <span class="text-xl sm:text-2xl font-bold text-green-600">Rs ${servicePrice.toFixed(2)}</span>
+        <div class="p-4 sm:p-6 flex flex-col flex-grow">
+          <div class="text-right mb-2">
+            <span class="text-base sm:text-lg font-bold text-green-600">Rs ${servicePrice.toFixed(2)}</span>
           </div>
-
+          <h3 class="text-lg sm:text-xl font-semibold text-blue-800 mb-2 text-start">${serviceName}</h3>
           <p class="text-gray-600 text-sm sm:text-md mb-4 clamp-4 text-start leading-relaxed">${serviceDescription}</p>
 
       
