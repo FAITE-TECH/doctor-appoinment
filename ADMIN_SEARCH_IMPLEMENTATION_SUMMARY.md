@@ -1,7 +1,7 @@
 # Admin Search Functionality Implementation Summary
 
 ## Overview
-A comprehensive search functionality has been implemented across all admin pages (except the dashboard) in the HPC Hospital management system. This allows administrators to search across all data types using various search criteria.
+A comprehensive search functionality has been implemented across all admin pages (except the dashboard) in the SPC Hospital management system. This allows administrators to search across all data types using various search criteria.
 
 ## Features Implemented
 

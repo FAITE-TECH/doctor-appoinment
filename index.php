@@ -37,18 +37,18 @@
         </div>
         
         <div class="section">
-            <h2>🌐 Frontend Application</h2>
-            <p>Access the main application:</p>
-            <a href="Frontend/pages/index.html" class="btn btn-success">Go to Application</a>
-            <a href="Frontend/pages/signin.html" class="btn">Sign In</a>
-            <a href="Frontend/pages/signup.html" class="btn">Sign Up</a>
+            <h2>🌐 User Access</h2>
+            <p>Access the main application for normal users:</p>
+            <a href="Frontend/pages/index.html" class="btn btn-success">Normal User Portal</a>
+            <p class="text-sm text-gray-600 mt-2">Browse services, view doctors, departments, and contact information</p>
         </div>
         
         <div class="section">
-            <h2>⚙️ Admin Panel</h2>
+            <h2>⚙️ Admin Access</h2>
             <p>Access the admin panel (requires admin login):</p>
-            <a href="Frontend/pages/admin/index.html" class="btn btn-warning">Admin Panel</a>
             <a href="Frontend/pages/admin/login.html" class="btn btn-warning">Admin Login</a>
+            <a href="Frontend/pages/admin/index.html" class="btn btn-warning">Admin Panel</a>
+            <p class="text-sm text-gray-600 mt-2">Manage appointments, users, doctors, and system settings</p>
         </div>
         
         <div class="section">
@@ -65,8 +65,9 @@
             <h2>🔍 Quick Troubleshooting</h2>
             <ul>
                 <li><strong>Database Connection Issues:</strong> Make sure XAMPP MySQL is running</li>
-                <li><strong>Sign In Problems:</strong> Run the Authentication Test first to create test users</li>
+                <li><strong>Admin Login Problems:</strong> Run the Authentication Test first to create test admin users</li>
                 <li><strong>Role Issues:</strong> The system uses role-based access with 4 different user types</li>
+                <li><strong>User Access:</strong> Normal users can browse services without login, admin access requires authentication</li>
             </ul>
         </div>
     </div>

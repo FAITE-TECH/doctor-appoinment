@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HPC Hospital - Doctor Appointment System</title>
+  <title>SPC Hospital - Doctor Appointment System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../public/css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -12,7 +12,7 @@
 <body class="bg-gray-100">
   <div id="header"></div>
   <script>
-    fetch("shared-nav.html")
+    fetch("shared-nav.html?v=" + Date.now())
       .then((res) => res.text())
       .then((data) => {
         document.getElementById("header").innerHTML = data;
@@ -28,15 +28,15 @@
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 sm:py-16 lg:py-20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">Welcome to HPC Hospital</h1>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">Welcome to SPC Hospital</h1>
         <p class="text-lg sm:text-xl mb-6 sm:mb-8 text-blue-100 px-4">Your health is our priority. Book appointments with our expert doctors and access world-class medical care.</p>
         
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4" id="hero-actions">
           <!-- Guest Actions -->
           <div class="flex flex-col sm:flex-row gap-3 sm:gap-4" data-auth="guest">
-            <a href="./signup.html" class="bg-white text-blue-600 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition text-center">Get Started</a>
-            <a href="./home.html" class="border-2 border-white text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition text-center">Explore Services</a>
+            <a href="./home.html" class="bg-white text-blue-600 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition text-center">Explore Services</a>
+            <a href="./contact.html" class="border-2 border-white text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition text-center">Contact Us</a>
           </div>
           
           <!-- User Actions -->
@@ -52,7 +52,7 @@
     <section class="py-12 sm:py-16 bg-white">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <div class="text-center mb-8 sm:mb-12">
-          <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Why Choose HPC Hospital?</h2>
+          <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Why Choose SPC Hospital?</h2>
           <p class="text-gray-600 text-sm sm:text-base">Experience healthcare excellence with our comprehensive services</p>
         </div>
         
@@ -120,7 +120,7 @@
   <!-- Footer -->
   <footer class="bg-gray-800 text-white py-8">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <p>&copy; 2024 HPC Hospital. All rights reserved.</p>
+      <p>&copy; 2024 SPC Hospital. All rights reserved.</p>
       <p class="mt-2 text-gray-400">Your health, our commitment.</p>
     </div>
   </footer>

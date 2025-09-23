@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../public/css/styles.css">
     <link rel="icon" type="image/png" href="../public/assets/logo.png">
-    <title>My Messages - HPC Hospital</title>
+    <title>My Messages - SPC Hospital</title>
 </head>
 <body>
     <div id="header"></div>
     <script>
-        fetch("shared-nav.html")
+        fetch("shared-nav.html?v=" + Date.now())
             .then((res) => res.text())
             .then((data) => {
                 document.getElementById("header").innerHTML = data;
@@ -42,14 +42,12 @@
             <!-- Authentication Check -->
             <div id="authNotice" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 hidden">
                 <div class="flex items-center">
-                    <i class="fas fa-info-circle text-yellow-600 mr-3"></i>
+                    <i class="fas fa-info-circle text-blue-600 mr-3"></i>
                     <div>
-                        <p class="text-yellow-800 font-medium">Sign in to view your messages</p>
-                        <p class="text-yellow-700 text-sm">Please sign in to your account to view your message history and replies.</p>
+                        <p class="text-blue-800 font-medium">Message Center</p>
+                        <p class="text-blue-700 text-sm">This feature is available for registered users. Contact us directly for immediate assistance.</p>
                         <div class="mt-2">
-                            <a href="signin.html" class="text-yellow-800 underline hover:text-yellow-900">Sign In</a>
-                            <span class="mx-2">or</span>
-                            <a href="signup.html" class="text-yellow-800 underline hover:text-yellow-900">Create Account</a>
+                            <a href="contact.html" class="text-blue-800 underline hover:text-blue-900">Contact Us</a>
                         </div>
                     </div>
                 </div>
@@ -116,7 +114,7 @@
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8">
         <div class="max-w-6xl mx-auto px-6 text-center">
-            <p>&copy; 2024 HPC Hospital. All rights reserved.</p>
+            <p>&copy; 2024 SPC Hospital. All rights reserved.</p>
             <p class="mt-2 text-gray-400">Your health, our commitment.</p>
         </div>
     </footer>

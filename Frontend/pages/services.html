@@ -23,7 +23,7 @@
   <body>
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html")
+      fetch("shared-nav.html?v=" + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;

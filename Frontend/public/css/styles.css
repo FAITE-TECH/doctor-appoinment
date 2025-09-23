@@ -4,6 +4,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.4; /* Reduce line height to minimize gaps */
+  min-height: auto; /* Allow natural height for single lines */
 }
 .clamp-6 {
   display: -webkit-box;
@@ -11,6 +13,131 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Ensure service card text alignment */
+.service-card-content {
+  text-align: left !important;
+}
+
+.service-card-content h3,
+.service-card-content p {
+  text-align: left !important;
+}
+
+/* Reduce gap between heading and description in service cards */
+.service-card-content h3 {
+  margin-bottom: 0.25rem !important; /* mb-1 equivalent */
+}
+
+.service-card-content p {
+  margin-top: 0 !important;
+}
+
+/* Latest News card layout */
+.news-card-content {
+  text-align: left !important;
+}
+
+.news-card-content h3,
+.news-card-content p {
+  text-align: left !important;
+}
+
+.news-card-content h3 {
+  margin-bottom: 0.25rem !important;
+}
+
+.news-card-content p {
+  margin-top: 0 !important;
+}
+
+.news-date-bottom {
+  margin-top: auto !important;
+}
+
+/* Department card layout */
+.department-card-content {
+  text-align: left !important;
+}
+
+.department-card-content h3,
+.department-card-content p {
+  text-align: left !important;
+}
+
+.department-card-content h3 {
+  margin-bottom: 0.25rem !important;
+}
+
+.department-card-content p {
+  margin-top: 0 !important;
+}
+
+/* Doctor card layout */
+.doctor-card-content {
+  text-align: left !important;
+}
+
+.doctor-card-content h3,
+.doctor-card-content p {
+  text-align: left !important;
+}
+
+.doctor-card-content h3 {
+  margin-bottom: 0.25rem !important;
+}
+
+.doctor-card-content p {
+  margin-top: 0 !important;
+}
+
+/* Gallery card layout */
+.gallery-card-content {
+  text-align: left !important;
+}
+
+.gallery-card-content h3,
+.gallery-card-content p {
+  text-align: left !important;
+}
+
+.gallery-card-content h3 {
+  margin-bottom: 0.25rem !important;
+}
+
+.gallery-card-content p {
+  margin-top: 0 !important;
+}
+
+/* Optimize clamp-4 for better single line handling */
+.clamp-4 {
+  line-height: 1.3 !important; /* Tighter line height */
+  max-height: none !important; /* Remove any max-height constraints */
+}
+
+/* Specific fixes for services and departments single-line descriptions */
+.service-card-content .clamp-4,
+.department-card-content .clamp-4,
+.gallery-card-content .clamp-4 {
+  line-height: 1.2 !important; /* Even tighter for these sections */
+  margin-bottom: 0.5rem !important; /* Reduce bottom margin further */
+}
+
+/* Override any inherited line-height issues */
+.service-card-content p,
+.department-card-content p,
+.gallery-card-content p {
+  line-height: 1.2 !important;
+}
+
+/* Specific classes for service and department descriptions */
+.service-description,
+.department-description,
+.gallery-description {
+  line-height: 1.1 !important; /* Very tight line height */
+  margin-bottom: 0.25rem !important; /* Minimal bottom margin */
+  padding-bottom: 0 !important; /* Remove any padding */
 }
 
  /* .sticky {

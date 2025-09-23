@@ -29,12 +29,12 @@
     />
     <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
-    <title>HPC Hospital</title>
+    <title>SPC Hospital</title>
   </head>
   <body>
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html")
+      fetch("shared-nav.html?v=" + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
@@ -192,11 +192,10 @@
                 class="border h-12 px-3 py-2 focus:ring-2 focus:ring-green-400 rounded-md"
                 required
               />
-              <div id="emailSigninPrompt" class="hidden mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm shadow-sm">
+              <div id="emailSigninPrompt" class="hidden mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm shadow-sm">
                 <div class="flex items-center">
-                  <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
-                  <p class="text-yellow-800 flex-1">Please sign in to auto-fill your email</p>
-                  <a href="./signin.html" class="text-blue-600 hover:underline font-medium ml-2">Sign In</a>
+                  <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                  <p class="text-blue-800 flex-1">Please enter your email address to book an appointment</p>
                 </div>
               </div>
             </div>
@@ -853,13 +852,13 @@
 
        
         <!-- Doctor Content -->
-        <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-sans-serif text-blue-800 mb-2 text-start">${doctor.name}</h3>
-          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-3">
+        <div class="p-6 flex flex-col justify-between flex-grow doctor-card-content">
+          <h3 class="text-xl font-sans-serif text-blue-800 mb-1 text-left">${doctor.name}</h3>
+          <p class="bg-green-100 text-blue-500 text-xs font-[Roboto] px-3 py-1 rounded-full uppercase w-fit mb-2">
             ${doctorSpecialization}
           </p>
           
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start">${doctorDescription}</p>
+          <p class="text-gray-600 text-md mb-2 clamp-4 text-left">${doctorDescription}</p>
 
           <div class="flex justify-between items-center text-gray-400 text-sm">
             <p>10+ years experience</p>
@@ -904,9 +903,9 @@
         </div>
 
         <!-- Department Content -->
-        <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${departmentName}</h3>
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${departmentDescription}</p>
+        <div class="p-6 flex flex-col justify-between flex-grow department-card-content">
+          <h3 class="text-xl font-semibold text-blue-800 mb-1 text-left">${departmentName}</h3>
+          <p class="text-gray-600 text-md mb-2 clamp-4 text-left department-description">${departmentDescription}</p>
         </div>
       `;
 
@@ -1227,10 +1226,10 @@
       function generatePDFWithLogo(doc, appointmentData, doctorName, logoImg) {
         
         // Hospital Information (with proper encoding)
-        const hospitalName = "HPC Hospital";
+        const hospitalName = "SPC Hospital";
         const hospitalAddress = "123 Medical Center Drive, Healthcare City";
         const hospitalPhone = "+1 (555) 123-4567";
-        const hospitalEmail = "info@hpchospital.com";
+        const hospitalEmail = "info@spchospital.com";
         
         // Sanitize text inputs to prevent encoding issues
         const sanitizeText = (text) => {
@@ -1262,13 +1261,13 @@
             console.log('❌ Failed to add logo to PDF:', error);
             // Fallback to text if image addition fails
             doc.setFontSize(12);
-            doc.text('HPC', 180, 20);
+            doc.text('SPC', 180, 20);
           }
         } else {
           console.log('ℹ️ Using text fallback for hospital logo');
           // Fallback to text if no logo image
           doc.setFontSize(12);
-          doc.text('HPC', 180, 20);
+          doc.text('SPC', 180, 20);
         }
         
         // Reset text color
@@ -1531,11 +1530,9 @@
         </a>
 
         <!-- Service Content -->
-        <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${serviceName}</h3>
-          
-
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed">${serviceDescription}</p>
+        <div class="p-6 flex flex-col justify-between flex-grow service-card-content">
+          <h3 class="text-xl font-semibold text-blue-800 mb-1 text-left">${serviceName}</h3>
+          <p class="text-gray-600 text-md mb-2 clamp-4 text-left service-description">${serviceDescription}</p>
 
       
         </div>
@@ -1635,15 +1632,16 @@
         </div>
 
         <!-- Event Content -->
-        <div class="p-6 flex flex-col justify-between flex-grow">
-          <h3 class="text-xl font-semibold text-blue-800 mb-2 text-start">${eventTitle}</h3>
-          <div class="flex items-center gap-1 mb-2">
-            <i class="fa-solid fa-calendar-days text-gray-300 text-sm"></i>
-            <h4 class="text-md font-semibold text-gray-300 mb-2 text-start">${eventDate}</h4>
+        <div class="p-6 flex flex-col justify-between flex-grow news-card-content">
+          <div class="flex-grow">
+            <h3 class="text-xl font-semibold text-blue-800 mb-1 text-left">${eventTitle}</h3>
+            <p class="text-gray-600 text-md mb-2 clamp-4 text-left leading-relaxed">${eventDescription}</p>
           </div>
-
-          <p class="text-gray-600 text-md mb-4 clamp-4 text-start leading-relaxed text-start clamp-4">${eventDescription}</p>
-
+          
+          <div class="flex items-center gap-1 mt-auto news-date-bottom">
+            <i class="fa-solid fa-calendar-days text-gray-300 text-sm"></i>
+            <h4 class="text-md font-semibold text-gray-300 text-left">${eventDate}</h4>
+          </div>
         </div>
         </div>
       `;

@@ -1,7 +1,7 @@
 # Complete Appointment Management System Implementation
 
 ## Overview
-A comprehensive appointment scheduling system has been implemented for the HPC Hospital website, including both frontend patient booking functionality and complete admin management capabilities.
+A comprehensive appointment scheduling system has been implemented for the SPC Hospital website, including both frontend patient booking functionality and complete admin management capabilities.
 
 ## ✅ Completed Features
 

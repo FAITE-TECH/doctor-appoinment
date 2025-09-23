@@ -10,12 +10,12 @@
     />
     <link rel="stylesheet" href="../public/css/styles.css" />
     <link rel="icon" type="image/png" href="../public/assets/logo.png" />
-    <title>Contact Us - HPC Hospital</title>
+    <title>Contact Us - SPC Hospital</title>
   </head>
   <body>
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html")
+      fetch("shared-nav.html?v=" + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
@@ -69,7 +69,7 @@
               <i class="fas fa-envelope text-purple-600 text-2xl"></i>
             </div>
             <h3 class="text-xl font-semibold mb-2">Email</h3>
-            <p class="text-gray-600">info@hpchospital.com<br>support@hpchospital.com</p>
+            <p class="text-gray-600">info@spchospital.com<br>support@spchospital.com</p>
           </div>
         </div>
 
@@ -78,15 +78,10 @@
           <!-- Authentication Notice -->
           <div id="authNotice" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 hidden">
             <div class="flex items-center">
-              <i class="fas fa-info-circle text-yellow-600 mr-3"></i>
+              <i class="fas fa-info-circle text-blue-600 mr-3"></i>
               <div>
-                <p class="text-yellow-800 font-medium">Sign in to send messages</p>
-                <p class="text-yellow-700 text-sm">Please sign in to your account to send us a message. This helps us provide better support.</p>
-                <div class="mt-2">
-                  <a href="signin.html" class="text-yellow-800 underline hover:text-yellow-900">Sign In</a>
-                  <span class="mx-2">or</span>
-                  <a href="signup.html" class="text-yellow-800 underline hover:text-yellow-900">Create Account</a>
-                </div>
+                <p class="text-blue-800 font-medium">Send us a message</p>
+                <p class="text-blue-700 text-sm">Fill out the form below to send us a message. We'll get back to you as soon as possible.</p>
               </div>
             </div>
           </div>
@@ -167,7 +162,7 @@
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8">
       <div class="max-w-6xl mx-auto px-6 text-center">
-        <p>&copy; 2024 HPC Hospital. All rights reserved.</p>
+        <p>&copy; 2024 SPC Hospital. All rights reserved.</p>
         <p class="mt-2 text-gray-400">Your health, our commitment.</p>
       </div>
     </footer>
@@ -358,11 +353,12 @@
                 e.preventDefault();
                 
                 // Check authentication first
-                const isAuthenticated = await checkAuthenticationStatus();
-                if (!isAuthenticated) {
-                    showAlert('Please sign in to send a message', 'warning');
-                    return;
-                }
+                // Allow all users to send messages without authentication
+                // const isAuthenticated = await checkAuthenticationStatus();
+                // if (!isAuthenticated) {
+                //     showAlert('Please sign in to send a message', 'warning');
+                //     return;
+                // }
 
                 // Validate form
                 if (!validateForm()) {
