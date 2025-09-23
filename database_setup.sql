@@ -32,6 +32,15 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Create doctors table
+CREATE TABLE IF NOT EXISTS departments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    image_path VARCHAR(500) NULL, -- Path to department image
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS doctors (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NULL, -- Made nullable to allow admin-created doctors without linked users
@@ -60,16 +69,6 @@ CREATE TABLE IF NOT EXISTS appointments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
-);
-
--- Create departments table
-CREATE TABLE IF NOT EXISTS departments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    image_path VARCHAR(500) NULL, -- Path to department image
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Create services table
@@ -107,28 +106,28 @@ CREATE TABLE IF NOT EXISTS gallery (
 );
 
 -- Insert roles
-INSERT INTO roles (role_name) VALUES 
+INSERT IGNORE INTO roles (role_name) VALUES 
 ('admin'),
 ('doctor'),
 ('patient'),
 ('staff');
 
 -- Insert an admin user
-INSERT INTO users (name, email, password, role_id) VALUES
+INSERT IGNORE INTO users (name, email, password, role_id) VALUES
 ('System Admin', 'admin@hospital.com', MD5('admin123'), 1);
 
 -- Insert sample doctor users
-INSERT INTO users (name, email, password, role_id) VALUES
+INSERT IGNORE INTO users (name, email, password, role_id) VALUES
 ('Dr. John Smith', 'john.smith@hospital.com', MD5('doc123'), 2),
 ('Dr. Sarah Johnson', 'sarah.johnson@hospital.com', MD5('doc123'), 2);
 
 -- Insert sample patient users
-INSERT INTO users (name, email, password, role_id) VALUES
+INSERT IGNORE INTO users (name, email, password, role_id) VALUES
 ('John Doe', 'john.doe@example.com', MD5('patient123'), 3),
 ('Jane Smith', 'jane.smith@example.com', MD5('patient123'), 3);
 
 -- Insert sample doctors (with new structure)
-INSERT INTO doctors (user_id, name, email, specialization, phone, description, department_id) VALUES
+INSERT IGNORE INTO doctors (user_id, name, email, specialization, phone, description, department_id) VALUES
 (2, 'Dr. John Smith', 'john.smith@hospital.com', 'Cardiology', '+1234567890', 'Experienced cardiologist with 15 years of practice in heart disease treatment and prevention.', 1),
 (3, 'Dr. Sarah Johnson', 'sarah.johnson@hospital.com', 'Pediatrics', '+1234567891', 'Pediatric specialist focused on child health and development with expertise in preventive care.', 2),
 (NULL, 'Dr. Michael Brown', 'michael.brown@hospital.com', 'Orthopedics', '+1234567892', 'Orthopedic surgeon specializing in joint replacement and sports medicine.', 3),
@@ -136,7 +135,7 @@ INSERT INTO doctors (user_id, name, email, specialization, phone, description, d
 (NULL, 'Dr. Robert Wilson', 'robert.wilson@hospital.com', 'Dermatology', '+1234567894', 'Dermatologist specializing in skin conditions and cosmetic dermatology.', 5);
 
 -- Insert sample departments
-INSERT INTO departments (name, description, image_path) VALUES
+INSERT IGNORE INTO departments (name, description, image_path) VALUES
 ('Cardiology', 'Heart and cardiovascular system treatment', NULL),
 ('Pediatrics', 'Medical care for infants, children, and adolescents', NULL),
 ('Orthopedics', 'Bones, joints, and musculoskeletal system', NULL),
@@ -144,7 +143,7 @@ INSERT INTO departments (name, description, image_path) VALUES
 ('Dermatology', 'Skin, hair, and nail conditions', NULL);
 
 -- Insert sample services
-INSERT INTO services (name, description, price, image_path) VALUES
+INSERT IGNORE INTO services (name, description, price, image_path) VALUES
 ('General Consultation', 'Basic medical consultation with a doctor', 50.00, NULL),
 ('Specialist Consultation', 'Consultation with a specialist doctor', 100.00, NULL),
 ('Laboratory Tests', 'Blood tests and other laboratory examinations', 75.00, NULL),
@@ -152,7 +151,7 @@ INSERT INTO services (name, description, price, image_path) VALUES
 ('Physical Therapy', 'Rehabilitation and physical therapy sessions', 80.00, NULL);
 
 -- Insert sample events
-INSERT INTO events (title, description, event_date, event_time, location, image_path) VALUES
+INSERT IGNORE INTO events (title, description, event_date, event_time, location, image_path) VALUES
 ('Health Awareness Seminar', 'Learn about preventive healthcare and wellness', '2025-09-10', '14:00:00', 'Main Conference Hall', NULL),
 ('Blood Donation Drive', 'Community blood donation event', '2025-09-15', '10:00:00', 'Hospital Lobby', NULL),
 ('Diabetes Management Workshop', 'Educational workshop for diabetes patients', '2025-09-20', '15:30:00', 'Seminar Room A', NULL);
@@ -184,7 +183,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 -- /doctor-appoinment/uploads/services/ (for service images)
 -- /doctor-appoinment/uploads/events/ (for event images)
 -- /doctor-appoinment/uploads/gallery/ (for gallery images)
-INSERT INTO gallery (title, description, image_path) VALUES
+INSERT IGNORE INTO gallery (title, description, image_path) VALUES
 ('Modern Hospital Facility', 'Our state-of-the-art hospital building with advanced medical equipment', 'hospital-building.jpg'),
 ('Emergency Department', '24/7 emergency care facility with dedicated medical staff', 'emergency-dept.jpg'),
 ('Surgery Suite', 'Advanced operating rooms equipped with latest surgical technology', 'surgery-suite.jpg'),
@@ -292,86 +291,85 @@ DROP PROCEDURE IF EXISTS CreateIndexIfNotExists;
 -- Sample schedules for the next 7 days starting from today
 -- Only insert if no schedules exist yet
 INSERT IGNORE INTO doctor_schedules (doctor_id, schedule_date, start_time, end_time, is_available, max_appointments) VALUES
--- Sample schedules for Doctor ID 6 (Dr. Michael Brown - Orthopedics)
-(6, CURDATE(), '09:00:00', '10:00:00', TRUE, 1),
-(6, CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
-(6, CURDATE(), '11:00:00', '12:00:00', TRUE, 1),
-(6, CURDATE(), '14:00:00', '15:00:00', TRUE, 1),
-(6, CURDATE(), '15:00:00', '16:00:00', TRUE, 1),
+-- Sample schedules for Dr. Michael Brown (Orthopedics)
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), CURDATE(), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), CURDATE(), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), CURDATE(), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), CURDATE(), '15:00:00', '16:00:00', TRUE, 1),
 
-(6, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', TRUE, 1),
 
-(6, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '09:00:00', '10:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '11:00:00', '12:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:00:00', '15:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '15:00:00', '16:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '15:00:00', '16:00:00', TRUE, 1),
 
--- Sample schedules for Doctor ID 7 (Dr. Emily Davis - Neurology)
-(7, CURDATE(), '08:00:00', '09:00:00', TRUE, 1),
-(7, CURDATE(), '09:00:00', '10:00:00', TRUE, 1),
-(7, CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
-(7, CURDATE(), '13:00:00', '14:00:00', TRUE, 1),
-(7, CURDATE(), '14:00:00', '15:00:00', TRUE, 1),
+-- Sample schedules for Dr. Emily Davis (Neurology)
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), CURDATE(), '08:00:00', '09:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), CURDATE(), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), CURDATE(), '13:00:00', '14:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), CURDATE(), '14:00:00', '15:00:00', TRUE, 1),
 
-(7, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '08:00:00', '09:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '13:00:00', '14:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '08:00:00', '09:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '13:00:00', '14:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '15:00:00', TRUE, 1),
 
-(7, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '08:00:00', '09:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '09:00:00', '10:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '13:00:00', '14:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '08:00:00', '09:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '13:00:00', '14:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:00:00', '15:00:00', TRUE, 1),
 
--- Sample schedules for Doctor ID 8 (Dr. Robert Wilson - Dermatology)
-(8, CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
-(8, CURDATE(), '11:00:00', '12:00:00', TRUE, 1),
-(8, CURDATE(), '15:00:00', '16:00:00', TRUE, 1),
-(8, CURDATE(), '16:00:00', '17:00:00', TRUE, 1),
+-- Sample schedules for Dr. Robert Wilson (Dermatology)
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), CURDATE(), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), CURDATE(), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), CURDATE(), '15:00:00', '16:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), CURDATE(), '16:00:00', '17:00:00', TRUE, 1),
 
-(8, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '15:00:00', '16:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:00:00', '17:00:00', TRUE, 1),
 
-(8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '11:00:00', '12:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '15:00:00', '16:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '16:00:00', '17:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 2 DAY), '15:00:00', '16:00:00', TRUE, 1),
 
 -- Additional schedules for the next 4 days to provide more availability
-(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '09:00:00', '10:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '14:00:00', '15:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '15:00:00', '16:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '15:00:00', '16:00:00', TRUE, 1),
 
-(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '08:00:00', '09:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '09:00:00', '10:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '13:00:00', '14:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '08:00:00', '09:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '13:00:00', '14:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '14:00:00', '15:00:00', TRUE, 1),
 
-(8, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '11:00:00', '12:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '15:00:00', '16:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 3 DAY), '15:00:00', '16:00:00', TRUE, 1),
 
 -- Weekend schedules (Saturday and Sunday)
-(6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '11:00:00', '12:00:00', TRUE, 1),
-(6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '14:00:00', '15:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '11:00:00', '12:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'michael.brown@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '14:00:00', '15:00:00', TRUE, 1),
 
-(7, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '09:00:00', '10:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(7, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '13:00:00', '14:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '09:00:00', '10:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'emily.davis@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '13:00:00', '14:00:00', TRUE, 1),
 
-(8, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
-(8, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '15:00:00', '16:00:00', TRUE, 1);
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', '11:00:00', TRUE, 1),
+((SELECT id FROM doctors WHERE email = 'robert.wilson@hospital.com' LIMIT 1), DATE_ADD(CURDATE(), INTERVAL 4 DAY), '15:00:00', '16:00:00', TRUE, 1);
 
 -- ========================================
 -- SETUP INSTRUCTIONS
