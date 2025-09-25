@@ -4,13 +4,13 @@ function getFooterPath() {
     const scripts = document.getElementsByTagName('script');
     // Find the footer script tag
     for (const script of scripts) {
-        if (script.src.includes('shared-footer.js')) {
+        if (script.src.includes('footer.js')) {
             // Return the path to the footer HTML file
-            return script.src.replace('shared-footer.js', 'shared-footer.html');
+            return script.src.replace('footer.js', 'footer.html');
         }
     }
     // Fallback to default path if script tag not found
-    return '/doctor-appoinment/Frontend/pages/shared-footer.html';
+    return '/doctor-appoinment/Frontend/pages/footer.html';
 }
 
 // Function to load and inject the shared footer
