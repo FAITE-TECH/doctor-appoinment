@@ -15,12 +15,16 @@
 
     <div id="header"></div>
     <script>
-      fetch("header.html")
+      fetch("shared-nav.html")
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
+          if (window.initNavigationAfterLoad) {
+            window.initNavigationAfterLoad();
+          }
         });
     </script>
+    <script src="shared-nav.js"></script>
 
   <div class="text-center px-6">
     <!-- Big 404 with animation -->

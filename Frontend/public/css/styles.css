@@ -129,6 +129,17 @@
   .clamp-6 { -webkit-line-clamp: 7 !important; }
 }
 
+/* Safari footer fallback to ensure consistent colors if Tailwind fails to load */
+#site-footer {
+  background-image: linear-gradient(to right, #1e3a8a, #1e40af) !important; /* from-blue-900 to-blue-800 */
+  color: #ffffff !important;
+}
+
+#site-footer a { color: #e5e7eb !important; }
+#site-footer a:hover { color: #ffffff !important; }
+
+#site-footer .border-blue-700 { border-color: rgba(30, 64, 175, 0.6) !important; }
+
  /* .sticky {
             position: fixed;
             top: 0;
