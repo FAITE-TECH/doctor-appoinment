@@ -82,13 +82,18 @@ if ($method === 'POST' && $action === 'book') {
     
     if (!$user) {
         // Create new patient user
-        $stmt = $conn->prepare('INSERT INTO users (name, email, password, role_id) VALUES (?, ?, ?, 3)'); // role_id 3 = patient
+        $stmt = $conn->prepare('INSERT INTO users (name, email, phone, password, role_id) VALUES (?, ?, ?, ?, 3)'); // role_id 3 = patient
         $hashed_password = password_hash(uniqid(), PASSWORD_DEFAULT); // Random password for patients
-        $stmt->bind_param('sss', $patient_name, $patient_email, $hashed_password);
+        $stmt->bind_param('ssss', $patient_name, $patient_email, $patient_phone, $hashed_password);
         $stmt->execute();
         $user_id = $stmt->insert_id;
         $stmt->close();
     } else {
+        // Update the phone number if user exists
+        $stmt = $conn->prepare('UPDATE users SET phone = ? WHERE id = ?');
+        $stmt->bind_param('si', $patient_phone, $user['id']);
+        $stmt->execute();
+        $stmt->close();
         $user_id = $user['id'];
     }
     
@@ -214,7 +219,7 @@ switch ($method) {
             
             $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
             
-            $sql = "SELECT a.*, u.name as patient_name, u.email as patient_email, d.name as doctor_name, d.specialization, dept.name as department_name
+            $sql = "SELECT a.*, u.name as patient_name, u.email as patient_email, u.phone as phone_number, d.name as doctor_name, d.specialization, dept.name as department_name
                     FROM appointments a
                     JOIN users u ON a.user_id = u.id
                     JOIN doctors d ON a.doctor_id = d.id
@@ -290,7 +295,7 @@ switch ($method) {
             ]);
         } elseif ($id) {
             // Get specific appointment
-            $stmt = $conn->prepare('SELECT a.*, u.name as patient_name, u.email as patient_email, d.name as doctor_name, d.specialization, dept.name as department_name
+            $stmt = $conn->prepare('SELECT a.*, u.name as patient_name, u.email as patient_email, u.phone as phone_number, d.name as doctor_name, d.specialization, dept.name as department_name
                                    FROM appointments a
                                    JOIN users u ON a.user_id = u.id
                                    JOIN doctors d ON a.doctor_id = d.id

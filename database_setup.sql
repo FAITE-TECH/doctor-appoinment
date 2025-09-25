@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(20) NULL,
     password VARCHAR(255) NOT NULL,
     role_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -113,18 +114,18 @@ INSERT IGNORE INTO roles (role_name) VALUES
 ('staff');
 
 -- Insert an admin user
-INSERT IGNORE INTO users (name, email, password, role_id) VALUES
-('System Admin', 'admin@hospital.com', MD5('admin123'), 1);
+INSERT IGNORE INTO users (name, email, phone, password, role_id) VALUES
+('System Admin', 'admin@hospital.com', '+1234567800', MD5('admin123'), 1);
 
 -- Insert sample doctor users
-INSERT IGNORE INTO users (name, email, password, role_id) VALUES
-('Dr. John Smith', 'john.smith@hospital.com', MD5('doc123'), 2),
-('Dr. Sarah Johnson', 'sarah.johnson@hospital.com', MD5('doc123'), 2);
+INSERT IGNORE INTO users (name, email, phone, password, role_id) VALUES
+('Dr. John Smith', 'john.smith@hospital.com', '+1234567890', MD5('doc123'), 2),
+('Dr. Sarah Johnson', 'sarah.johnson@hospital.com', '+1234567891', MD5('doc123'), 2);
 
 -- Insert sample patient users
-INSERT IGNORE INTO users (name, email, password, role_id) VALUES
-('John Doe', 'john.doe@example.com', MD5('patient123'), 3),
-('Jane Smith', 'jane.smith@example.com', MD5('patient123'), 3);
+INSERT IGNORE INTO users (name, email, phone, password, role_id) VALUES
+('John Doe', 'john.doe@example.com', '+1234567895', MD5('patient123'), 3),
+('Jane Smith', 'jane.smith@example.com', '+1234567896', MD5('patient123'), 3);
 
 -- Insert sample doctors (with new structure)
 INSERT IGNORE INTO doctors (user_id, name, email, specialization, phone, description, department_id) VALUES

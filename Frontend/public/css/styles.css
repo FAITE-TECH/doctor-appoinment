@@ -140,6 +140,31 @@
   padding-bottom: 0 !important; /* Remove any padding */
 }
 
+/* Global responsive utilities (non-invasive) */
+@media (max-width: 640px) {
+  /* Containers: reduce horizontal padding on small screens */
+  .container,
+  .max-w-6xl,
+  .max-w-7xl {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Images inside hero/detail banners: keep aspect and full width */
+  .w-full.h-full.object-cover {
+    object-position: center center;
+  }
+
+  /* Grid cards: ensure single column when space is tight */
+  .grid {
+    grid-auto-rows: 1fr;
+  }
+
+  /* Text clamping: allow a bit more space on mobile for readability */
+  .clamp-4 { -webkit-line-clamp: 5 !important; }
+  .clamp-6 { -webkit-line-clamp: 7 !important; }
+}
+
  /* .sticky {
             position: fixed;
             top: 0;

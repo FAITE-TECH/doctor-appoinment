@@ -49,12 +49,20 @@
       class="relative md:w-full md:h-[600px] h-[400px] mb-6 shadow-lg rounded-2xl flex justify-center align-center"
     >
       <!-- Image -->
-      <img
-        id="slider-image"
-        class="w-full h-full object-cover transition duration-500"
-        src="../public/assets/doctor1.jpg"
-        alt="Hero Image"
-      />
+      <div class="w-full h-full relative overflow-hidden">
+        <img
+          id="slider-image"
+          class="w-full h-full object-cover absolute top-0 left-0 opacity-100 transition-opacity duration-1000 ease-in-out"
+          src="../public/assets/doctor1.jpg"
+          alt="Hero Image"
+        />
+        <img
+          id="slider-image-next"
+          class="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-1000 ease-in-out"
+          src="../public/assets/doctor1.jpg"
+          alt="Hero Image"
+        />
+      </div>
 
       <!-- Left Arrow -->
       <button
@@ -99,9 +107,30 @@
       const nextBtn = document.getElementById("next");
       const dots = document.querySelectorAll(".dot");
 
+      let slideInterval;
+      let isTransitioning = false;
+      const sliderImageNext = document.getElementById("slider-image-next");
+
       function showImage(i) {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
         index = (i + images.length) % images.length;
-        sliderImage.src = images[index];
+        
+        // Set the next image
+        sliderImageNext.src = images[index];
+        
+        // Fade out current image and fade in next image
+        sliderImage.style.opacity = "0";
+        sliderImageNext.style.opacity = "1";
+
+        // After transition completes, swap the images
+        setTimeout(() => {
+          sliderImage.src = images[index];
+          sliderImage.style.opacity = "1";
+          sliderImageNext.style.opacity = "0";
+          isTransitioning = false;
+        }, 1000);
 
         // Update dots
         dots.forEach((dot, idx) => {
@@ -110,20 +139,51 @@
         });
       }
 
+      function startAutoSlide() {
+        // Clear any existing interval
+        if (slideInterval) {
+          clearInterval(slideInterval);
+        }
+        // Set new interval
+        slideInterval = setInterval(() => {
+          if (!isTransitioning) {
+            showImage(index + 1);
+          }
+        }, 5000); // 5 seconds
+      }
+
+      function resetAutoSlide() {
+        // Reset the timer when user interacts with controls
+        startAutoSlide();
+      }
+
       prevBtn.addEventListener("click", () => {
-        showImage(index - 1);
+        if (!isTransitioning) {
+          showImage(index - 1);
+          resetAutoSlide();
+        }
       });
 
       nextBtn.addEventListener("click", () => {
-        showImage(index + 1);
+        if (!isTransitioning) {
+          showImage(index + 1);
+          resetAutoSlide();
+        }
       });
 
       dots.forEach((dot, idx) => {
-        dot.addEventListener("click", () => showImage(idx));
+        dot.addEventListener("click", () => {
+          if (!isTransitioning) {
+            showImage(idx);
+            resetAutoSlide();
+          }
+        });
       });
 
       // Initialize
+      sliderImageNext.src = images[0];
       showImage(index);
+      startAutoSlide();
     </script>
 
     <!-- Form Section -->

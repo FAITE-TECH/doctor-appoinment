@@ -85,6 +85,7 @@
                     </label>
                     <a
                       href="/forgot-password"
+                      id="forgotPasswordLink"
                       class="text-base font-medium text-gray-500 rounded font-pj hover:text-gray-900 hover:underline focus:outline-none focus:ring-1 focus:ring-gray-900 focus:ring-offset-2"
                     >
                       Forgot Password?
@@ -110,7 +111,7 @@
                 </button>
               </form>
 
-              <p class="mt-5 text-base font-normal text-center text-gray-900 font-pj">
+              <p class="mt-5 text-base font-normal text-center text-gray-900 font-pj" id="signupSection">
                 Don't have an account?
                 <a
                   href="./signup.html"
@@ -127,5 +128,14 @@
 
       <script src="../public/js/script.js"></script>
       <script src="shared-nav.js"></script>
+      <script>
+        // Check if this is an admin redirect
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('redirect') === 'admin') {
+          // Hide the signup section and forgot password link for admin login
+          document.getElementById('signupSection').style.display = 'none';
+          document.getElementById('forgotPasswordLink').style.display = 'none';
+        }
+      </script>
 </body>
 </html>

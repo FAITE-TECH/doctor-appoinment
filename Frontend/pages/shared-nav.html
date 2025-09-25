@@ -1,6 +1,6 @@
 <!-- Navigation Header -->
-<header class="bg-white shadow-md fixed w-full top-0 z-[100]">
-  <div class="w-full flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
+<header class="bg-white shadow-md fixed inset-x-0 top-0 w-screen z-[100]">
+  <div class="w-full max-w-7xl mx-auto flex items-center justify-between px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
     <!-- Logo -->
     <a href="./index.html" class="flex items-center space-x-2 sm:space-x-3">
       <img src="../public/assets/logo.png" alt="SPC Hospital Logo" class="h-8 sm:h-10 lg:h-12 w-auto" />
@@ -11,33 +11,17 @@
     </a>
 
     <!-- Navigation Links -->
-    <nav class="hidden lg:flex items-center space-x-8 font-medium text-gray-600">
-      <a href="./home.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="home">Home</a>
-      <a href="./doctors.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="doctors">Doctors</a>
-      <a href="./departments.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="departments">Departments</a>
-      <a href="./services.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="services">Services</a>
-      <a href="./gallery.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="gallery">Gallery</a>
-      <a href="./events.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="events">Events</a>
-      <a href="./contact.html" class="hover:text-blue-600 transition-colors duration-200 px-2 py-1" data-nav="contact">Contact</a>
+    <nav class="hidden lg:flex items-center justify-center flex-1 mx-4 font-medium text-gray-600">
+      <div class="flex items-center justify-center space-x-8">
+        <a href="./home.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2" data-nav="home">Home</a>
+        <a href="./doctors.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2" data-nav="doctors">Doctors</a>
+        <a href="./departments.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2" data-nav="departments">Departments</a>
+        <a href="./services.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2" data-nav="services">Services</a>
+        <a href="./gallery.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2" data-nav="gallery">Gallery</a>
+        <a href="./events.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2" data-nav="events">Events</a>
+        <a href="./contact.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2" data-nav="contact">Contact</a>
+      </div>
     </nav>
-
-    <!-- User Authentication -->
-    <div class="flex items-center space-x-2 sm:space-x-3" id="nav-links">
-      <!-- Guest Links - Hidden for normal users -->
-      <div class="hidden" data-auth="guest">
-        <!-- Sign in/sign up links are now hidden from normal user UI -->
-      </div>
-      
-      <!-- User Links -->
-      <div class="hidden flex items-center space-x-2 sm:space-x-3" data-auth="user">
-        <span id="nav-user-email" class="text-gray-700 font-medium text-xs sm:text-sm px-1 sm:px-2 py-1 hidden sm:block"></span>
-        <a href="./home.html" class="bg-green-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-green-700 transition-colors duration-200 font-medium text-sm sm:text-base">Dashboard</a>
-        <button id="signoutBtn" class="bg-gray-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-gray-700 transition-colors duration-200 font-medium text-sm sm:text-base">Sign Out</button>
-      </div>
-
-      <!-- Admin Link -->
-      <a href="./admin/index.html" class="hidden bg-red-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-red-700 transition-colors duration-200 font-medium text-sm sm:text-base" data-auth="admin" id="adminLink">Admin</a>
-    </div>
 
     <!-- Mobile Menu Toggle -->
     <button id="mobileMenuToggle" class="lg:hidden text-2xl focus:outline-none p-2 hover:bg-gray-100 rounded-md transition-colors duration-200">
@@ -46,18 +30,15 @@
   </div>
 
   <!-- Mobile Menu -->
-  <nav id="mobileMenu" class="hidden flex flex-col space-y-1 bg-white shadow-lg border-t border-gray-200 lg:hidden fixed w-full top-[60px] sm:top-[68px] lg:top-[76px] z-[101] px-4 py-4">
-    <a href="./home.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="home">Home</a>
-    <a href="./doctors.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="doctors">Doctors</a>
-    <a href="./departments.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="departments">Departments</a>
-    <a href="./services.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="services">Services</a>
-    <a href="./gallery.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="gallery">Gallery</a>
-    <a href="./events.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="events">Events</a>
-    <a href="./contact.html" class="block py-3 px-4 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="contact">Contact</a>
-    
-    <!-- Mobile Auth Links - Hidden for normal users -->
-    <div class="border-t border-gray-200 pt-4 mt-4 hidden" data-auth="guest">
-      <!-- Sign in/sign up links are now hidden from normal user UI -->
+  <nav id="mobileMenu" class="hidden flex flex-col bg-white shadow-lg border-t border-gray-200 lg:hidden fixed w-full top-[60px] sm:top-[68px] lg:top-[76px] z-[101] px-4 py-4" aria-hidden="true">
+    <div class="flex flex-col space-y-2 items-center">
+      <a href="./home.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="home">Home</a>
+      <a href="./doctors.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="doctors">Doctors</a>
+      <a href="./departments.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="departments">Departments</a>
+      <a href="./services.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="services">Services</a>
+      <a href="./gallery.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="gallery">Gallery</a>
+      <a href="./events.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="events">Events</a>
+      <a href="./contact.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="contact">Contact</a>
     </div>
   </nav>
 </header>

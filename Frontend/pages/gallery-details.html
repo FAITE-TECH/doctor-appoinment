@@ -18,18 +18,41 @@
   </head>
   <body class="bg-gray-50">
 
+
     <!--  Import Header -->
+
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html")
-        .then((res) => res.text())
-        .then((data) => {
-          document.getElementById("header").innerHTML = data;
-          // Initialize navigation after it's loaded
-          if (window.initNavigationAfterLoad) {
-            window.initNavigationAfterLoad();
-          }
-        });
+      document.addEventListener('DOMContentLoaded', () => {
+        fetch("shared-nav.html?v=" + Date.now())
+          .then((res) => res.ok ? res.text() : Promise.reject('Failed to load nav'))
+          .then((data) => {
+            document.getElementById("header").innerHTML = data;
+            if (window.initNavigationAfterLoad) {
+              window.initNavigationAfterLoad();
+            }
+          })
+          .catch(() => {
+            document.getElementById("header").innerHTML = `
+              <header class="bg-white shadow-md w-full">
+                <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+                  <a href="./index.html" class="flex items-center space-x-2">
+                    <img src="../public/assets/logo.png" alt="SPC Hospital Logo" class="h-8 w-auto" />
+                    <span class="font-bold text-blue-600">SPC Hospital</span>
+                  </a>
+                  <nav class="hidden md:flex items-center space-x-6 text-gray-600">
+                    <a href="./home.html">Home</a>
+                    <a href="./doctors.html">Doctors</a>
+                    <a href="./departments.html">Departments</a>
+                    <a href="./services.html">Services</a>
+                    <a href="./gallery.html">Gallery</a>
+                    <a href="./events.html">Events</a>
+                    <a href="./contact.html">Contact</a>
+                  </nav>
+                </div>
+              </header>`;
+          });
+      });
     </script>
 
     <div class="container mx-auto p-6">
@@ -104,6 +127,13 @@
           const createdDate = new Date(currentGalleryItem.created_at).toLocaleDateString();
 
           document.getElementById("galleryDetail").innerHTML = `
+            <div class="relative w-full h-56 sm:h-64 md:h-72 lg:h-80 max-w-6xl mx-auto">
+                <img src="${imagePath}" alt="${title}" class="w-full h-full object-cover rounded-lg">
+                <h1 class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
+                    ${title}
+                </h1>
+            </div>
+
             <div class="flex text-gray-600 my-6 leading-relaxed space-x-1 text-sm justify-center max-w-6xl">
                 <a href="home.html#gallery" class="text-blue-600 hover:underline">Home</a>
                 <span>&gt;</span>
