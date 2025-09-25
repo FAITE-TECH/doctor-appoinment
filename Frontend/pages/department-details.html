@@ -2,7 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scal            <div class="relative w-full max-w-6xl mx-auto h-[480px]">
+                <div class="absolute ins                  <img src="${departmentImage}" alt="${departmentName}" class="w-full h-full object-cover rounded-lg transform-gpu">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 rounded-lg"></div>
+                <h1 class="absolute bottom-4 left-4 text-xl font-bold text-white px-3 py-2 rounded drop-shadow">
+                    ${departmentName}
+                </h1>
+            </div> />
     <title>Department Details</title>
     <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
@@ -16,7 +23,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
   </head>
-  <body class="bg-gray-50">
+  <body class="bg-white">
 
 
     <!--  Import Header -->
@@ -59,7 +66,7 @@
     <div class="container mx-auto p-6">
       <div
         id="departmentDetail"
-        class="flex flex-col mt-6 justify-center align-center"
+        class="flex flex-col mt-6 justify-center items-center"
       ></div>
     </div>
 
@@ -136,13 +143,6 @@
           const departmentDescription = currentDepartment.description || "Specialized medical department providing quality healthcare services.";
 
           document.getElementById("departmentDetail").innerHTML = `
-            <div class="relative w-full h-56 sm:h-64 md:h-72 lg:h-80 max-w-6xl mx-auto">
-                <img src="${departmentImage}" alt="${departmentName}" class="w-full h-full object-cover rounded-lg">
-                <h1 class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
-                    ${departmentName}
-                </h1>
-            </div>
-
             <div class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm justify-center max-w-6xl">
                 <a href="home.html#departments" class="text-blue-600 hover:underline">Home</a>
                 <span>&gt;</span>
@@ -151,7 +151,7 @@
                 <span class="text-gray-800 font-medium">${departmentName}</span>
             </div>
 
-            <div class="bg-white p-6 flex flex-col justify-between max-w-6xl mx-auto md:flex-row gap-6">
+            <div class="bg-white p-6 flex flex-col justify-between max-w-6xl mx-auto md:flex-row gap-6 shadow-sm rounded-lg border border-gray-100">
               <img src="${departmentImage}" alt="${departmentName}" class="w-60 h-60 object-cover rounded-lg shadow-md">
               
               <div class="md:w-2/3">

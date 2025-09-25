@@ -1,52 +1,16 @@
-.clamp-4 {
-  display: -webkit-box;
-  -webkit-line-clamp: 4; /* Show only 4 lines */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.4; /* Reduce line height to minimize gaps */
-  min-height: auto; /* Allow natural height for single lines */
-}
-.clamp-6 {
-  display: -webkit-box;
-  -webkit-line-clamp: 6; /* Show only 6 lines */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* Replaced with Tailwind classes:
+   Use class="line-clamp-4" for 4 lines
+   Use class="line-clamp-6" for 6 lines
+   These utilities are part of @tailwindcss/line-clamp plugin
+*/
 
-/* Ensure service card text alignment */
-.service-card-content {
-  text-align: left !important;
-}
-
-.service-card-content h3,
-.service-card-content p {
-  text-align: left !important;
-}
-
-/* Reduce gap between heading and description in service cards */
-.service-card-content h3 {
-  margin-bottom: 0.25rem !important; /* mb-1 equivalent */
-}
-
-.service-card-content p {
-  margin-top: 0 !important;
-}
-
-/* Latest News card layout */
-.news-card-content {
-  text-align: left !important;
-}
-
-.news-card-content h3,
-.news-card-content p {
-  text-align: left !important;
-}
-
-.news-card-content h3 {
-  margin-bottom: 0.25rem !important;
-}
+/* Replaced with Tailwind classes:
+   For service and news cards, use:
+   - text-left for text alignment
+   - mb-1 for margin bottom
+   - mt-0 for margin top
+   Example: class="text-left mb-1"
+*/
 
 .news-card-content p {
   margin-top: 0 !important;

@@ -143,14 +143,7 @@
           const eventLocation = currentEvent.location || "Hospital Main Hall";
 
           document.getElementById("eventDetail").innerHTML = `
-            <div class="relative w-full h-56 sm:h-64 md:h-72 lg:h-80 max-w-6xl mx-auto">
-                <img src="${eventImage}" alt="${eventTitle}" class="w-full h-full object-cover rounded-lg">
-                <h1 class="absolute bottom-2 left-2 text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
-                    ${eventTitle}
-                </h1>
-            </div>
-
-            <div class="flex text-gray-600 my-10 leading-relaxed space-x-1 text-sm justify-center max-w-6xl">
+            <div class="flex text-gray-600 my-6 leading-relaxed space-x-1 text-sm justify-center max-w-6xl">
                 <a href="home.html#events" class="text-blue-600 hover:underline">Home</a>
                 <span>&gt;</span>
                 <a href="events.html" class="text-blue-600 hover:underline">Events</a>
