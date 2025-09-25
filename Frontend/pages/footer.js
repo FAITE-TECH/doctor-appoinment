@@ -1,23 +1,34 @@
 // Function to get the base URL for the footer
 function getFooterPath() {
+    // Add cache-busting query parameter
+    const cacheBuster = Date.now();
     // Get all script tags
     const scripts = document.getElementsByTagName('script');
     // Find the footer script tag
     for (const script of scripts) {
         if (script.src.includes('footer.js')) {
-            // Return the path to the footer HTML file
-            return script.src.replace('footer.js', 'footer.html');
+            // Return the path to the footer HTML file with cache buster
+            return script.src.replace('footer.js', `footer.html?v=${cacheBuster}`);
         }
     }
     // Fallback to default path if script tag not found
-    return '/doctor-appoinment/Frontend/pages/footer.html';
+    return `/doctor-appoinment/Frontend/pages/footer.html?v=${cacheBuster}`;
 }
 
 // Function to load and inject the shared footer
 async function loadFooter() {
     try {
         const footerPath = getFooterPath();
-        const response = await fetch(footerPath);
+        const response = await fetch(footerPath, {
+            headers: {
+                'Accept': 'text/html',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            },
+            cache: 'no-store',
+            credentials: 'same-origin'
+        });
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

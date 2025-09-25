@@ -29,19 +29,58 @@
     </button>
   </div>
 
+  <!-- Mobile Menu Overlay -->
+  <div id="mobileMenuOverlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-[90] hidden transition-opacity duration-300"></div>
+  
   <!-- Mobile Menu -->
-  <nav id="mobileMenu" class="hidden flex flex-col bg-white shadow-lg border-t border-gray-200 lg:hidden fixed w-full top-[60px] sm:top-[68px] lg:top-[76px] z-[101] px-4 py-4" aria-hidden="true">
-    <div class="flex flex-col space-y-2 items-center">
-      <a href="./home.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="home">Home</a>
-      <a href="./doctors.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="doctors">Doctors</a>
-      <a href="./departments.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="departments">Departments</a>
-      <a href="./services.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="services">Services</a>
-      <a href="./gallery.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="gallery">Gallery</a>
-      <a href="./events.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="events">Events</a>
-      <a href="./contact.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="contact">Contact</a>
+  <nav id="mobileMenu" class="lg:hidden fixed inset-y-0 right-0 w-64 bg-white shadow-lg z-[101] transform translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="h-full overflow-y-auto">
+      <div class="px-4 py-6">
+        <div class="flex flex-col space-y-2">
+          <a href="./home.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="home">Home</a>
+          <a href="./doctors.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="doctors">Doctors</a>
+          <a href="./departments.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="departments">Departments</a>
+          <a href="./services.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="services">Services</a>
+          <a href="./gallery.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="gallery">Gallery</a>
+          <a href="./events.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="events">Events</a>
+          <a href="./contact.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="contact">Contact</a>
+        </div>
+      </div>
     </div>
   </nav>
 </header>
 
 <!-- Add top padding to account for fixed header -->
 <div class="pt-[60px] sm:pt-[68px] lg:pt-[76px]"></div>
+
+<!-- Load navigation script -->
+<script>
+  // Create a promise to track script loading
+  window.navScriptLoaded = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'shared-nav.js';
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  // Initialize navigation after script is loaded
+  window.navScriptLoaded.then(() => {
+    if (typeof initMobileMenu === 'function') {
+      initMobileMenu();
+      setActiveNavLink();
+    }
+  }).catch(error => {
+    console.error('Error loading navigation script:', error);
+  });
+  
+  // Also expose initialization function for dynamic loading
+  window.initNavigationAfterLoad = function() {
+    window.navScriptLoaded.then(() => {
+      if (typeof initMobileMenu === 'function') {
+        initMobileMenu();
+        setActiveNavLink();
+      }
+    });
+  };
+</script>

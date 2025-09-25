@@ -3,30 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
     <title>Doctor Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-   ttps://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Load shared navigation script early -->
+    <script src="shared-nav.js"></script>
   </head>
   <body>
     <div id="header"></div>
     <script>
+      // Load navigation content
       fetch("shared-nav.html?v=" + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
-          // Initialize navigation after it's loaded
-          if (window.initNavigationAfterLoad) {
-            window.initNavigationAfterLoad();
-          }
+          // Initialize navigation after content is loaded
+          setTimeout(() => {
+            if (typeof initMobileMenu === 'function') {
+              initMobileMenu();
+              setActiveNavLink();
+            }
+          }, 100);
         });
     </script>
 

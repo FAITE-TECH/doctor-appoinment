@@ -4,14 +4,75 @@
 
   // Mobile menu toggle
   function initMobileMenu() {
-    const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-    const mobileMenu = document.getElementById("mobileMenu");
+    // Wait for DOM elements to be available
+    const waitForElements = setInterval(() => {
+      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
 
-    if (mobileMenuToggle && mobileMenu) {
-      mobileMenuToggle.addEventListener("click", () => {
-        mobileMenu.classList.toggle("hidden");
-      });
-    }
+      if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
+        clearInterval(waitForElements);
+
+        // Make sure the menu starts in the correct state
+        mobileMenu.classList.add("translate-x-full");
+        mobileMenuOverlay.classList.add("hidden");
+
+        function openMenu() {
+          mobileMenu.classList.remove("translate-x-full");
+          mobileMenuOverlay.classList.remove("hidden");
+          setTimeout(() => {
+            mobileMenuOverlay.classList.add("opacity-100");
+          }, 0);
+          const icon = mobileMenuToggle.querySelector("i");
+          if (icon) {
+            icon.classList.remove("fa-bars");
+            icon.classList.add("fa-times");
+          }
+        }
+
+        function closeMenu() {
+          mobileMenu.classList.add("translate-x-full");
+          mobileMenuOverlay.classList.remove("opacity-100");
+          setTimeout(() => {
+            mobileMenuOverlay.classList.add("hidden");
+          }, 300);
+          const icon = mobileMenuToggle.querySelector("i");
+          if (icon) {
+            icon.classList.add("fa-bars");
+            icon.classList.remove("fa-times");
+          }
+        }
+
+        // Remove any existing event listeners
+        const newMenuToggle = mobileMenuToggle.cloneNode(true);
+        mobileMenuToggle.parentNode.replaceChild(newMenuToggle, mobileMenuToggle);
+        
+        // Add new event listeners
+        newMenuToggle.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (mobileMenu.classList.contains("translate-x-full")) {
+            openMenu();
+          } else {
+            closeMenu();
+          }
+        });
+
+        mobileMenuOverlay.addEventListener("click", closeMenu);
+
+        mobileMenu.querySelectorAll("a").forEach(link => {
+          link.addEventListener("click", closeMenu);
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !mobileMenu.classList.contains("translate-x-full")) {
+            closeMenu();
+          }
+        });
+      }
+    }, 100); // Check every 100ms
+
+    // Cleanup after 5 seconds to prevent infinite checking
+    setTimeout(() => clearInterval(waitForElements), 5000);
   }
 
   // Set active navigation link
