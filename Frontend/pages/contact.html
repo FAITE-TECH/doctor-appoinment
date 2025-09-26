@@ -116,6 +116,12 @@
                 <i class="fas fa-check-circle mr-1"></i>Email auto-filled from your account
               </div>
             </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number (Optional)</label>
+              <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" maxlength="10" placeholder="Enter 10 digit number" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <div id="phoneError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid 10-digit phone number</div>
+            </div>
             
             <div class="mb-6">
               <label class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
@@ -377,6 +383,10 @@
                 });
                 
                 input.addEventListener('input', function() {
+                    if (this.name === 'phone') {
+                        // Remove any non-digit characters
+                        this.value = this.value.replace(/\D/g, '');
+                    }
                     clearFieldError(this);
                 });
             });
@@ -406,10 +416,15 @@
             // Clear previous error
             clearFieldError(field);
 
-            // Check if field is empty
-            if (!value) {
+            // Check if field is empty (except for phone which is optional)
+            if (!value && field.hasAttribute('required')) {
                 showFieldError(field, 'This field is required');
                 return false;
+            }
+            
+            // If field is empty and not required, it's valid
+            if (!value && !field.hasAttribute('required')) {
+                return true;
             }
 
             // Email validation
@@ -417,6 +432,15 @@
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(value)) {
                     showFieldError(field, 'Please enter a valid email address');
+                    return false;
+                }
+            }
+
+            // Phone validation (only if a value is provided)
+            if (fieldName === 'phone' && value) {
+                const phoneRegex = /^[0-9]{10}$/;
+                if (!phoneRegex.test(value)) {
+                    showFieldError(field, 'Please enter a valid 10-digit phone number');
                     return false;
                 }
             }
@@ -481,10 +505,14 @@
                 firstName: document.getElementById('firstName').value.trim(),
                 lastName: document.getElementById('lastName').value.trim(),
                 email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
                 subject: document.getElementById('subject').value.trim(),
                 message: document.getElementById('message').value.trim()
             };
 
+            // Debug log the form data
+            console.log('Submitting form data:', formData);
+            
             // Submit to API
             fetch('../../Backend/api/contact.php', {
                 method: 'POST',
@@ -517,6 +545,14 @@
                     showAlert(data.message || 'Failed to send message', 'error');
                 }
             })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Server error');
+                    });
+                }
+                return response.json();
+            })
             .catch(error => {
                 // Hide loading state
                 submitBtn.disabled = false;
@@ -524,7 +560,7 @@
                 submitSpinner.classList.add('hidden');
                 
                 console.error('Error submitting form:', error);
-                showAlert('Failed to send message. Please try again.', 'error');
+                showAlert(error.message || 'Failed to send message. Please try again.', 'error');
             });
         }
 

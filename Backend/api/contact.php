@@ -39,20 +39,36 @@ function validateRequired($fields) {
 // Handle POST request - Submit contact message
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
+        // Debug logging
+        error_log("Received POST request to contact.php");
+        $rawInput = file_get_contents('php://input');
+        error_log("Raw input: " . $rawInput);
+        
         // Get JSON input
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = json_decode($rawInput, true);
         
         if (!$input) {
-            throw new Exception('Invalid JSON input');
+            error_log("JSON decode error: " . json_last_error_msg());
+            throw new Exception('Invalid JSON input: ' . json_last_error_msg());
         }
         
         // Extract and sanitize form data
         $firstName = sanitizeInput($input['firstName'] ?? '');
         $lastName = sanitizeInput($input['lastName'] ?? '');
         $email = sanitizeInput($input['email'] ?? '');
+        $phone = sanitizeInput($input['phone'] ?? '');
         $subject = sanitizeInput($input['subject'] ?? '');
         $message = sanitizeInput($input['message'] ?? '');
         
+        // Debug log sanitized input
+        error_log("Sanitized input values:");
+        error_log("firstName: " . $firstName);
+        error_log("lastName: " . $lastName);
+        error_log("email: " . $email);
+        error_log("phone: " . $phone);
+        error_log("subject: " . $subject);
+        error_log("message: " . $message);
+
         // Validate required fields
         $requiredFields = [
             'firstName' => $firstName,
@@ -64,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $validationError = validateRequired($requiredFields);
         if ($validationError) {
+            error_log("Validation error: " . $validationError);
             throw new Exception($validationError);
         }
         
@@ -78,17 +95,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = $_SESSION['user_id'];
         }
         
+        // Validate phone format if provided
+        if (!empty($phone) && !preg_match('/^[0-9]{10}$/', $phone)) {
+            throw new Exception('Invalid phone number format. Please enter exactly 10 digits.');
+        }
+
         // Insert contact message into database
         $stmt = $conn->prepare("
-            INSERT INTO contact_messages (user_id, first_name, last_name, email, subject, message, status) 
-            VALUES (?, ?, ?, ?, ?, ?, 'new')
+            INSERT INTO contact_messages (user_id, first_name, last_name, email, phone, subject, message, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'new')
         ");
         
         if (!$stmt) {
             throw new Exception('Database prepare error: ' . $conn->error);
         }
         
-        $stmt->bind_param("isssss", $userId, $firstName, $lastName, $email, $subject, $message);
+        $stmt->bind_param("issssss", $userId, $firstName, $lastName, $email, $phone, $subject, $message);
         
         if ($stmt->execute()) {
             $messageId = $conn->insert_id;
