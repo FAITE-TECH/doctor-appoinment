@@ -946,7 +946,8 @@
           return;
         }
 
-        departments.forEach((department) => {
+        // Only show the first 4 departments
+        departments.slice(0, 4).forEach((department) => {
           const departmentCard = document.createElement("div");
           departmentCard.className =
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
@@ -1674,7 +1675,8 @@
           return;
         }
 
-        events.forEach((event) => {
+        // Only show the first 4 events
+        events.slice(0, 4).forEach((event) => {
           const newsCard = document.createElement("div");
           newsCard.className =
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
@@ -1737,7 +1739,7 @@
 
         <div class="mt-8">
           <a
-            href="./services.html"
+            href="./departments.html"
             class="text-blue-600 font-semibold hover:underline"
           >
             View All Departments →
