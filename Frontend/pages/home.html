@@ -975,11 +975,81 @@
       }
 
       // Initialize when page loads
-      document.addEventListener("DOMContentLoaded", () => {
-        fetchDepartments();
-        fetchDoctors();
+      // Function to handle URL parameters for department and doctor selection
+      async function handleURLParameters() {
+        if (window.location.hash.includes('?')) {
+          const hashParts = window.location.hash.split('?');
+          const params = new URLSearchParams(hashParts[1]);
+          
+          // Get the parameters
+          const doctorId = params.get('doctor_id');
+          const departmentName = params.get('department');
+          
+          if (departmentName) {
+            // Wait for departments to load
+            await new Promise(resolve => {
+              const checkDepartments = () => {
+                const deptSelect = document.getElementById('deptSelect');
+                if (deptSelect.options.length > 1) {
+                  resolve();
+                } else {
+                  setTimeout(checkDepartments, 100);
+                }
+              };
+              checkDepartments();
+            });
+            
+            // Set department
+            const deptSelect = document.getElementById('deptSelect');
+            Array.from(deptSelect.options).forEach(option => {
+              if (option.text === departmentName) {
+                deptSelect.value = option.value;
+                deptSelect.dispatchEvent(new Event('change'));
+              }
+            });
+          }
+          
+          if (doctorId) {
+            // Wait for doctors to load
+            await new Promise(resolve => {
+              const checkDoctors = () => {
+                const doctorSelect = document.getElementById('doctorSelect');
+                if (doctorSelect.options.length > 1) {
+                  resolve();
+                } else {
+                  setTimeout(checkDoctors, 100);
+                }
+              };
+              checkDoctors();
+            });
+            
+            // Set doctor and trigger change event
+            const doctorSelect = document.getElementById('doctorSelect');
+            doctorSelect.value = doctorId;
+            doctorSelect.dispatchEvent(new Event('change'));
+          }
+        }
+      }
+
+      // Reset form fields before auto-filling
+      function resetFormFields() {
+        const deptSelect = document.getElementById('deptSelect');
+        const doctorSelect = document.getElementById('doctorSelect');
+        if (deptSelect) deptSelect.value = '';
+        if (doctorSelect) doctorSelect.value = '';
+      }
+
+      // Listen for hash changes to handle new parameters
+      window.addEventListener('hashchange', () => {
+        resetFormFields();
+        handleURLParameters();
+      });
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        await Promise.all([fetchDepartments(), fetchDoctors()]);
         checkUserAuthAndFillEmail();
         initializeAppointmentCalendar();
+        handleURLParameters();
       });
 
       // Function to check user authentication and auto-fill email
