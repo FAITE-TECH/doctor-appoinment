@@ -82,7 +82,13 @@
     
     navLinks.forEach(link => {
       const linkPage = link.getAttribute('href').replace('./', '').replace('.html', '');
-      if (linkPage === currentPage) {
+      // Check if current page matches exactly or if it's a detail page (e.g., doctor-details should highlight doctors)
+      if (linkPage === currentPage || 
+          (currentPage === 'doctor-details' && linkPage === 'doctors') ||
+          (currentPage === 'department-details' && linkPage === 'departments') ||
+          (currentPage === 'service-details' && linkPage === 'services') ||
+          (currentPage === 'event-details' && linkPage === 'events') ||
+          (currentPage === 'gallery-details' && linkPage === 'gallery')) {
         link.classList.add('text-blue-600', 'font-semibold');
         link.classList.remove('hover:text-blue-600');
       } else {
