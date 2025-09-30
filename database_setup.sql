@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS gallery (
 );
 
 -- Insert sample gallery items
-INSERT IGNORE INTO
+INSERT IGNORE INTO gallery (title, description, image_path) VALUES
 ('Modern Operating Theater', 'State-of-the-art operating facility with latest equipment', 'gallery/modern-ot.jpg'),
 ('Emergency Department', '24/7 emergency care unit with skilled medical staff', 'gallery/emergency.jpg'),
 ('Medical Conference 2025', 'Annual medical conference with international speakers', 'gallery/conference.jpg'),
