@@ -417,8 +417,7 @@ if ($method === 'POST' && $action === 'upload_image') {
     if (move_uploaded_file($file['tmp_name'],$filepath)) {
         try {
             $stmt = $GLOBALS['conn']->prepare('INSERT INTO gallery (title, description, image_path) VALUES (?,?,?)');
-            $path = '/doctor-appoinment/uploads/gallery/'.$filename;
-            $stmt->bind_param('sss',$title,$description,$path);
+            $stmt->bind_param('sss',$title,$description,$filename);
             
             if ($stmt->execute()) {
                 json_response(['success'=>true,'message'=>'Image uploaded successfully'],201);
