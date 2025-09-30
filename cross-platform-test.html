@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Cross-Platform Compatibility Test - Doctor Appointment System</title>
+    
+    <!-- Load our compatibility scripts first -->
+    <script src="Frontend/public/js/browser-compat.js"></script>
+    <script src="Frontend/public/js/cross-platform-utils.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2563eb;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+        .result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        .warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #2563eb;
+        }
+        .btn-success {
+            background: #10b981;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Cross-Platform Compatibility Test Suite</h1>
+        <p>This page tests all the cross-platform fixes and compatibility features implemented in the Doctor Appointment System.</p>
+        
+        <div class="test-section">
+            <h2>🖥️ Environment Detection</h2>
+            <div id="environment-info"></div>
+            <button class="btn" onclick="testEnvironment()">Run Environment Test</button>
+        </div>
+        
+        <div class="grid">
+            <div class="test-section">
+                <h2>🌐 Browser Compatibility</h2>
+                <div id="browser-tests"></div>
+                <button class="btn" onclick="testBrowserFeatures()">Test Browser Features</button>
+            </div>
+            
+            <div class="test-section">
+                <h2>📁 Path Resolution</h2>
+                <div id="path-tests"></div>
+                <button class="btn" onclick="testPaths()">Test Path Functions</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔗 API Connectivity</h2>
+            <div id="api-tests"></div>
+            <button class="btn" onclick="testApiConnections()">Test API Endpoints</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎨 CSS Features</h2>
+            <div id="css-tests"></div>
+            <button class="btn" onclick="testCSSFeatures()">Test CSS Support</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📱 Responsive Design</h2>
+            <div id="responsive-tests"></div>
+            <button class="btn" onclick="testResponsiveFeatures()">Test Responsive Design</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 JavaScript Polyfills</h2>
+            <div id="polyfill-tests"></div>
+            <button class="btn" onclick="testPolyfills()">Test Polyfills</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🚀 Quick Links</h2>
+            <p>Test the application with the fixes applied:</p>
+            <a href="Frontend/pages/index.html" class="btn btn-success">Main Application</a>
+            <a href="Frontend/pages/admin/login.html" class="btn">Admin Login</a>
+            <a href="test_connection.php" class="btn">Database Test</a>
+            <button class="btn" onclick="runAllTests()">Run All Tests</button>
+        </div>
+    </div>
+
+    <script>
+        // Test environment detection
+        function testEnvironment() {
+            var output = document.getElementById('environment-info');
+            var html = '<h3>Environment Information:</h3>';
+            
+            try {
+                // Browser information
+                var browserInfo = window.CrossPlatformUtils ? 
+                    window.CrossPlatformUtils.getBrowserInfo() :
+                    { browser: 'unknown', version: 0, os: 'unknown' };
+                
+                html += '<div class="result info">';
+                html += '<strong>Browser:</strong> ' + browserInfo.browser + ' ' + browserInfo.version + '<br>';
+                html += '<strong>Operating System:</strong> ' + browserInfo.os + '<br>';
+                html += '<strong>Old Browser:</strong> ' + (browserInfo.isOldBrowser ? 'Yes (compatibility mode enabled)' : 'No') + '<br>';
+                html += '<strong>User Agent:</strong> ' + navigator.userAgent;
+                html += '</div>';
+                
+                // Screen information
+                html += '<div class="result info">';
+                html += '<strong>Screen Resolution:</strong> ' + screen.width + 'x' + screen.height + '<br>';
+                html += '<strong>Viewport:</strong> ' + window.innerWidth + 'x' + window.innerHeight + '<br>';
+                html += '<strong>Device Pixel Ratio:</strong> ' + (window.devicePixelRatio || 1);
+                html += '</div>';
+                
+                // JavaScript features
+                html += '<div class="result ' + (window.fetch ? 'success' : 'warning') + '">';
+                html += '<strong>Fetch API:</strong> ' + (window.fetch ? 'Native' : 'Polyfilled');
+                html += '</div>';
+                
+                html += '<div class="result ' + (window.Promise ? 'success' : 'warning') + '">';
+                html += '<strong>Promises:</strong> ' + (window.Promise ? 'Supported' : 'Polyfilled');
+                html += '</div>';
+                
+            } catch (e) {
+                html += '<div class="result error">Error detecting environment: ' + e.message + '</div>';
+            }
+            
+            output.innerHTML = html;
+        }
+        
+        // Test browser features
+        function testBrowserFeatures() {
+            var output = document.getElementById('browser-tests');
+            var html = '<h3>Browser Feature Tests:</h3>';
+            
+            var tests = [
+                { name: 'querySelector', test: function() { return !!document.querySelector; } },
+                { name: 'querySelectorAll', test: function() { return !!document.querySelectorAll; } },
+                { name: 'addEventListener', test: function() { return !!Element.prototype.addEventListener; } },
+                { name: 'classList', test: function() { return !!Element.prototype.classList; } },
+                { name: 'JSON', test: function() { return !!(window.JSON && JSON.parse && JSON.stringify); } },
+                { name: 'localStorage', test: function() { return !!window.localStorage; } },
+                { name: 'console', test: function() { return !!(window.console && console.log); } },
+                { name: 'Array.forEach', test: function() { return !!Array.prototype.forEach; } },
+                { name: 'CustomEvent', test: function() { return !!window.CustomEvent; } },
+                { name: 'CSS Transitions', test: function() { 
+                    var el = document.createElement('div');
+                    return 'transition' in el.style || 'webkitTransition' in el.style;
+                } }
+            ];
+            
+            tests.forEach(function(test) {
+                var supported = false;
+                try {
+                    supported = test.test();
+                } catch (e) {
+                    supported = false;
+                }
+                
+                html += '<div class="result ' + (supported ? 'success' : 'error') + '">';
+                html += test.name + ': ' + (supported ? '✓ Supported' : '✗ Not supported');
+                html += '</div>';
+            });
+            
+            output.innerHTML = html;
+        }
+        
+        // Test path functions
+        function testPaths() {
+            var output = document.getElementById('path-tests');
+            var html = '<h3>Path Resolution Tests:</h3>';
+            
+            if (window.CrossPlatformUtils) {
+                try {
+                    var basePath = window.CrossPlatformUtils.getBasePath();
+                    html += '<div class="result success">Base Path: ' + basePath + '</div>';
+                    
+                    var apiUrl = window.CrossPlatformUtils.buildApiUrl('auth.php');
+                    html += '<div class="result info">API URL: ' + apiUrl + '</div>';
+                    
+                    var uploadUrl = window.CrossPlatformUtils.buildUploadUrl('doctors/test.jpg');
+                    html += '<div class="result info">Upload URL: ' + uploadUrl + '</div>';
+                    
+                    var assetUrl = window.CrossPlatformUtils.buildAssetUrl('logo.png');
+                    html += '<div class="result info">Asset URL: ' + assetUrl + '</div>';
+                    
+                } catch (e) {
+                    html += '<div class="result error">Path test error: ' + e.message + '</div>';
+                }
+            } else {
+                html += '<div class="result error">CrossPlatformUtils not loaded</div>';
+            }
+            
+            output.innerHTML = html;
+        }
+        
+        // Test API connections
+        function testApiConnections() {
+            var output = document.getElementById('api-tests');
+            var html = '<h3>API Connection Tests:</h3>';
+            output.innerHTML = html + '<div class="result info">Testing API endpoints...</div>';
+            
+            var endpoints = [
+                'auth.php',
+                'departments.php',
+                'doctors.php',
+                'events.php'
+            ];
+            
+            var results = [];
+            var completed = 0;
+            
+            endpoints.forEach(function(endpoint) {
+                var url = window.buildApiUrl ? window.buildApiUrl(endpoint) : '../../Backend/api/' + endpoint;
+                
+                fetch(url + '?action=test')
+                    .then(function(response) {
+                        results.push({
+                            endpoint: endpoint,
+                            status: response.status,
+                            success: response.ok
+                        });
+                        return response.text();
+                    })
+                    .catch(function(error) {
+                        results.push({
+                            endpoint: endpoint,
+                            status: 'Error',
+                            success: false,
+                            error: error.message
+                        });
+                    })
+                    .finally(function() {
+                        completed++;
+                        if (completed === endpoints.length) {
+                            displayApiResults(results);
+                        }
+                    });
+            });
+            
+            function displayApiResults(results) {
+                var html = '<h3>API Connection Results:</h3>';
+                results.forEach(function(result) {
+                    html += '<div class="result ' + (result.success ? 'success' : 'error') + '">';
+                    html += result.endpoint + ': ' + result.status;
+                    if (result.error) {
+                        html += ' (' + result.error + ')';
+                    }
+                    html += '</div>';
+                });
+                output.innerHTML = html;
+            }
+        }
+        
+        // Test CSS features
+        function testCSSFeatures() {
+            var output = document.getElementById('css-tests');
+            var html = '<h3>CSS Feature Support:</h3>';
+            
+            var testElement = document.createElement('div');
+            document.body.appendChild(testElement);
+            
+            var cssTests = [
+                { name: 'Flexbox', property: 'display', value: 'flex' },
+                { name: 'Grid', property: 'display', value: 'grid' },
+                { name: 'Border Radius', property: 'borderRadius', value: '5px' },
+                { name: 'Box Shadow', property: 'boxShadow', value: '0 0 5px #000' },
+                { name: 'Transform', property: 'transform', value: 'translateX(10px)' },
+                { name: 'Transition', property: 'transition', value: 'all 0.3s ease' }
+            ];
+            
+            cssTests.forEach(function(test) {
+                var supported = false;
+                try {
+                    testElement.style[test.property] = test.value;
+                    supported = testElement.style[test.property] !== '';
+                } catch (e) {
+                    supported = false;
+                }
+                
+                html += '<div class="result ' + (supported ? 'success' : 'warning') + '">';
+                html += test.name + ': ' + (supported ? '✓ Supported' : '⚠ May need prefixes');
+                html += '</div>';
+            });
+            
+            document.body.removeChild(testElement);
+            output.innerHTML = html;
+        }
+        
+        // Test responsive features
+        function testResponsiveFeatures() {
+            var output = document.getElementById('responsive-tests');
+            var html = '<h3>Responsive Design Tests:</h3>';
+            
+            // Test viewport
+            var viewport = document.querySelector('meta[name="viewport"]');
+            html += '<div class="result ' + (viewport ? 'success' : 'error') + '">';
+            html += 'Viewport Meta Tag: ' + (viewport ? '✓ Present' : '✗ Missing');
+            html += '</div>';
+            
+            // Test media query support
+            var supportsMediaQueries = window.matchMedia && window.matchMedia('(min-width: 768px)').matches !== undefined;
+            html += '<div class="result ' + (supportsMediaQueries ? 'success' : 'error') + '">';
+            html += 'Media Queries: ' + (supportsMediaQueries ? '✓ Supported' : '✗ Not supported');
+            html += '</div>';
+            
+            // Test current screen size
+            var screenSize = 'Unknown';
+            if (window.innerWidth >= 1200) screenSize = 'Large Desktop';
+            else if (window.innerWidth >= 992) screenSize = 'Desktop';
+            else if (window.innerWidth >= 768) screenSize = 'Tablet';
+            else screenSize = 'Mobile';
+            
+            html += '<div class="result info">Current Screen Size: ' + screenSize + ' (' + window.innerWidth + 'px)</div>';
+            
+            output.innerHTML = html;
+        }
+        
+        // Test polyfills
+        function testPolyfills() {
+            var output = document.getElementById('polyfill-tests');
+            var html = '<h3>Polyfill Status:</h3>';
+            
+            var polyfills = [
+                { name: 'fetch', check: function() { return !!window.fetch; } },
+                { name: 'Promise', check: function() { return !!window.Promise; } },
+                { name: 'Array.forEach', check: function() { return !!Array.prototype.forEach; } },
+                { name: 'querySelector', check: function() { return !!document.querySelector; } },
+                { name: 'addEventListener', check: function() { return !!Element.prototype.addEventListener; } },
+                { name: 'classList', check: function() { return !!Element.prototype.classList; } },
+                { name: 'JSON', check: function() { return !!(window.JSON && JSON.parse); } },
+                { name: 'console', check: function() { return !!(window.console && console.log); } }
+            ];
+            
+            polyfills.forEach(function(polyfill) {
+                var available = polyfill.check();
+                html += '<div class="result ' + (available ? 'success' : 'error') + '">';
+                html += polyfill.name + ': ' + (available ? '✓ Available' : '✗ Missing');
+                html += '</div>';
+            });
+            
+            output.innerHTML = html;
+        }
+        
+        // Run all tests
+        function runAllTests() {
+            testEnvironment();
+            testBrowserFeatures();
+            testPaths();
+            testApiConnections();
+            testCSSFeatures();
+            testResponsiveFeatures();
+            testPolyfills();
+        }
+        
+        // Auto-run environment test on page load
+        window.addEventListener ? 
+            window.addEventListener('load', testEnvironment) :
+            window.attachEvent('onload', testEnvironment);
+    </script>
+</body>
+</html>

@@ -32,8 +32,9 @@
         <div class="section">
             <h2>🔧 System Tests</h2>
             <p>Run these tests to verify your system is working correctly:</p>
+            <a href="cross-platform-test.html" class="btn btn-success">Cross-Platform Compatibility Test</a>
             <a href="test_connection.php" class="btn">Database Connection Test</a>
-            <a href="test_auth.php" class="btn btn-success">Authentication Test</a>
+            <a href="test_auth.php" class="btn">Authentication Test</a>
         </div>
         
         <div class="section">

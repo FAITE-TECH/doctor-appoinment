@@ -15,67 +15,88 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
+    
+    <!-- Safari and Cross-browser compatibility -->
+    <script src="../public/js/browser-compat.js"></script>
+    <script src="../public/js/cross-platform-utils.js"></script>
   </head>
-  <body class="bg-gray-50">
+  <body class="bg-gray-50" style="min-height: 100vh; display: flex; flex-direction: column;">
 
 
     <!--  Import Header -->
 
     <div id="header"></div>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        fetch("shared-nav.html?v=" + Date.now())
-          .then((res) => res.ok ? res.text() : Promise.reject('Failed to load nav'))
-          .then((data) => {
-            document.getElementById("header").innerHTML = data;
+      // Safari-compatible navigation loading
+      function loadNavigation() {
+        var headerEl = document.getElementById("header");
+        if (!headerEl) {
+          console.error('Header element not found');
+          return;
+        }
+        
+        fetch("shared-nav.html?v=" + Date.now(), {
+          method: 'GET',
+          cache: 'no-cache',
+          headers: {
+            'Accept': 'text/html',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        })
+        .then(function(res) {
+          if (!res.ok) {
+            throw new Error('HTTP error! status: ' + res.status);
+          }
+          return res.text();
+        })
+        .then(function(data) {
+          headerEl.innerHTML = data;
+          // Small delay to ensure DOM is ready
+          setTimeout(function() {
             if (window.initNavigationAfterLoad) {
               window.initNavigationAfterLoad();
             }
-          })
-          .catch(() => {
-            document.getElementById("header").innerHTML = `
-              <header class="bg-white shadow-md w-full">
-                <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-                  <a href="./index.html" class="flex items-center space-x-2">
-                    <img src="../public/assets/logo.png" alt="SPC Hospital Logo" class="h-8 w-auto" />
-                    <span class="font-bold text-blue-600">SPC Hospital</span>
-                  </a>
-                  <nav class="hidden md:flex items-center space-x-6 text-gray-600">
-                    <a href="./home.html">Home</a>
-                    <a href="./doctors.html">Doctors</a>
-                    <a href="./departments.html">Departments</a>
-                    <a href="./services.html">Services</a>
-                    <a href="./gallery.html">Gallery</a>
-                    <a href="./events.html">Events</a>
-                    <a href="./contact.html">Contact</a>
-                  </nav>
-                </div>
-              </header>`;
-          });
-      });
+          }, 100);
+        })
+        .catch(function(error) {
+          console.warn('Failed to load navigation:', error.message);
+          // Minimal fallback nav
+          headerEl.innerHTML = '<header class="bg-white shadow-md w-full"><div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3"><a href="./index.html" class="flex items-center space-x-2"><img src="../public/assets/logo.png" alt="SPC Hospital Logo" class="h-8 w-auto" /><span class="font-bold text-blue-600">SPC Hospital</span></a><nav class="hidden md:flex items-center space-x-6 text-gray-600"><a href="./home.html">Home</a><a href="./doctors.html">Doctors</a><a href="./departments.html">Departments</a><a href="./services.html">Services</a><a href="./gallery.html">Gallery</a><a href="./events.html">Events</a><a href="./contact.html">Contact</a></nav></div></header>';
+        });
+      }
+      
+      // Safari-compatible DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadNavigation);
+      } else {
+        loadNavigation();
+      }
+    </script>
     </script>
 
-    <div class="container mx-auto p-6">
-      <div
-        id="eventDetail"
-        class="flex flex-col mt-6 justify-center align-center"
-      ></div>
-    </div>
-
-    <!-- Related Events -->
-    <section id="events">
-      <div class="text-center my-10 container mx-auto max-w-6xl px-4">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8">Other Events</h2>
-        
-        <!-- Cards Grid -->
+    <main style="flex: 1 0 auto;">
+      <div class="container mx-auto p-6">
         <div
-          id="eventContainer"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 transition-all duration-500"
-        >
-          <!-- Cards will be injected by JS -->
-        </div>
+          id="eventDetail"
+          class="flex flex-col mt-6 justify-center align-center"
+        ></div>
       </div>
-    </section>
+
+      <!-- Related Events -->
+      <section id="events">
+        <div class="text-center my-10 container mx-auto max-w-6xl px-4">
+          <h2 class="text-3xl font-bold text-gray-800 mb-8">Other Events</h2>
+          
+          <!-- Cards Grid -->
+          <div
+            id="eventContainer"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 transition-all duration-500"
+          >
+            <!-- Cards will be injected by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
 
     <script>
       // Global variables
@@ -287,11 +308,46 @@
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-      fetch("footer.html")
-        .then((res) => res.text())
-        .then((data) => {
-          document.getElementById("footer").innerHTML = data;
+      // Safari-compatible footer loading
+      function loadFooter() {
+        var footerEl = document.getElementById("footer");
+        if (!footerEl) {
+          console.error('Footer element not found');
+          return;
+        }
+        
+        fetch("footer.html?v=" + Date.now(), {
+          method: 'GET',
+          cache: 'no-cache',
+          headers: {
+            'Accept': 'text/html',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        })
+        .then(function(res) {
+          if (!res.ok) {
+            throw new Error('HTTP error! status: ' + res.status);
+          }
+          return res.text();
+        })
+        .then(function(data) {
+          footerEl.innerHTML = data;
+          // Add proper styling to footer without affecting body layout
+          var footer = footerEl.querySelector('footer');
+          if (footer) {
+            footer.style.marginTop = 'auto';
+            footer.style.flexShrink = '0';
+          }
+        })
+        .catch(function(error) {
+          console.warn('Failed to load footer:', error.message);
+          // Minimal fallback footer with proper styling
+          footerEl.innerHTML = '<footer class="bg-gray-700 text-white py-6" style="margin-top: auto; flex-shrink: 0;"><div class="container mx-auto px-4 text-center"><p>&copy; 2025 SPC Hospital. All rights reserved.</p></div></footer>';
         });
+      }
+      
+      // Load footer immediately on DOM ready to prevent layout issues
+      loadFooter();
     </script>
 
     <!-- Placeholder for spinner -->

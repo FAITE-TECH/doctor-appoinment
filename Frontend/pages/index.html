@@ -3,11 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>SPC Hospital - Doctor Appointment System</title>
+  
+  <!-- Cross-browser compatibility polyfills - Load first -->
+  <script src="../public/js/browser-compat.js"></script>
+  
+  <!-- External CSS and JS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../public/css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" type="image/png" href="../public/assets/logo.png">
+  
+  <!-- Tailwind config for cross-browser support -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          animation: {
+            'slideDown': 'slideDown 0.5s ease-out',
+            'fadeIn': 'fadeIn 0.3s ease-in-out'
+          }
+        }
+      }
+    }
+  </script>
 </head>
 <body class="bg-gray-100">
   <div id="header"></div>
