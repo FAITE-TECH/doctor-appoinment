@@ -193,18 +193,17 @@ CREATE TABLE IF NOT EXISTS gallery (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    image VARCHAR(500) NOT NULL,
-    category ENUM('facilities', 'events', 'staff', 'other') DEFAULT 'other',
+    image_path VARCHAR(500) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Insert sample gallery items
-INSERT IGNORE INTO gallery (title, description, image, category) VALUES
-('Modern Operating Theater', 'State-of-the-art operating facility with latest equipment', 'gallery/modern-ot.jpg', 'facilities'),
-('Emergency Department', '24/7 emergency care unit with skilled medical staff', 'gallery/emergency.jpg', 'facilities'),
-('Medical Conference 2025', 'Annual medical conference with international speakers', 'gallery/conference.jpg', 'events'),
-('Community Health Camp', 'Free health checkup camp for local community', 'gallery/health-camp.jpg', 'events'),
-('Medical Team', 'Our dedicated team of healthcare professionals', 'gallery/medical-team.jpg', 'staff');
+INSERT IGNORE INTO gallery (title, description, image_path) VALUES
+('Modern Operating Theater', 'State-of-the-art operating facility with latest equipment', 'gallery/modern-ot.jpg'),
+('Emergency Department', '24/7 emergency care unit with skilled medical staff', 'gallery/emergency.jpg'),
+('Medical Conference 2025', 'Annual medical conference with international speakers', 'gallery/conference.jpg'),
+('Community Health Camp', 'Free health checkup camp for local community', 'gallery/health-camp.jpg'),
+('Medical Team', 'Our dedicated team of healthcare professionals', 'gallery/medical-team.jpg');
 
 -- Create contact messages table
 CREATE TABLE IF NOT EXISTS contact_messages (
@@ -231,4 +230,3 @@ CREATE INDEX idx_appointment_patient ON appointments(patient_id);
 CREATE INDEX idx_doctor_department ON doctors(department_id);
 CREATE INDEX idx_user_role ON users(role_id);
 CREATE INDEX idx_schedule_doctor ON schedules(doctor_id);
-CREATE INDEX idx_gallery_category ON gallery(category);
