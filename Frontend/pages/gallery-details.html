@@ -142,7 +142,7 @@
         currentGalleryItem = galleryItems.find((item) => parseInt(item.id) === galleryId);
 
         if (currentGalleryItem) {
-          const imagePath = `../uploads/gallery/${currentGalleryItem.image_path}`;
+          const imagePath = `../../uploads/gallery/${currentGalleryItem.image_path}`;
           const title = currentGalleryItem.title || "Gallery Image";
           const description = currentGalleryItem.description || "Beautiful image from our gallery.";
           const createdDate = new Date(currentGalleryItem.created_at).toLocaleDateString();
@@ -208,7 +208,7 @@
 
         galleryContainer.innerHTML = displayItems
           .map((item) => {
-            const imagePath = `../uploads/gallery/${item.image_path}`;
+            const imagePath = `../../uploads/gallery/${item.image_path}`;
             const title = item.title || "Gallery Image";
             const description = item.description || "Beautiful image from our gallery.";
             const createdDate = new Date(item.created_at).toLocaleDateString();

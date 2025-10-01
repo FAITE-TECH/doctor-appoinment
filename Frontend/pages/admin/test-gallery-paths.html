@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gallery Paths</title>
+</head>
+<body>
+    <h1>Testing Gallery API Paths</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testPaths() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Testing API paths...</p>';
+            
+            const pathsToTest = [
+                '../../../Backend/api/gallery.php',
+                '../../../Backend/api/auth.php?action=me',
+                '../../Backend/api/gallery.php',
+                '/doctor-appoinment/Backend/api/gallery.php'
+            ];
+            
+            for (const path of pathsToTest) {
+                try {
+                    console.log(`Testing path: ${path}`);
+                    const response = await fetch(path, {
+                        credentials: 'include',
+                        cache: 'no-cache'
+                    });
+                    
+                    const status = response.status;
+                    const statusText = response.statusText;
+                    
+                    resultsDiv.innerHTML += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #ccc;">
+                            <strong>Path:</strong> ${path}<br>
+                            <strong>Status:</strong> ${status} ${statusText}<br>
+                            <strong>Result:</strong> ${status === 200 ? '✅ Success' : status === 403 ? '🔒 Forbidden (Auth required)' : status === 404 ? '❌ Not Found' : '⚠️ Other'}
+                        </div>
+                    `;
+                } catch (error) {
+                    resultsDiv.innerHTML += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid red;">
+                            <strong>Path:</strong> ${path}<br>
+                            <strong>Error:</strong> ${error.message}
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Test when page loads
+        document.addEventListener('DOMContentLoaded', testPaths);
+    </script>
+</body>
+</html>
