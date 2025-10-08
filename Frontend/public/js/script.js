@@ -1,6 +1,41 @@
 // Basic frontend auth and navigation wiring
 (function () {
-  const apiBase = '../../Backend/api/auth.php';
+  // Dynamically compute project root and API base so the frontend works
+  // whether the app is deployed at the domain root or inside a subfolder
+  (function computeApiBase() {
+    // Build a robust absolute API base so fetch() always targets the correct PHP endpoint
+    // Strategy: detect the project root from the pathname (strip any '/Frontend' segment) and
+    // combine it with the current origin to form an absolute URL. This avoids producing
+    // relative paths like 'Backend/...' which the browser resolves under the current folder
+    // (causing requests to hit '/doctor-appoinment/Frontend/Backend/...').
+    const path = window.location.pathname || '';
+    let projectRoot = '';
+    const frontendIdx = path.indexOf('/Frontend');
+    if (frontendIdx !== -1) {
+      projectRoot = path.substring(0, frontendIdx);
+    } else if (path.indexOf('/doctor-appoinment') !== -1) {
+      // fallback if project folder is present in path
+      projectRoot = '/doctor-appoinment';
+    }
+    // Ensure leading slash and no trailing slash
+    if (projectRoot && !projectRoot.startsWith('/')) projectRoot = '/' + projectRoot;
+    projectRoot = projectRoot.replace(/\/+$/,'');
+    // Always use an absolute URL on the same origin
+    window.APP_API_BASE = window.location.origin + (projectRoot || '') + '/Backend/api/auth.php';
+  })();
+  const apiBase = window.APP_API_BASE;
+
+  // Helper to parse JSON safely and surface non-JSON responses for debugging.
+  async function parseJsonSafe(res) {
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+      // try to extract text for diagnostics (server likely returned HTML error page)
+      const text = await res.text();
+      const snippet = text.slice(0, 200);
+      throw new Error('Expected JSON response but received: ' + snippet);
+    }
+    return res.json();
+  }
 
   function byId(id) {
     return document.getElementById(id);
@@ -42,9 +77,11 @@
   async function fetchMe() {
     try {
       const res = await fetch(apiBase + '?action=me', { credentials: 'include' });
-      const data = await res.json();
+      if (!res.ok) return null;
+      const data = await parseJsonSafe(res);
       return data && data.authenticated ? data.user : null;
     } catch (e) {
+      console.warn('fetchMe error:', e.message || e);
       return null;
     }
   }
@@ -66,8 +103,8 @@
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || 'Signin failed');
+      const data = await parseJsonSafe(res);
+      if (!res.ok) throw new Error(data?.error || ('Signin failed (status ' + res.status + ')'));
       
       // Check if user is admin and redirect accordingly
       if (data.user.role === 'admin') {
@@ -94,8 +131,8 @@
         credentials: 'include',
         body: JSON.stringify({ name, email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || 'Signup failed');
+      const data = await parseJsonSafe(res);
+      if (!res.ok) throw new Error(data?.error || ('Signup failed (status ' + res.status + ')'));
       
       // Check if user is admin and redirect accordingly
       if (data.user.role === 'admin') {

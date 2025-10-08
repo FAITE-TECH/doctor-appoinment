@@ -54,7 +54,8 @@ class SharedAdminAuth {
     async checkAuth() {
         try {
             console.log('Checking authentication...');
-            const response = await fetch('../../../Backend/api/auth.php?action=me', {
+            const apiUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=me';
+            const response = await fetch(apiUrl, {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
             });
@@ -62,7 +63,8 @@ class SharedAdminAuth {
             console.log('Auth response status:', response.status);
             
             if (response.ok) {
-                const data = await response.json();
+                let data;
+                try { data = await response.json(); } catch (e) { throw new Error('Unable to parse JSON from auth endpoint'); }
                 console.log('Auth response data:', data);
                 
                 if (data.authenticated && data.user && data.user.role === 'admin') {
@@ -115,7 +117,8 @@ class SharedAdminAuth {
 
     async logout() {
         try {
-            await fetch('../../../Backend/api/auth.php?action=signout', {
+            const signoutUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=signout';
+            await fetch(signoutUrl, {
                 method: 'POST',
                 credentials: 'include'
             });

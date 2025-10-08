@@ -59,8 +59,9 @@
                 return;
             }
             
-            try {
-                const response = await fetch('/doctor-appoinment/Backend/api/auth.php?action=signin', {
+                try {
+                const apiUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=signin';
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -69,7 +70,8 @@
                     body: JSON.stringify({ email, password }),
                 });
                 
-                const data = await response.json();
+                let data;
+                try { data = await response.json(); } catch (e) { throw new Error('Invalid server response'); }
                 
                 if (response.ok && data.user && data.user.role === 'admin') {
                     // Successfully logged in as admin

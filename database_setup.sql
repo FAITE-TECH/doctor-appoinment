@@ -2,9 +2,9 @@
 -- Complete Database Setup - Consolidated Version
 -- Includes all tables, sample data, and doctor schedule management system
 
--- Create database
-CREATE DATABASE IF NOT EXISTS doctor;
-USE doctor;
+-- (REMOVED: CREATE DATABASE and USE statements for Hostinger compatibility)
+-- CREATE DATABASE IF NOT EXISTS doctor;
+-- USE doctor;
 
 -- Create roles table
 CREATE TABLE IF NOT EXISTS roles (

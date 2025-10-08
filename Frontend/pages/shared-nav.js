@@ -2,7 +2,20 @@
 (function() {
   'use strict'; // Enable strict mode for better error catching
   
-  var apiBase = '../../Backend/api/auth.php';
+  // Build a reliable API base. Prefer global `window.APP_API_BASE` if the other script set it.
+  var apiBase = (window && window.APP_API_BASE) ? window.APP_API_BASE : (function() {
+    var path = window.location.pathname || '';
+    var projectRoot = '';
+    var frontendIdx = path.indexOf('/Frontend');
+    if (frontendIdx !== -1) {
+      projectRoot = path.substring(0, frontendIdx);
+    } else if (path.indexOf('/doctor-appoinment') !== -1) {
+      projectRoot = '/doctor-appoinment';
+    }
+    if (projectRoot && projectRoot.charAt(0) !== '/') projectRoot = '/' + projectRoot;
+    projectRoot = projectRoot.replace(/\/+$/,'');
+    return window.location.origin + (projectRoot || '') + '/Backend/api/auth.php';
+  })();
 
   // Mobile menu toggle - compatible with older browsers
   function initMobileMenu() {

@@ -63,7 +63,8 @@ class AdminPanel {
     async checkAdminAuth() {
         try {
             console.log('AdminPanel: Checking admin authentication...');
-            const data = await this.handleApiCall('/doctor-appoinment/Backend/api/auth.php?action=me');
+            const authUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=me';
+            const data = await this.handleApiCall(authUrl);
             console.log('AdminPanel: Auth response:', data);
             
             if (data.authenticated && data.user && data.user.role === 'admin') {
