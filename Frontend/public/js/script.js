@@ -1,13 +1,12 @@
 // Basic frontend auth and navigation wiring
 (function () {
   // Dynamically compute project root and API base so the frontend works
-  // whether the app is deployed at the domain root or inside a subfolder
-  (function computeApiBase() {
-    // Build a robust absolute API base so fetch() always targets the correct PHP endpoint
-    // Strategy: detect the project root from the pathname (strip any '/Frontend' segment) and
-    // combine it with the current origin to form an absolute URL. This avoids producing
-    // relative paths like 'Backend/...' which the browser resolves under the current folder
-    // (causing requests to hit '/doctor-appoinment/Frontend/Backend/...').
+  // whether the app is deployed at the domain root or inside a subfolder.
+  // We'll try several candidate endpoints and pick the first one that responds
+  // with JSON. This makes the frontend resilient when Backend is served from
+  // different locations (common between local XAMPP and hosted setups).
+
+  function computeProjectRoot() {
     const path = window.location.pathname || '';
     let projectRoot = '';
     const frontendIdx = path.indexOf('/Frontend');
@@ -20,10 +19,57 @@
     // Ensure leading slash and no trailing slash
     if (projectRoot && !projectRoot.startsWith('/')) projectRoot = '/' + projectRoot;
     projectRoot = projectRoot.replace(/\/+$/,'');
-    // Always use an absolute URL on the same origin
-    window.APP_API_BASE = window.location.origin + (projectRoot || '') + '/Backend/api/auth.php';
-  })();
-  const apiBase = window.APP_API_BASE;
+    return projectRoot;
+  }
+
+  function buildCandidateEndpoints() {
+    const origin = window.location.origin;
+    const root = computeProjectRoot();
+    const candidates = [];
+    // Common locations to try (absolute on same origin)
+    if (root) {
+      candidates.push(origin + root + '/Backend/api/auth.php');
+      candidates.push(origin + root + '/api/auth.php');
+      candidates.push(origin + root + '/backend/api/auth.php');
+    }
+    // Also try without project root (app may be hosted at domain root)
+    candidates.push(origin + '/Backend/api/auth.php');
+    candidates.push(origin + '/api/auth.php');
+    candidates.push(origin + '/backend/api/auth.php');
+    // Deduplicate keeping order
+    return Array.from(new Set(candidates));
+  }
+
+  // Default to a sensible value immediately to avoid undefined usage.
+  window.APP_API_BASE = window.location.origin + computeProjectRoot() + '/Backend/api/auth.php';
+
+  function getApiBase() {
+    return window.APP_API_BASE;
+  }
+
+  // Try candidate endpoints and pick the first that returns JSON for ?action=me
+  async function ensureApiBase(timeoutMs = 3000) {
+    const candidates = buildCandidateEndpoints();
+    for (const candidate of candidates) {
+      try {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeoutMs);
+        const res = await fetch(candidate + '?action=me', { credentials: 'include', signal: controller.signal });
+        clearTimeout(id);
+        if (!res.ok) continue;
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) continue;
+        // Looks like a working API endpoint
+        window.APP_API_BASE = candidate;
+        console.log('Using API endpoint:', candidate);
+        return candidate;
+      } catch (e) {
+        // ignore and try next candidate
+      }
+    }
+    console.warn('No working API endpoint detected; falling back to', window.APP_API_BASE);
+    return window.APP_API_BASE;
+  }
 
   // Helper to parse JSON safely and surface non-JSON responses for debugging.
   async function parseJsonSafe(res) {
@@ -76,7 +122,7 @@
 
   async function fetchMe() {
     try {
-      const res = await fetch(apiBase + '?action=me', { credentials: 'include' });
+      const res = await fetch(getApiBase() + '?action=me', { credentials: 'include' });
       if (!res.ok) return null;
       const data = await parseJsonSafe(res);
       return data && data.authenticated ? data.user : null;
@@ -97,7 +143,7 @@
     const password = byId('password')?.value;
     if (!email || !password) return;
     try {
-      const res = await fetch(apiBase + '?action=signin', {
+      const res = await fetch(getApiBase() + '?action=signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -125,7 +171,7 @@
     const password = byId('password')?.value;
     if (!name || !email || !password) return;
     try {
-      const res = await fetch(apiBase + '?action=signup', {
+      const res = await fetch(getApiBase() + '?action=signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -148,13 +194,16 @@
 
   async function handleSignoutClick() {
     try {
-      await fetch(apiBase + '?action=signout', { method: 'POST', credentials: 'include' });
+      await fetch(getApiBase() + '?action=signout', { method: 'POST', credentials: 'include' });
     } catch (e) {}
     window.location.href = './index.html';
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initAuthUI();
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Probe for a working API endpoint before making calls. This helps avoid
+    // 404s when the Backend is at a different path on hosted vs local setups.
+    await ensureApiBase();
+    await initAuthUI();
     const signinForm = byId('signinForm');
     const signupForm = byId('signupForm');
     const signoutBtn = byId('signoutBtn');
@@ -163,5 +212,3 @@
     if (signoutBtn) signoutBtn.addEventListener('click', handleSignoutClick);
   });
 })();
-
-
