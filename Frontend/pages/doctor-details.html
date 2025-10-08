@@ -270,7 +270,7 @@
       // Fetch doctors from API
       async function fetchDoctors() {
         try {
-          const response = await fetch('../../Backend/api/doctors.php?action=doctors');
+          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('doctors.php?action=doctors') : '../../Backend/api/doctors.php?action=doctors'));
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -477,7 +477,7 @@
           scheduleData = {};
           
           for (const month of monthsToLoad) {
-            const response = await fetch(`../../Backend/api/schedules.php?action=get_schedules&doctor_id=${currentDoctor.id}&month=${month}`);
+            const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`schedules.php?action=get_schedules&doctor_id=${currentDoctor.id}&month=${month}`) : `../../Backend/api/schedules.php?action=get_schedules&doctor_id=${currentDoctor.id}&month=${month}`));
             const data = await response.json();
             
             if (data.status === 'success' && data.data) {

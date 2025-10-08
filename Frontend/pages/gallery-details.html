@@ -106,7 +106,7 @@
       // Fetch gallery from API
       async function fetchGallery() {
         try {
-          const response = await fetch('../../Backend/api/public_gallery.php');
+          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('public_gallery.php') : '../../Backend/api/public_gallery.php'));
           
           if (!response.ok) {
             throw new Error('Failed to load gallery');

@@ -54,8 +54,8 @@ class SharedAdminAuth {
     async checkAuth() {
         try {
             console.log('Checking authentication...');
-            const apiUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=me';
-            const response = await fetch(apiUrl, {
+            const authEndpoint = (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')));
+            const response = await fetch(authEndpoint + '?action=me', {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
             });
@@ -117,7 +117,7 @@ class SharedAdminAuth {
 
     async logout() {
         try {
-            const signoutUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=signout';
+            const signoutUrl = (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php'))) + '?action=signout';
             await fetch(signoutUrl, {
                 method: 'POST',
                 credentials: 'include'

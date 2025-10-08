@@ -216,7 +216,7 @@
                     return;
                 }
 
-                let url = '../../../Backend/api/users.php';
+                let url = (window.buildApiUrl ? window.buildApiUrl('users.php') : '../../../Backend/api/users.php');
                 if (searchTerm) {
                     url += '?search=' + encodeURIComponent(searchTerm);
                 }

@@ -1,11 +1,6 @@
 // Basic frontend auth and navigation wiring
 (function () {
-  // Dynamically compute project root and API base so the frontend works
-  // whether the app is deployed at the domain root or inside a subfolder.
-  // We'll try several candidate endpoints and pick the first one that responds
-  // with JSON. This makes the frontend resilient when Backend is served from
-  // different locations (common between local XAMPP and hosted setups).
-
+  // Compute a project root fallback (detect either 'Frontend' or known project folder)
   function computeProjectRoot() {
     const path = window.location.pathname || '';
     let projectRoot = '';
@@ -13,43 +8,45 @@
     if (frontendIdx !== -1) {
       projectRoot = path.substring(0, frontendIdx);
     } else if (path.indexOf('/doctor-appoinment') !== -1) {
-      // fallback if project folder is present in path
       projectRoot = '/doctor-appoinment';
+    } else if (path.indexOf('/doctor-appointment') !== -1) {
+      projectRoot = '/doctor-appointment';
     }
-    // Ensure leading slash and no trailing slash
     if (projectRoot && !projectRoot.startsWith('/')) projectRoot = '/' + projectRoot;
+    projectRoot = projectRoot.replace(/\/+$|\/?$/,'').replace(/\/+$/,'');
+    // normalize: remove trailing slashes
     projectRoot = projectRoot.replace(/\/+$/,'');
     return projectRoot;
   }
 
-  function buildCandidateEndpoints() {
-    const origin = window.location.origin;
-    const root = computeProjectRoot();
-    const candidates = [];
-    // Common locations to try (absolute on same origin)
-    if (root) {
-      candidates.push(origin + root + '/Backend/api/auth.php');
-      candidates.push(origin + root + '/api/auth.php');
-      candidates.push(origin + root + '/backend/api/auth.php');
+  const BASE_URL = (function() {
+    const host = window.location.hostname || '';
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://localhost/doctor-appointment/Backend/api/';
     }
-    // Also try without project root (app may be hosted at domain root)
-    candidates.push(origin + '/Backend/api/auth.php');
-    candidates.push(origin + '/api/auth.php');
-    candidates.push(origin + '/backend/api/auth.php');
-    // Deduplicate keeping order
-    return Array.from(new Set(candidates));
-  }
+    if (host.endsWith('spchospital.com')) {
+      return 'https://spchospital.com/Backend/api/';
+    }
+    const root = computeProjectRoot();
+    return window.location.origin + root + '/Backend/api/';
+  })();
 
-  // Default to a sensible value immediately to avoid undefined usage.
-  window.APP_API_BASE = window.location.origin + computeProjectRoot() + '/Backend/api/auth.php';
+  // Expose canonical API pointers
+  window.APP_API_FOLDER = window.APP_API_FOLDER || BASE_URL;
+  window.APP_API_BASE = window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php');
 
-  function getApiBase() {
+  function getAuthEndpoint() {
     return window.APP_API_BASE;
   }
 
-  // Try candidate endpoints and pick the first that returns JSON for ?action=me
   async function ensureApiBase(timeoutMs = 3000) {
-    const candidates = buildCandidateEndpoints();
+    const candidates = [
+      window.APP_API_FOLDER + 'auth.php',
+      window.APP_API_FOLDER.replace('/Backend/api/', '/backend/api/') + 'auth.php',
+      window.APP_API_FOLDER.replace('/doctor-appointment/', '/doctor-appoinment/') + 'auth.php',
+      window.location.origin + computeProjectRoot() + '/Backend/api/auth.php'
+    ].filter(Boolean).map((c, i, arr) => arr.indexOf(c) === i ? c : null).filter(Boolean);
+
     for (const candidate of candidates) {
       try {
         const controller = new AbortController();
@@ -59,23 +56,20 @@
         if (!res.ok) continue;
         const ct = res.headers.get('content-type') || '';
         if (!ct.includes('application/json')) continue;
-        // Looks like a working API endpoint
         window.APP_API_BASE = candidate;
         console.log('Using API endpoint:', candidate);
         return candidate;
       } catch (e) {
-        // ignore and try next candidate
+        // try next
       }
     }
     console.warn('No working API endpoint detected; falling back to', window.APP_API_BASE);
     return window.APP_API_BASE;
   }
 
-  // Helper to parse JSON safely and surface non-JSON responses for debugging.
   async function parseJsonSafe(res) {
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('application/json')) {
-      // try to extract text for diagnostics (server likely returned HTML error page)
       const text = await res.text();
       const snippet = text.slice(0, 200);
       throw new Error('Expected JSON response but received: ' + snippet);
@@ -83,9 +77,7 @@
     return res.json();
   }
 
-  function byId(id) {
-    return document.getElementById(id);
-  }
+  function byId(id) { return document.getElementById(id); }
 
   function setAuthUI(user) {
     const guestLinks = document.querySelectorAll('[data-auth="guest"]');
@@ -93,23 +85,16 @@
     const adminItems = document.querySelectorAll('[data-auth="admin"]');
     const emailSpan = byId('nav-user-email');
     const adminLink = byId('adminLink');
-    
     if (user && user.email) {
       guestLinks.forEach(el => el.classList.add('hidden'));
       userItems.forEach(el => el.classList.remove('hidden'));
-      
-      // Show admin panel link for admin users
       if (user.role === 'admin') {
         adminItems.forEach(el => el.classList.remove('hidden'));
-        if (adminLink) {
-          adminLink.classList.remove('hidden');
-          console.log('Admin panel link shown for:', user.email);
-        }
+        if (adminLink) adminLink.classList.remove('hidden');
       } else {
         adminItems.forEach(el => el.classList.add('hidden'));
         if (adminLink) adminLink.classList.add('hidden');
       }
-      
       if (emailSpan) emailSpan.textContent = user.email;
     } else {
       guestLinks.forEach(el => el.classList.remove('hidden'));
@@ -122,7 +107,7 @@
 
   async function fetchMe() {
     try {
-      const res = await fetch(getApiBase() + '?action=me', { credentials: 'include' });
+      const res = await fetch(getAuthEndpoint() + '?action=me', { credentials: 'include' });
       if (!res.ok) return null;
       const data = await parseJsonSafe(res);
       return data && data.authenticated ? data.user : null;
@@ -143,25 +128,13 @@
     const password = byId('password')?.value;
     if (!email || !password) return;
     try {
-      const res = await fetch(getApiBase() + '?action=signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
+      const res = await fetch(getAuthEndpoint() + '?action=signin', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ email, password })
       });
       const data = await parseJsonSafe(res);
       if (!res.ok) throw new Error(data?.error || ('Signin failed (status ' + res.status + ')'));
-      
-      // Check if user is admin and redirect accordingly
-      if (data.user.role === 'admin') {
-        // Always redirect admin users to admin dashboard
-        window.location.href = './admin/index.html';
-      } else {
-        window.location.href = './index.html';
-      }
-    } catch (err) {
-      alert(err.message);
-    }
+      if (data.user.role === 'admin') window.location.href = './admin/index.html'; else window.location.href = './index.html';
+    } catch (err) { alert(err.message); }
   }
 
   async function handleSignupSubmit(e) {
@@ -171,37 +144,21 @@
     const password = byId('password')?.value;
     if (!name || !email || !password) return;
     try {
-      const res = await fetch(getApiBase() + '?action=signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ name, email, password }),
+      const res = await fetch(getAuthEndpoint() + '?action=signup', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ name, email, password })
       });
       const data = await parseJsonSafe(res);
       if (!res.ok) throw new Error(data?.error || ('Signup failed (status ' + res.status + ')'));
-      
-      // Check if user is admin and redirect accordingly
-      if (data.user.role === 'admin') {
-        // Always redirect admin users to admin dashboard
-        window.location.href = './admin/index.html';
-      } else {
-        window.location.href = './index.html';
-      }
-    } catch (err) {
-      alert(err.message);
-    }
+      if (data.user.role === 'admin') window.location.href = './admin/index.html'; else window.location.href = './index.html';
+    } catch (err) { alert(err.message); }
   }
 
   async function handleSignoutClick() {
-    try {
-      await fetch(getApiBase() + '?action=signout', { method: 'POST', credentials: 'include' });
-    } catch (e) {}
+    try { await fetch(getAuthEndpoint() + '?action=signout', { method: 'POST', credentials: 'include' }); } catch (e) {}
     window.location.href = './index.html';
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-    // Probe for a working API endpoint before making calls. This helps avoid
-    // 404s when the Backend is at a different path on hosted vs local setups.
     await ensureApiBase();
     await initAuthUI();
     const signinForm = byId('signinForm');
@@ -211,4 +168,9 @@
     if (signupForm) signupForm.addEventListener('submit', handleSignupSubmit);
     if (signoutBtn) signoutBtn.addEventListener('click', handleSignoutClick);
   });
+
+  // Re-expose for other scripts (in case other scripts ran earlier)
+  window.APP_API_FOLDER = window.APP_API_FOLDER || BASE_URL;
+  window.APP_API_BASE = window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php');
+
 })();

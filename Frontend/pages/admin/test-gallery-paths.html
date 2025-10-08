@@ -15,10 +15,10 @@
             resultsDiv.innerHTML = '<p>Testing API paths...</p>';
             
             const pathsToTest = [
-                '../../../Backend/api/gallery.php',
-                '../../../Backend/api/auth.php?action=me',
-                '../../Backend/api/gallery.php',
-                '/doctor-appoinment/Backend/api/gallery.php'
+                (window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../../Backend/api/gallery.php'),
+                (window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : '../../../Backend/api/auth.php?action=me')),
+                (window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../Backend/api/gallery.php'),
+                (window.buildApiUrl ? window.buildApiUrl('gallery.php') : '/doctor-appoinment/Backend/api/gallery.php')
             ];
             
             for (const path of pathsToTest) {

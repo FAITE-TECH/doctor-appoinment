@@ -275,7 +275,7 @@
             var completed = 0;
             
             endpoints.forEach(function(endpoint) {
-                var url = window.buildApiUrl ? window.buildApiUrl(endpoint) : '../../Backend/api/' + endpoint;
+                var url = (window.buildApiUrl ? window.buildApiUrl(endpoint) : '../../Backend/api/' + endpoint);
                 
                 fetch(url + '?action=test')
                     .then(function(response) {

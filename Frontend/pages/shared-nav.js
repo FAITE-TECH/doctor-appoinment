@@ -4,6 +4,8 @@
   
   // Build a reliable API base. Prefer global `window.APP_API_BASE` if the other script set it.
   var apiBase = (window && window.APP_API_BASE) ? window.APP_API_BASE : (function() {
+    // Fallback to APP_API_FOLDER if available, otherwise construct a fallback similar to main script
+    if (window && window.APP_API_FOLDER) return window.APP_API_FOLDER + 'auth.php';
     var path = window.location.pathname || '';
     var projectRoot = '';
     var frontendIdx = path.indexOf('/Frontend');
@@ -11,6 +13,8 @@
       projectRoot = path.substring(0, frontendIdx);
     } else if (path.indexOf('/doctor-appoinment') !== -1) {
       projectRoot = '/doctor-appoinment';
+    } else if (path.indexOf('/doctor-appointment') !== -1) {
+      projectRoot = '/doctor-appointment';
     }
     if (projectRoot && projectRoot.charAt(0) !== '/') projectRoot = '/' + projectRoot;
     projectRoot = projectRoot.replace(/\/+$/,'');
@@ -214,7 +218,9 @@
       
       newSignoutBtn.addEventListener('click', async function() {
         try {
-          await fetch(apiBase + '?action=signout', { method: 'POST', credentials: 'include' });
+          // Use global APP_API_BASE when available (already includes auth.php)
+          const signoutEndpoint = (window.APP_API_BASE || apiBase) + '?action=signout';
+          await fetch(signoutEndpoint, { method: 'POST', credentials: 'include' });
         } catch (e) {
           console.error('Signout error:', e);
         }

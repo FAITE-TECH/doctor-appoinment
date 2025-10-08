@@ -3,7 +3,7 @@ let services = [];
 
 async function fetchServicesData() {
   try {
-    const response = await fetch('../../Backend/api/services.php?action=public');
+  const response = await fetch((window.buildApiUrl ? window.buildApiUrl('services.php?action=public') : '../../Backend/api/services.php?action=public'));
     const data = await response.json();
     
     if (data.status === 'success') {

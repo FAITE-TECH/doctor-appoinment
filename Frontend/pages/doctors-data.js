@@ -3,7 +3,7 @@ let doctors = [];
 
 async function fetchDoctorsData(searchTerm = '') {
   try {
-    let url = '../../Backend/api/doctors.php?action=doctors';
+  let url = (window.buildApiUrl ? window.buildApiUrl('doctors.php?action=doctors') : '../../Backend/api/doctors.php?action=doctors');
     if (searchTerm) {
       url += '&search=' + encodeURIComponent(searchTerm);
     }

@@ -3,7 +3,7 @@ let departments = [];
 
 async function fetchDepartmentsData() {
   try {
-    const response = await fetch('../../Backend/api/departments.php?action=public');
+  const response = await fetch((window.buildApiUrl ? window.buildApiUrl('departments.php?action=public') : '../../Backend/api/departments.php?action=public'));
     const data = await response.json();
     
     if (data.status === 'success') {

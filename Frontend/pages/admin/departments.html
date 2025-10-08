@@ -217,7 +217,7 @@
                     return;
                 }
 
-                let url = '/doctor-appoinment/Backend/api/departments.php';
+                let url = (window.buildApiUrl ? window.buildApiUrl('departments.php') : '/doctor-appoinment/Backend/api/departments.php');
                 if (searchTerm) {
                     url += '?search=' + encodeURIComponent(searchTerm);
                 }
@@ -307,7 +307,7 @@
         async function deleteDepartment(id) {
             if (confirm('Are you sure you want to delete this department?')) {
                 try {
-                    const response = await fetch(`/doctor-appoinment/Backend/api/departments.php?id=${id}`, {
+                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`departments.php?id=${id}`) : `/doctor-appoinment/Backend/api/departments.php?id=${id}`), {
                         method: 'DELETE'
                     });
                     if (response.ok) {
@@ -367,8 +367,8 @@
             
             try {
                 const url = editingDepartmentId 
-                    ? `/doctor-appoinment/Backend/api/departments.php?id=${editingDepartmentId}`
-                    : '/doctor-appoinment/Backend/api/departments.php';
+                    ? (window.buildApiUrl ? window.buildApiUrl(`departments.php?id=${editingDepartmentId}`) : `/doctor-appoinment/Backend/api/departments.php?id=${editingDepartmentId}`)
+                    : (window.buildApiUrl ? window.buildApiUrl('departments.php') : '/doctor-appoinment/Backend/api/departments.php');
                 
                 const method = editingDepartmentId ? 'PUT' : 'POST';
                 

@@ -358,7 +358,7 @@
                     return;
                 }
 
-                let url = '/doctor-appoinment/Backend/api/events.php';
+                let url = (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'events.php' : '/doctor-appoinment/Backend/api/events.php');
                 if (searchTerm) {
                     url += '?search=' + encodeURIComponent(searchTerm);
                 }
@@ -475,7 +475,7 @@
             if (confirm('Are you sure you want to delete this event?')) {
                 try {
                     showLoading();
-                    const response = await fetch(`/doctor-appoinment/Backend/api/events.php?id=${id}`, {
+                    const response = await fetch((window.APP_API_FOLDER ? window.APP_API_FOLDER + `events.php?id=${id}` : `/doctor-appoinment/Backend/api/events.php?id=${id}`), {
                         method: 'DELETE'
                     });
                     
@@ -582,7 +582,7 @@ if (editingEventId) {
     fd.append('id', editingEventId);
 }
 
-const response = await fetch('/doctor-appoinment/Backend/api/events.php', {
+const response = await fetch((window.buildApiUrl ? window.buildApiUrl('events.php') : '/doctor-appoinment/Backend/api/events.php'), {
     method: 'POST',   // ✅ Always POST
     credentials: 'include',
     body: fd

@@ -197,9 +197,9 @@
                 }
 
                 console.log('✅ User authenticated, fetching gallery...');
-                console.log('🔗 API URL:', '../../../Backend/api/gallery.php');
-                
-                const response = await fetch('../../../Backend/api/gallery.php', {
+                console.log('🔗 API URL:', (window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../../Backend/api/gallery.php'));
+
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../../Backend/api/gallery.php'), {
                     credentials: 'include',
                     cache: 'no-cache'
                 });
@@ -347,7 +347,7 @@
         async function deleteImage(id) {
             if (confirm('Are you sure you want to delete this image?')) {
                 try {
-                    const response = await fetch(`../../../Backend/api/gallery.php?id=${id}`, {
+                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${id}`) : `../../../Backend/api/gallery.php?id=${id}`), {
                         method: 'DELETE'
                     });
                     if (response.ok) {
@@ -368,8 +368,8 @@
             
             try {
                 const url = editingImageId 
-                    ? `../../../Backend/api/gallery.php?id=${editingImageId}`
-                    : '../../../Backend/api/gallery.php';
+                    ? (window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${editingImageId}`) : `../../../Backend/api/gallery.php?id=${editingImageId}`)
+                    : (window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../../Backend/api/gallery.php');
                 
                 const method = editingImageId ? 'PUT' : 'POST';
                 

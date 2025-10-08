@@ -204,7 +204,7 @@
             const myMessagesButton = document.getElementById('myMessagesButton');
             
             try {
-                const response = await fetch('../../Backend/api/auth.php?action=me', {
+                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : '../../Backend/api/auth.php?action=me')), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -514,7 +514,7 @@
             console.log('Submitting form data:', formData);
             
             // Submit to API
-            fetch('../../Backend/api/contact.php', {
+            fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : '../../Backend/api/contact.php'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -134,7 +134,7 @@
             const messagesContainer = document.getElementById('messagesContainer');
             
             try {
-                const response = await fetch('../../Backend/api/auth.php?action=me', {
+                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : '../../Backend/api/auth.php?action=me')), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -167,7 +167,7 @@
             const noMessagesState = document.getElementById('noMessagesState');
             
             try {
-                const response = await fetch('../../Backend/api/contact.php?page=1&limit=50', {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=50') : '../../Backend/api/contact.php?page=1&limit=50'), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -312,7 +312,7 @@
         // Mark message as read (if user has replied)
         async function markAsRead(messageId) {
             try {
-                const response = await fetch('../../Backend/api/contact.php', {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : '../../Backend/api/contact.php'), {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'

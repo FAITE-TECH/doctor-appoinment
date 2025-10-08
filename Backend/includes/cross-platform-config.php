@@ -175,9 +175,9 @@ class CrossPlatformConfig {
         // Database configuration with cross-platform MySQL socket detection
         $this->config['database'] = [
             'host' => 'localhost',
-            'username' => 'root',
-            'password' => '',
-            'database' => 'doctor',
+            'username' => 'u697508608_doctor',
+            'password' => 'admin@SPC2024',
+            'database' => 'u697508608_doctor',
             'port' => 3306,
             'charset' => 'utf8mb4'
         ];

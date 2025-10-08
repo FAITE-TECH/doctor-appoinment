@@ -90,6 +90,22 @@
     return '';
   }
 
+  // If a global APP_API_FOLDER exists (set by main script), prefer it. Otherwise, leave getBasePath usage unchanged.
+  if (!window.APP_API_FOLDER) {
+    // Provide a lightweight BASE_URL fallback that matches the project's rules
+    (function(){
+      var host = window.location.hostname || '';
+      if (host === 'localhost' || host === '127.0.0.1') {
+        window.APP_API_FOLDER = 'http://localhost/doctor-appointment/Backend/api/';
+      } else if (host.indexOf('spchospital.com') !== -1) {
+        window.APP_API_FOLDER = 'https://spchospital.com/Backend/api/';
+      } else {
+        var root = getBasePath();
+        window.APP_API_FOLDER = window.location.origin + (root || '') + '/Backend/api/';
+      }
+    })();
+  }
+
   // Normalize file paths for cross-platform compatibility
   function normalizePath(path) {
     if (!path) return '';
@@ -152,15 +168,13 @@
 
   // Build API URL that works across different setups
   function buildApiUrl(endpoint) {
-    var basePath = getBasePath();
+    // Prefer globally defined APP_API_FOLDER (canonical API folder root)
+    var base = (window.APP_API_FOLDER || (function(){ var bp = getBasePath(); return window.location.origin + (bp || '') + '/Backend/api/'; })());
     var cleanEndpoint = normalizePath(endpoint);
-    
-    // Remove leading slash from endpoint if present
     if (cleanEndpoint.charAt(0) === '/') {
       cleanEndpoint = cleanEndpoint.substring(1);
     }
-    
-    return basePath + '/Backend/api/' + cleanEndpoint;
+    return base + cleanEndpoint;
   }
 
   // Build upload URL that works across different setups
