@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - SPC Hospital</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Correct CSS path -->
     <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css">
 </head>
 <body class="bg-gray-100">
@@ -45,42 +46,42 @@
         </div>
     </div>
 
-    <!-- Central config: dynamic API folder detection (Hostinger vs local) -->
+    <!-- Correct JS paths -->
     <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
     <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+
     <script>
-        // Handle admin login directly
         document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            
             if (!email || !password) {
                 alert('Please fill in all fields');
                 return;
             }
-            
-                try {
-                const apiUrl = (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signin' : 'https://spchospital.com/Backend/api/auth.php?action=signin')));
+
+            try {
+                const apiUrl = window.buildApiUrl
+                    ? window.buildApiUrl('auth.php?action=signin')
+                    : 'https://spchospital.com/Backend/api/auth.php?action=signin';
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({ email, password }),
                 });
-                
+
                 let data;
-                try { data = await response.json(); } catch (e) { throw new Error('Invalid server response'); }
-                
+                try { data = await response.json(); } 
+                catch (err) { throw new Error('Invalid server response'); }
+
                 if (response.ok && data.user && data.user.role === 'admin') {
-                    // Successfully logged in as admin
                     window.location.href = './index.html';
                 } else {
                     alert(data.error || 'Invalid admin credentials');
                 }
+
             } catch (error) {
                 console.error('Login error:', error);
                 alert('Login failed. Please try again.');
