@@ -1,5 +1,17 @@
 // Basic frontend auth and navigation wiring
 (function () {
+  // Ensure production host overrides are applied as early as possible.
+  try {
+    var _host = (window && window.location && window.location.hostname) ? window.location.hostname : '';
+    if (_host && _host.indexOf('spchospital.com') !== -1) {
+      // Force canonical production API endpoints so relative path heuristics don't produce incorrect URLs
+      window.APP_API_FOLDER = window.APP_API_FOLDER || 'https://spchospital.com/Backend/api/';
+      window.APP_API_BASE = window.APP_API_BASE || 'https://spchospital.com/Backend/api/auth.php';
+    }
+  } catch (e) {
+    // noop
+  }
+
   // Compute a project root fallback (detect either 'Frontend' or known project folder)
   function computeProjectRoot() {
     const path = window.location.pathname || '';
@@ -20,26 +32,17 @@
     return projectRoot;
   }
 
-  const BASE_URL = (function() {
-    const host = window.location.hostname || '';
-    const root = computeProjectRoot();
-
-    // For local development prefer using the detected project root when available
-    if (host === 'localhost' || host === '127.0.0.1') {
-      if (root) return window.location.origin + root + '/Backend/api/';
-      // Fallback to the repo folder spelling used here
-      return window.location.origin + '/doctor-appoinment/Backend/api/';
-    }
-
-    if (host.endsWith('spchospital.com')) {
-      return 'https://spchospital.com/Backend/api/';
-    }
-
-    return window.location.origin + root + '/Backend/api/';
+  // Prefer values already set in `config.js` (or by other early scripts)
+  window.APP_API_FOLDER = window.APP_API_FOLDER || (function(){
+    // fallback: compute a reasonable default when config wasn't loaded
+    try {
+      const host = window.location.hostname || '';
+      const root = computeProjectRoot();
+      if (host && host.indexOf('spchospital.com') !== -1) return 'https://spchospital.com/Backend/api/';
+      return window.location.origin + (root || '/doctor-appoinment') + '/Backend/api/';
+    } catch (e) { return window.location.origin + '/doctor-appoinment/Backend/api/'; }
   })();
 
-  // Expose canonical API pointers
-  window.APP_API_FOLDER = window.APP_API_FOLDER || BASE_URL;
   window.APP_API_BASE = window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php');
 
   function getAuthEndpoint() {
@@ -48,9 +51,11 @@
 
   async function ensureApiBase(timeoutMs = 3000) {
     const candidates = [
+      window.APP_API_BASE,
       window.APP_API_FOLDER + 'auth.php',
-      window.APP_API_FOLDER.replace('/Backend/api/', '/backend/api/') + 'auth.php',
-      window.APP_API_FOLDER.replace('/doctor-appointment/', '/doctor-appoinment/') + 'auth.php',
+      // some environments may have lowercase 'backend' or alternative project root spelling
+      (window.APP_API_FOLDER || '').replace('/Backend/api/', '/backend/api/') + 'auth.php',
+      (window.APP_API_FOLDER || '').replace('/doctor-appointment/', '/doctor-appoinment/') + 'auth.php',
       window.location.origin + computeProjectRoot() + '/Backend/api/auth.php'
     ].filter(Boolean).map((c, i, arr) => arr.indexOf(c) === i ? c : null).filter(Boolean);
 
@@ -179,5 +184,62 @@
   // Re-expose for other scripts (in case other scripts ran earlier)
   window.APP_API_FOLDER = window.APP_API_FOLDER || BASE_URL;
   window.APP_API_BASE = window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php');
+
+  // Helper: build a canonical API URL for an endpoint (used by many pages)
+  // Examples callers use: buildApiUrl('events.php?action=public') or buildApiUrl('auth.php?action=me')
+  window.buildApiUrl = window.buildApiUrl || function(endpoint) {
+    try {
+      endpoint = endpoint || '';
+      // If caller passed a full URL or absolute path, return as-is
+      if (/^https?:\/\//i.test(endpoint) || endpoint.startsWith('/')) return endpoint;
+
+      // Special-case auth.php to prefer APP_API_BASE (may include host and path adjustments)
+      if (endpoint.toLowerCase().startsWith('auth.php')) {
+        const suffix = endpoint.substring('auth.php'.length);
+        return (window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php')) + suffix;
+      }
+
+      // Otherwise return APP_API_FOLDER + endpoint
+      const folder = (window.APP_API_FOLDER || BASE_URL || '');
+      if (!folder) return endpoint;
+      return (folder.endsWith('/') ? folder : folder + '/') + endpoint.replace(/^\/+/, '');
+    } catch (e) {
+      return endpoint;
+    }
+  };
+
+  // Optional global fetch wrapper:
+  // Rewrites common Backend/api paths (relative or absolute) to the canonical APP_API_FOLDER / APP_API_BASE
+  // This avoids editing every file that uses '../../Backend/api/...' when the app is hosted.
+  (function attachFetchRewrite() {
+    if (!window.fetch) return;
+    const originalFetch = window.fetch.bind(window);
+
+    window.fetch = function(input, init) {
+      try {
+        // Only rewrite string URLs (leave Request objects alone to avoid streaming/body issues)
+        if (typeof input === 'string') {
+          const low = input.toLowerCase();
+          const marker = 'backend/api/';
+          const idx = low.indexOf(marker);
+          if (idx !== -1) {
+            // capture the path after 'backend/api/' and rebuild using APP_API_FOLDER
+            const rest = input.substring(idx + marker.length);
+            const folder = (window.APP_API_FOLDER || BASE_URL || '');
+            if (folder) {
+              input = (folder.endsWith('/') ? folder : folder + '/') + rest.replace(/^\/+/, '');
+            }
+          } else if (/^auth\.php/i.test(input)) {
+            // For bare auth.php URLs, prefer APP_API_BASE
+            const suffix = input.substring('auth.php'.length);
+            input = (window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php')) + suffix;
+          }
+        }
+      } catch (e) {
+        // if rewrite fails, fall back to original input
+      }
+      return originalFetch(input, init);
+    };
+  })();
 
 })();

@@ -1,7 +1,7 @@
 // Admin Panel JavaScript
 class AdminPanel {
     constructor() {
-    this.apiBase = (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : '/doctor-appoinment/Backend/api/admin.php');
+        this.apiBase = (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : window.buildApiUrl ? window.buildApiUrl('admin.php') : (window.location.origin + '/doctor-appoinment/Backend/api/admin.php'));
         this.init();
     }
 
@@ -63,7 +63,7 @@ class AdminPanel {
     async checkAdminAuth() {
         try {
             console.log('AdminPanel: Checking admin authentication...');
-            const authUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=me';
+            const authUrl = window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment/Backend/api/auth.php') + '?action=me');
             const data = await this.handleApiCall(authUrl);
             console.log('AdminPanel: Auth response:', data);
             
@@ -162,7 +162,7 @@ class AdminPanel {
 
     async loadMessageCount() {
         try {
-            const data = await this.handleApiCall((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=1') : '../../../Backend/api/contact.php?page=1&limit=1'));
+            const data = await this.handleApiCall(window.buildApiUrl('contact.php?page=1&limit=1'));
             const element = document.getElementById('totalMessages');
             if (element) {
                 if (data.success && data.pagination) {
@@ -186,7 +186,7 @@ class AdminPanel {
 
     async loadUnreadMessagesCount() {
         try {
-            const data = await this.handleApiCall((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=1&status=new') : '../../../Backend/api/contact.php?page=1&limit=1&status=new'));
+            const data = await this.handleApiCall(window.buildApiUrl('contact.php?page=1&limit=1&status=new'));
             const badge = document.getElementById('unreadMessagesBadge');
             if (data.success && data.pagination && data.pagination.total > 0) {
                 badge.textContent = data.pagination.total;
@@ -239,7 +239,7 @@ class AdminPanel {
 
     async loadRecentMessages() {
         try {
-            const data = await this.handleApiCall((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=5') : '../../../Backend/api/contact.php?page=1&limit=5'));
+            const data = await this.handleApiCall(window.buildApiUrl('contact.php?page=1&limit=5'));
             const container = document.getElementById('recentMessages');
             
             if (!container) {
@@ -293,7 +293,7 @@ class AdminPanel {
 
     async logout() {
         try {
-            await this.handleApiCall((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : '/doctor-appoinment/Backend/api/auth.php?action=signout')), {
+            await this.handleApiCall(window.buildApiUrl('auth.php?action=signout'), {
                 method: 'POST'
             });
             window.location.href = 'login.html';

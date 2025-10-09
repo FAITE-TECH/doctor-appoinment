@@ -6,7 +6,7 @@
     <title>Manage Departments - SPC Hospital Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../../public/css/styles.css">
-    <script src="/shared/admin-nav.js"></script>
+    <script src="./shared/admin-nav.js"></script>
     <style>
     </style>
 </head>
@@ -199,6 +199,7 @@
         </div>
     </div>
 
+    <script src="../../public/js/config.js"></script>
     <script src="../../public/js/script.js"></script>
     <script src="./js/shared-auth.js"></script>
     <script>
@@ -217,7 +218,7 @@
                     return;
                 }
 
-                let url = (window.buildApiUrl ? window.buildApiUrl('departments.php') : '/doctor-appoinment/Backend/api/departments.php');
+                let url = window.buildApiUrl('departments.php');
                 if (searchTerm) {
                     url += '?search=' + encodeURIComponent(searchTerm);
                 }
@@ -307,7 +308,7 @@
         async function deleteDepartment(id) {
             if (confirm('Are you sure you want to delete this department?')) {
                 try {
-                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`departments.php?id=${id}`) : `/doctor-appoinment/Backend/api/departments.php?id=${id}`), {
+                    const response = await fetch(window.buildApiUrl(`departments.php?id=${id}`), {
                         method: 'DELETE'
                     });
                     if (response.ok) {
@@ -367,8 +368,8 @@
             
             try {
                 const url = editingDepartmentId 
-                    ? (window.buildApiUrl ? window.buildApiUrl(`departments.php?id=${editingDepartmentId}`) : `/doctor-appoinment/Backend/api/departments.php?id=${editingDepartmentId}`)
-                    : (window.buildApiUrl ? window.buildApiUrl('departments.php') : '/doctor-appoinment/Backend/api/departments.php');
+                    ? window.buildApiUrl(`departments.php?id=${editingDepartmentId}`)
+                    : window.buildApiUrl('departments.php');
                 
                 const method = editingDepartmentId ? 'PUT' : 'POST';
                 
@@ -411,8 +412,7 @@
             setupSearchFunctionality();
         });
     </script>
-    <script src="../../public/js/script.js"></script>
-    <script src="./js/shared-auth.js"></script>
+    <!-- scripts already included above: config.js, script.js, shared-auth.js -->
     <script src="./js/admin.js"></script>
 </body>
 </html>

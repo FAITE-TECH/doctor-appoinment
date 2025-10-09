@@ -14,7 +14,10 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     ini_set('session.use_only_cookies', 1);
     ini_set('session.cookie_httponly', 1);
     ini_set('session.cookie_samesite', 'Lax');
-    ini_set('session.cookie_path', '/doctor-appoinment/');
+    // Use root path so API endpoints and frontend pages on the same host receive the session cookie
+    ini_set('session.cookie_path', '/');
+    // Leave cookie domain empty to default to the request host. If you need cross-subdomain cookies,
+    // set this explicitly to '.yourdomain.com'
     ini_set('session.cookie_domain', '');
     
     // Start the session

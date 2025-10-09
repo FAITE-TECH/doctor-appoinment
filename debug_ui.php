@@ -21,7 +21,7 @@
                 <button id="addDoctorBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                     + Add New Doctor
                 </button>
-                <a href="./Frontend/pages/admin/doctors.html" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                <a href="Frontend/pages/admin/doctors.html" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                     Manage Doctors (Admin Panel)
                 </a>
             </div>

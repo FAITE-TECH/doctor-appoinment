@@ -71,7 +71,7 @@
       // Fetch events from API
       async function fetchEvents() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('events.php?action=public') : '../../Backend/api/events.php?action=public'));
+          const response = await fetch(window.buildApiUrl('events.php?action=public'));
           const data = await response.json();
           
           if (data.status === 'success') {

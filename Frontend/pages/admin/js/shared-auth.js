@@ -1,5 +1,7 @@
 // Shared Authentication System for Admin Pages
-class SharedAdminAuth {
+// Guard: avoid redeclaring if this script is loaded twice
+if (typeof window.SharedAdminAuth === 'undefined') {
+    class SharedAdminAuth {
     constructor() {
         this.isAuthenticated = false;
         this.user = null;
@@ -54,7 +56,8 @@ class SharedAdminAuth {
     async checkAuth() {
         try {
             console.log('Checking authentication...');
-            const authEndpoint = (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')));
+            // Use global config when available
+            const authEndpoint = window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment/Backend/api/auth.php'));
             const response = await fetch(authEndpoint + '?action=me', {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
@@ -117,8 +120,9 @@ class SharedAdminAuth {
 
     async logout() {
         try {
-            const signoutUrl = (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php'))) + '?action=signout';
-            await fetch(signoutUrl, {
+            // Reuse same resolver used for auth checks to avoid inconsistent endpoints
+            const signoutEndpoint = (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment/Backend/api/auth.php'))) + '?action=signout';
+            await fetch(signoutEndpoint, {
                 method: 'POST',
                 credentials: 'include'
             });
@@ -160,8 +164,19 @@ class SharedAdminAuth {
     }
 }
 
-// Initialize shared auth when DOM is loaded
-let sharedAuth;
-document.addEventListener('DOMContentLoaded', () => {
-    sharedAuth = new SharedAdminAuth();
-});
+    // Expose the class on window for other scripts and to avoid redeclaration
+    window.SharedAdminAuth = SharedAdminAuth;
+}
+
+// Initialize shared auth when DOM is loaded (only once)
+if (!window.__sharedAdminAuthInitialized) {
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            // store on window so dev tools can access it if needed
+            window.sharedAuth = new window.SharedAdminAuth();
+        } catch (e) {
+            console.error('Failed to initialize SharedAdminAuth:', e);
+        }
+    });
+    window.__sharedAdminAuthInitialized = true;
+}

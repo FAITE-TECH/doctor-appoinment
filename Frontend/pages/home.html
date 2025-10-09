@@ -608,7 +608,7 @@
             try {
               console.log('Sending appointment data:', JSON.stringify(appointmentData, null, 2));
               
-              const response = await fetch((window.buildApiUrl ? window.buildApiUrl('appointments.php?action=book') : '/doctor-appoinment/Backend/api/appointments.php?action=book'), {
+              const response = await fetch(window.buildApiUrl('appointments.php?action=book'), {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -828,7 +828,7 @@
       // Fetch departments from API
       async function fetchDepartments() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('departments.php?action=public') : '/doctor-appoinment/Backend/api/departments.php?action=public'));
+          const response = await fetch(window.buildApiUrl('departments.php?action=public'));
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -846,7 +846,7 @@
       // Fetch doctors from API
       async function fetchDoctors() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('doctors.php?action=doctors') : '/doctor-appoinment/Backend/api/doctors.php?action=doctors'));
+          const response = await fetch(window.buildApiUrl('doctors.php?action=doctors'));
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -1099,7 +1099,7 @@
         
         try {
           // Check if user is authenticated
-          const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : '/doctor-appoinment/Backend/api/auth.php?action=me')), {
+          const response = await fetch(window.buildApiUrl('auth.php?action=me'), {
             credentials: 'include'
           });
           const data = await response.json();
@@ -1238,7 +1238,7 @@
 
       async function loadScheduleDataForCalendar(startDate, endDate) {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`schedules.php?action=get_schedules&doctor_id=${selectedDoctor}&start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`) : `/doctor-appoinment/Backend/api/schedules.php?action=get_schedules&doctor_id=${selectedDoctor}&start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`));
+          const response = await fetch(window.buildApiUrl(`schedules.php?action=get_schedules&doctor_id=${selectedDoctor}&start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`));
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -1648,7 +1648,7 @@
       // Fetch services from API
       async function fetchServices() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('services.php?action=public') : '/doctor-appoinment/Backend/api/services.php?action=public'));
+          const response = await fetch(window.buildApiUrl('services.php?action=public'));
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -1755,7 +1755,7 @@
       // Fetch events from API
       async function fetchEvents() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('events.php?action=public') : '/doctor-appoinment/Backend/api/events.php?action=public'));
+          const response = await fetch(window.buildApiUrl('events.php?action=public'));
           const data = await response.json();
           
           if (data.status === 'success') {
