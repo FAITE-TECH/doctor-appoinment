@@ -142,12 +142,21 @@
                         <input type="file" id="imageFile" name="image" accept="image/*" required
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
+                    <div class="mb-4">
+                        <!-- Upload progress -->
+                        <div id="uploadProgressContainer" class="hidden">
+                            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                <div id="uploadProgressBar" class="bg-blue-600 h-3 w-0"></div>
+                            </div>
+                            <p id="uploadProgressText" class="text-sm text-gray-600 mt-2">0%</p>
+                        </div>
+                    </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" id="cancelImageBtn" 
                                 class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                             Cancel
                         </button>
-                        <button type="submit" 
+                        <button type="submit" id="uploadImageBtn"
                                 class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                             Upload
                         </button>
@@ -324,13 +333,40 @@
                 form.reset();
                 editingImageId = null;
             }
-            
+            // Reset progress UI whenever modal is shown
+            const progressContainer = document.getElementById('uploadProgressContainer');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressText = document.getElementById('uploadProgressText');
+            const uploadBtn = document.getElementById('uploadImageBtn');
+            if (progressContainer) progressContainer.classList.add('hidden');
+            if (progressBar) progressBar.style.width = '0%';
+            if (progressText) progressText.textContent = '0%';
+            if (uploadBtn) {
+                uploadBtn.disabled = false;
+                uploadBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+
             modal.classList.remove('hidden');
         }
 
         // Hide modal
         function hideImageModal() {
-            document.getElementById('imageModal').classList.add('hidden');
+            const modal = document.getElementById('imageModal');
+            const progressContainer = document.getElementById('uploadProgressContainer');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressText = document.getElementById('uploadProgressText');
+            const uploadBtn = document.getElementById('uploadImageBtn');
+
+            // Reset progress UI when hiding
+            if (progressContainer) progressContainer.classList.add('hidden');
+            if (progressBar) progressBar.style.width = '0%';
+            if (progressText) progressText.textContent = '0%';
+            if (uploadBtn) {
+                uploadBtn.disabled = false;
+                uploadBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+
+            if (modal) modal.classList.add('hidden');
         }
 
         // Edit image
@@ -388,23 +424,100 @@
                         body: JSON.stringify(imageData)
                     });
                 } else {
-                    // Create via FormData (with file upload)
-                    const formData = new FormData(e.target);
-                    response = await fetch(url, {
-                        method: method,
-                        credentials: 'include',
-                        body: formData
+                    // Create via FormData (with file upload) using XHR to track progress
+                    await new Promise((resolve, reject) => {
+                        const formData = new FormData(e.target);
+
+                        const xhr = new XMLHttpRequest();
+                        xhr.open(method, url, true);
+                        xhr.withCredentials = true;
+
+                        const uploadBtn = document.getElementById('uploadImageBtn');
+                        const progressContainer = document.getElementById('uploadProgressContainer');
+                        const progressBar = document.getElementById('uploadProgressBar');
+                        const progressText = document.getElementById('uploadProgressText');
+
+                        // Disable the upload button to prevent duplicate clicks
+                        if (uploadBtn) {
+                            uploadBtn.disabled = true;
+                            uploadBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                        }
+
+                        // Show progress UI
+                        if (progressContainer) progressContainer.classList.remove('hidden');
+
+                        xhr.upload.addEventListener('progress', (evt) => {
+                            if (evt.lengthComputable) {
+                                const percent = Math.round((evt.loaded / evt.total) * 100);
+                                if (progressBar) progressBar.style.width = percent + '%';
+                                if (progressText) progressText.textContent = percent + '%';
+                            }
+                        });
+
+                        xhr.onreadystatechange = function() {
+                            if (xhr.readyState === XMLHttpRequest.DONE) {
+                                const progressContainerLocal = progressContainer;
+                                const progressBarLocal = progressBar;
+                                const progressTextLocal = progressText;
+
+                                if (xhr.status >= 200 && xhr.status < 300) {
+                                    resolve(xhr.responseText);
+                                } else {
+                                    reject(xhr);
+                                }
+
+                                // Re-enable upload button
+                                if (uploadBtn) {
+                                    uploadBtn.disabled = false;
+                                    uploadBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                                }
+
+                                // Hide/reset progress UI after a short delay so user can see 100%
+                                setTimeout(() => {
+                                    if (progressContainerLocal) progressContainerLocal.classList.add('hidden');
+                                    if (progressBarLocal) progressBarLocal.style.width = '0%';
+                                    if (progressTextLocal) progressTextLocal.textContent = '0%';
+                                }, 700);
+                            }
+                        };
+
+                        xhr.onerror = function() {
+                            // Network error
+                            if (uploadBtn) {
+                                uploadBtn.disabled = false;
+                                uploadBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                            }
+
+                            // Hide/reset progress UI
+                            if (progressContainer) progressContainer.classList.add('hidden');
+                            if (progressBar) progressBar.style.width = '0%';
+                            if (progressText) progressText.textContent = '0%';
+
+                            reject(new Error('Network error during image upload'));
+                        };
+
+                        xhr.send(formData);
+                    }).then(() => {
+                        // success
+                        hideImageModal();
+                        loadGallery();
+                    }).catch(async (xhrOrError) => {
+                        console.error('Error saving image:', xhrOrError);
+                        let msg = 'Failed to save image';
+                        try {
+                            if (xhrOrError && xhrOrError.responseText) {
+                                const json = JSON.parse(xhrOrError.responseText);
+                                msg = json.error || msg;
+                            } else if (xhrOrError instanceof Error) {
+                                msg = xhrOrError.message;
+                            }
+                        } catch (e) {
+                            // ignore JSON parse errors
+                        }
+                        alert('Error: ' + msg);
                     });
                 }
 
-                if (response.ok) {
-                    hideImageModal();
-                    loadGallery();
-                } else {
-                    const errorData = await response.json();
-                    console.error('Error saving image:', errorData);
-                    alert('Error: ' + (errorData.error || 'Failed to save image'));
-                }
             } catch (error) {
                 console.error('Error saving image:', error);
                 alert('Error: ' + error.message);
