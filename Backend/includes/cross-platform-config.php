@@ -56,6 +56,17 @@ class CrossPlatformConfig {
         
         // Set relative paths
         $this->config['web_root'] = $this->getWebRoot();
+
+        // Determine server name and whether we're running in production.
+        // Treat non-localhost names as production by default. This can be
+        // overridden by setting the environment variable FORCE_PRODUCTION=1
+        // on the server if necessary.
+        $server_name = $_SERVER['SERVER_NAME'] ?? ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        $force_production = getenv('FORCE_PRODUCTION');
+        $is_production = $force_production ? true : !in_array($server_name, ['localhost', '127.0.0.1', '::1']);
+
+        $this->config['server_name'] = $server_name;
+        $this->config['is_production'] = $is_production;
     }
     
     private function findProjectRoot($start_dir) {
@@ -163,9 +174,32 @@ class CrossPlatformConfig {
         ];
         
         // Web URLs
+        // Build absolute origin for production and local cases. Prefer HTTPS
+        // in production (site is served on spchospital.com).
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 0) == 443 ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+
+        // Origin without path (e.g. https://spchospital.com or http://localhost:8000)
+        $origin_no_path = $protocol . '://' . $host;
+
+        // For production, use the canonical deployment domain. This avoids
+        // issues when the project sits in a subdirectory on a developer's machine.
+        if (!empty($this->config['is_production'])) {
+            // Hard-code the production domain here to ensure client fetches go to
+            // the public API endpoint. Update if production domain changes.
+            $production_domain = 'https://spchospital.com';
+            $origin_no_path = $production_domain;
+        }
+
+        // api_full is an absolute URL clients (browser JS) can use. api is a
+        // relative URL useful for same-origin server-side requests.
+        $api_full = rtrim($origin_no_path, '/') . rtrim($web_root, '/') . '/Backend/api';
+
         $this->config['urls'] = [
             'base' => $web_root,
+            'origin' => $origin_no_path,
             'api' => $web_root . '/Backend/api',
+            'api_full' => $api_full,
             'uploads' => $web_root . '/uploads',
             'assets' => $web_root . '/Frontend/public/assets',
         ];
@@ -294,6 +328,13 @@ class CrossPlatformConfig {
     }
     
     public function getApiUrl($endpoint = '') {
+        // If running in production, return the absolute API URL so clients
+        // fetch the deployed domain (e.g. https://spchospital.com/Backend/api/...)
+        if (!empty($this->config['is_production'])) {
+            return rtrim($this->config['urls']['api_full'], '/') . ($endpoint ? '/' . ltrim($endpoint, '/') : '');
+        }
+
+        // Local / development: use relative API path to respect developer setups
         return $this->config['urls']['api'] . ($endpoint ? '/' . ltrim($endpoint, '/') : '');
     }
     
@@ -306,7 +347,7 @@ class CrossPlatformConfig {
     }
     
     public function isProduction() {
-        return !in_array($_SERVER['SERVER_NAME'] ?? 'localhost', ['localhost', '127.0.0.1', '::1']);
+        return !empty($this->config['is_production']);
     }
     
     public function getEnvironmentInfo() {
