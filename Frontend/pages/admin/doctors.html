@@ -197,7 +197,7 @@
     <script>
         class DoctorsManager {
             constructor() {
-                this.apiBase = (window.buildApiUrl ? window.buildApiUrl('admin.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : 'https://spchospital.com/Backend/api/admin.php'));
+                this.apiBase = ((typeof window.buildApiUrl === 'function') ? window.buildApiUrl('admin.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : 'https://spchospital.com/Backend/api/admin.php'));
                 this.doctors = [];
                 this.departments = [];
                 this.editingDoctorId = null;
@@ -223,7 +223,8 @@
 
             async loadDepartments() {
                 try {
-                        const response = await fetch(window.buildApiUrl('admin.php?action=get_departments_dropdown'), {
+                        const deptUrl = (typeof window.buildApiUrl === 'function') ? window.buildApiUrl('admin.php?action=get_departments_dropdown') : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php?action=get_departments_dropdown') : 'https://spchospital.com/Backend/api/admin.php?action=get_departments_dropdown');
+                        const response = await fetch(deptUrl, {
                         credentials: 'include',
                         cache: 'no-cache'
                     });
@@ -258,7 +259,7 @@
 
             async loadDoctors(searchTerm = '') {
                 try {
-                    let url = window.buildApiUrl('admin.php?action=get_doctors');
+                    let url = (typeof window.buildApiUrl === 'function') ? window.buildApiUrl('admin.php?action=get_doctors') : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php?action=get_doctors') : 'https://spchospital.com/Backend/api/admin.php?action=get_doctors');
                     if (searchTerm) {
                         url += '&search=' + encodeURIComponent(searchTerm);
                     }
@@ -410,7 +411,8 @@
                                 department_id: fd.get('department_id') || null
                             };
                             try {
-                                const response = await fetch(window.buildApiUrl('admin.php?action=update_doctor'), {
+                                const updateUrl = (typeof window.buildApiUrl === 'function') ? window.buildApiUrl('admin.php?action=update_doctor') : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php?action=update_doctor') : 'https://spchospital.com/Backend/api/admin.php?action=update_doctor');
+                                const response = await fetch(updateUrl, {
                                     method: 'PUT',
                                     credentials: 'include',
                                     headers: { 'Content-Type': 'application/json' },
@@ -431,7 +433,8 @@
                             // Create via multipart FormData (supports image)
                             const formData = new FormData(form);
                             try {
-                                const response = await fetch(window.buildApiUrl('admin.php?action=add_doctor'), {
+                                const addUrl = (typeof window.buildApiUrl === 'function') ? window.buildApiUrl('admin.php?action=add_doctor') : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php?action=add_doctor') : 'https://spchospital.com/Backend/api/admin.php?action=add_doctor');
+                                const response = await fetch(addUrl, {
                                     method: 'POST',
                                     credentials: 'include',
                                     body: formData
@@ -483,7 +486,8 @@
             async deleteDoctor(id) {
                 if (!confirm('Are you sure you want to delete this doctor?')) return;
                 try {
-                    const resp = await fetch(window.buildApiUrl(`admin.php?action=delete_doctor&id=${id}`), {
+                    const delUrl = (typeof window.buildApiUrl === 'function') ? window.buildApiUrl(`admin.php?action=delete_doctor&id=${id}`) : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + `admin.php?action=delete_doctor&id=${id}`) : `https://spchospital.com/Backend/api/admin.php?action=delete_doctor&id=${id}`);
+                    const resp = await fetch(delUrl, {
                         method: 'DELETE',
                         credentials: 'include'
                     });

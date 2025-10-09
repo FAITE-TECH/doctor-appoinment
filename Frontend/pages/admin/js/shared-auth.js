@@ -57,7 +57,7 @@ if (typeof window.SharedAdminAuth === 'undefined') {
         try {
             console.log('Checking authentication...');
             // Use APP_API_BASE or buildApiUrl helper when available
-            const authUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=me') : (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'));
+            const authUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=me') : (typeof window.buildApiUrl === 'function' ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'));
             const response = await fetch(authUrl, {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
@@ -121,7 +121,7 @@ if (typeof window.SharedAdminAuth === 'undefined') {
     async logout() {
         try {
             // Reuse same resolver used for auth checks to avoid inconsistent endpoints
-            const signoutUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=signout') : (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'));
+            const signoutUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=signout') : (typeof window.buildApiUrl === 'function' ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'));
             await fetch(signoutUrl, {
                 method: 'POST',
                 credentials: 'include'

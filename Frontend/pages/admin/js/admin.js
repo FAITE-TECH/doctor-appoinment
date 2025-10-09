@@ -1,403 +1,182 @@
-// Admin Panel JavaScript
-class AdminPanel {
+// Shared Authentication System for Admin Pages
+// Guard: avoid redeclaring if this script is loaded twice
+if (typeof window.SharedAdminAuth === 'undefined') {
+    class SharedAdminAuth {
     constructor() {
-        // Resolve apiBase with runtime fallbacks: buildApiUrl -> APP_API_FOLDER -> hosted fallback
-    this.apiBase = window.buildApiUrl
-        ? window.buildApiUrl('admin.php')
-        : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php') : 'https://spchospital.com/Backend/api/admin.php');
+        this.isAuthenticated = false;
+        this.user = null;
+        this.authChecked = false;
         this.init();
     }
 
     async init() {
+        // Check if we already have auth data in localStorage (for persistence across page refreshes)
+        const cachedAuth = this.getCachedAuth();
+        if (cachedAuth && cachedAuth.timestamp > Date.now() - 1800000) { // 30 minutes cache
+            this.isAuthenticated = true;
+            this.user = cachedAuth.user;
+            this.authChecked = true;
+            this.updateUI();
+        }
+        
+        await this.checkAuth();
+        this.setupLogoutButton();
+        this.updateUI();
+    }
+
+    getCachedAuth() {
         try {
-            // Wait for shared auth to initialize if it exists
-            if (typeof sharedAuth !== 'undefined') {
-                await sharedAuth.init();
-                if (!sharedAuth.canAccess()) {
-                    // Don't redirect immediately, just show a warning
-                    const userInfoEl = document.getElementById('admin-user-info');
-                    const welcomeEl = document.getElementById('welcomeMessage');
-                    if (userInfoEl) userInfoEl.textContent = 'Not authenticated';
-                    if (welcomeEl) welcomeEl.textContent = 'Please log in to access admin features.';
-                    return;
-                }
-            }
-            
-            await this.checkAdminAuth();
-            await this.loadDashboardStats();
-            await this.loadRecentAppointments();
-            await this.loadRecentMessages();
-            this.setupEventListeners();
-        } catch (error) {
-            console.error('AdminPanel initialization failed:', error);
-            // Set error state for user info
-            const userInfoEl = document.getElementById('admin-user-info');
-            const welcomeEl = document.getElementById('welcomeMessage');
-            if (userInfoEl) userInfoEl.textContent = 'Initialization error';
-            if (welcomeEl) welcomeEl.textContent = 'Failed to initialize admin panel. Please refresh the page.';
+            const cached = localStorage.getItem('admin_auth_cache');
+            return cached ? JSON.parse(cached) : null;
+        } catch (e) {
+            return null;
         }
     }
 
-    async handleApiCall(url, options = {}) {
+    setCachedAuth(user) {
         try {
-            const response = await fetch(url, {
+            const cacheData = {
+                user: user,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('admin_auth_cache', JSON.stringify(cacheData));
+        } catch (e) {
+            console.warn('Could not cache auth data:', e);
+        }
+    }
+
+    clearCachedAuth() {
+        try {
+            localStorage.removeItem('admin_auth_cache');
+        } catch (e) {
+            console.warn('Could not clear auth cache:', e);
+        }
+    }
+
+    async checkAuth() {
+        try {
+            console.log('Checking authentication...');
+            // Use APP_API_BASE or buildApiUrl helper when available
+            const authUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=me') : (typeof window.buildApiUrl === 'function' ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'));
+            const response = await fetch(authUrl, {
                 credentials: 'include',
-                cache: 'no-cache', // Ensure fresh data
-                ...options
+                cache: 'no-cache' // Ensure fresh auth check
             });
             
-            const text = await response.text();
+            console.log('Auth response status:', response.status);
             
-            // Try to parse as JSON first
-            try {
-                const data = JSON.parse(text);
-                return data;
-            } catch (e) {
-                // If it's not JSON, it's probably a PHP error
-                console.error('PHP Error Response:', text);
-                throw new Error('Server returned an error. Check console for details.');
-            }
-        } catch (error) {
-            console.error('API Call failed:', error);
-            throw error;
-        }
-    }
-
-    async checkAdminAuth() {
-        try {
-            console.log('AdminPanel: Checking admin authentication...');
-            const authUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=me') : (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'));
-            const data = await this.handleApiCall(authUrl);
-            console.log('AdminPanel: Auth response:', data);
-            
-            if (data.authenticated && data.user && data.user.role === 'admin') {
-                // User is authenticated as admin
-                const userInfoEl = document.getElementById('admin-user-info');
-                const welcomeEl = document.getElementById('welcomeMessage');
+            if (response.ok) {
+                let data;
+                try { data = await response.json(); } catch (e) { throw new Error('Unable to parse JSON from auth endpoint'); }
+                console.log('Auth response data:', data);
                 
-                if (userInfoEl) {
-                    userInfoEl.textContent = `${data.user.name} (${data.user.role})`;
+                if (data.authenticated && data.user && data.user.role === 'admin') {
+                    this.isAuthenticated = true;
+                    this.user = data.user;
+                    this.setCachedAuth(data.user);
+                    this.authChecked = true;
+                    console.log('✅ Admin authenticated successfully');
+                    return true;
+                } else {
+                    console.log('❌ Not authenticated as admin:', data);
                 }
-                if (welcomeEl) {
-                    welcomeEl.textContent = `Welcome, ${data.user.name}! You are logged in as an administrator.`;
-                }
-                console.log('✅ AdminPanel: Admin authenticated successfully');
-                return true;
             } else {
-                // User is not authenticated as admin, but don't redirect
-                const userInfoEl = document.getElementById('admin-user-info');
-                const welcomeEl = document.getElementById('welcomeMessage');
-                
-                if (userInfoEl) {
-                    userInfoEl.textContent = 'Not authenticated';
-                }
-                if (welcomeEl) {
-                    welcomeEl.textContent = 'Please log in to access admin features.';
-                }
-                console.log('❌ AdminPanel: Not authenticated as admin');
-                return false;
+                console.log('❌ Auth response not ok:', response.status);
             }
-        } catch (error) {
-            console.error('AdminPanel: Auth check failed:', error);
-            const userInfoEl = document.getElementById('admin-user-info');
-            const welcomeEl = document.getElementById('welcomeMessage');
             
-            if (userInfoEl) {
-                userInfoEl.textContent = 'Authentication error';
-            }
-            if (welcomeEl) {
-                welcomeEl.textContent = 'Unable to verify authentication.';
-            }
+            this.isAuthenticated = false;
+            this.user = null;
+            this.clearCachedAuth();
+            this.authChecked = true;
+            return false;
+        } catch (error) {
+            console.error('Auth check failed:', error);
+            this.isAuthenticated = false;
+            this.user = null;
+            this.authChecked = true;
             return false;
         }
     }
 
-    async loadDashboardStats() {
-        try {
-            const data = await this.handleApiCall(this.apiBase + '?action=dashboard_stats');
-            
-            // Helper function to safely set text content
-            const setTextContent = (elementId, value) => {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = value;
-                } else {
-                    console.warn(`Element with id '${elementId}' not found`);
-                }
-            };
-            
-            if (data.success) {
-                setTextContent('totalDoctors', data.stats.doctors || 0);
-                setTextContent('totalAppointments', data.stats.appointments || 0);
-                setTextContent('totalUsers', data.stats.users || 0);
-                setTextContent('totalEvents', data.stats.events || 0);
-            } else {
-                console.error('Failed to load stats:', data.error);
-                // Set default values
-                setTextContent('totalDoctors', '0');
-                setTextContent('totalAppointments', '0');
-                setTextContent('totalUsers', '0');
-                setTextContent('totalEvents', '0');
-            }
-            
-            // Load message count separately
-            await this.loadMessageCount();
-            await this.loadUnreadMessagesCount();
-        } catch (error) {
-            console.error('Failed to load dashboard stats:', error);
-            // Set default values on error
-            const setTextContent = (elementId, value) => {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = value;
-                } else {
-                    console.warn(`Element with id '${elementId}' not found`);
-                }
-            };
-            
-            setTextContent('totalDoctors', '0');
-            setTextContent('totalAppointments', '0');
-            setTextContent('totalUsers', '0');
-            setTextContent('totalEvents', '0');
-            setTextContent('totalMessages', '0');
-        }
-    }
-
-    async loadMessageCount() {
-        try {
-            const data = await this.handleApiCall(window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=1') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php?page=1&limit=1' : 'https://spchospital.com/Backend/api/contact.php?page=1&limit=1'));
-            const element = document.getElementById('totalMessages');
-            if (element) {
-                if (data.success && data.pagination) {
-                    element.textContent = data.pagination.total || 0;
-                } else {
-                    element.textContent = '0';
-                }
-            } else {
-                console.warn("Element with id 'totalMessages' not found");
-            }
-        } catch (error) {
-            console.error('Failed to load message count:', error);
-            const element = document.getElementById('totalMessages');
-            if (element) {
-                element.textContent = '0';
-            } else {
-                console.warn("Element with id 'totalMessages' not found");
-            }
-        }
-    }
-
-    async loadUnreadMessagesCount() {
-        try {
-            const data = await this.handleApiCall(window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=1&status=new') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php?page=1&limit=1&status=new' : 'https://spchospital.com/Backend/api/contact.php?page=1&limit=1&status=new'));
-            const badge = document.getElementById('unreadMessagesBadge');
-            if (data.success && data.pagination && data.pagination.total > 0) {
-                badge.textContent = data.pagination.total;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        } catch (error) {
-            console.error('Failed to load unread messages count:', error);
-            const badge = document.getElementById('unreadMessagesBadge');
-            if (badge) badge.classList.add('hidden');
-        }
-    }
-
-    async loadRecentAppointments() {
-        try {
-            const data = await this.handleApiCall(this.apiBase + '?action=recent_appointments');
-            const container = document.getElementById('recentAppointments');
-            
-            if (!container) {
-                console.log('Recent appointments container not found on this page');
-                return;
-            }
-            
-            if (data.success && data.appointments && data.appointments.length > 0) {
-                container.innerHTML = data.appointments.map(appointment => `
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <p class="font-medium text-gray-900">${appointment.patient_name || 'Unknown Patient'}</p>
-                            <p class="text-sm text-gray-600">${appointment.doctor_name || 'Unknown Doctor'} - ${appointment.appointment_date || 'No date'}</p>
-                        </div>
-                        <span class="px-2 py-1 text-xs rounded-full ${
-                            appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                            appointment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                        }">${appointment.status || 'unknown'}</span>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<p class="text-gray-500">No recent appointments</p>';
-            }
-        } catch (error) {
-            console.error('Failed to load recent appointments:', error);
-            const container = document.getElementById('recentAppointments');
-            if (container) {
-                container.innerHTML = '<p class="text-red-500">Failed to load appointments. Check console for details.</p>';
-            }
-        }
-    }
-
-    async loadRecentMessages() {
-        try {
-            const data = await this.handleApiCall(window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=5') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php?page=1&limit=5' : 'https://spchospital.com/Backend/api/contact.php?page=1&limit=5'));
-            const container = document.getElementById('recentMessages');
-            
-            if (!container) {
-                console.log('Recent messages container not found on this page');
-                return;
-            }
-            
-            if (data.success && data.messages && data.messages.length > 0) {
-                container.innerHTML = data.messages.map(message => `
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-900">${message.first_name} ${message.last_name}</p>
-                            <p class="text-sm text-gray-600">${message.subject}</p>
-                            <p class="text-xs text-gray-500">${this.formatDate(message.created_at)}</p>
-                        </div>
-                        <span class="px-2 py-1 text-xs rounded-full ${
-                            message.status === 'new' ? 'bg-red-100 text-red-800' :
-                            message.status === 'read' ? 'bg-yellow-100 text-yellow-800' :
-                            message.status === 'replied' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
-                        }">${message.status}</span>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<p class="text-gray-500">No recent messages</p>';
-            }
-        } catch (error) {
-            console.error('Failed to load recent messages:', error);
-            const container = document.getElementById('recentMessages');
-            if (container) {
-                container.innerHTML = '<p class="text-red-500">Failed to load messages. Check console for details.</p>';
-            }
-        }
-    }
-
-    formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-    }
-
-    setupEventListeners() {
+    setupLogoutButton() {
         const logoutBtn = document.getElementById('adminLogoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 this.logout();
             });
-        } else {
-            console.warn('Logout button not found');
+        }
+    }
+
+    updateUI() {
+        const userInfoElement = document.getElementById('admin-user-info') || document.getElementById('admin-email');
+        if (userInfoElement) {
+            if (this.isAuthenticated && this.user) {
+                userInfoElement.textContent = `${this.user.name} (${this.user.role})`;
+            } else {
+                userInfoElement.textContent = 'Not authenticated';
+            }
         }
     }
 
     async logout() {
         try {
-            await this.handleApiCall(window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'), {
-                method: 'POST'
+            // Reuse same resolver used for auth checks to avoid inconsistent endpoints
+            const signoutUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=signout') : (typeof window.buildApiUrl === 'function' ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'));
+            await fetch(signoutUrl, {
+                method: 'POST',
+                credentials: 'include'
             });
+            this.clearCachedAuth();
             window.location.href = 'login.html';
         } catch (error) {
             console.error('Logout failed:', error);
+            this.clearCachedAuth();
             window.location.href = 'login.html';
         }
     }
-}
 
-// Updated AdminUtils with better error handling
-class AdminUtils {
-    static async makeRequest(action, method = 'GET', data = null) {
-        const apiBase = window.buildApiUrl
-            ? (window.buildApiUrl('admin.php').replace(/auth\.php.*$/, 'admin.php'))
-            : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : 'https://spchospital.com/Backend/api/admin.php');
-        const options = {
-            method,
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
+    // Helper method to check if user can access admin features
+    canAccess() {
+        return this.isAuthenticated && this.user && this.user.role === 'admin';
+    }
+
+    // Helper method to show authentication status
+    showAuthStatus() {
+        if (!this.canAccess()) {
+            const container = document.querySelector('.main-content') || document.querySelector('.flex-1');
+            if (container) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h2>
+                        <p class="text-gray-600 mb-6">You need to be logged in as an administrator to access this page.</p>
+                        <a href="login.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                            Go to Login
+                        </a>
+                    </div>
+                `;
             }
-        };
-
-        if (data && method !== 'GET') {
-            options.body = JSON.stringify(data);
-        }
-
-        const url = method === 'GET' && data ? 
-            `${apiBase}?action=${action}&${new URLSearchParams(data)}` :
-            `${apiBase}?action=${action}`;
-
-        try {
-            const response = await fetch(url, options);
-            const text = await response.text();
-            
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('Invalid JSON response:', text);
-                return { success: false, error: 'Invalid server response' };
-            }
-        } catch (error) {
-            console.error('API request failed:', error);
-            return { success: false, error: 'Network error' };
         }
     }
 
-    static showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-            type === 'success' ? 'bg-green-500 text-white' :
-            type === 'error' ? 'bg-red-500 text-white' :
-            'bg-blue-500 text-white'
-        }`;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
-
-    static confirmDelete(message = 'Are you sure you want to delete this item?') {
-        return confirm(message);
-    }
-
-    static formatDate(dateString) {
-        if (!dateString) return 'N/A';
-        try {
-            return new Date(dateString).toLocaleDateString();
-        } catch (e) {
-            return 'Invalid date';
-        }
-    }
-
-    static formatDateTime(dateString) {
-        if (!dateString) return 'N/A';
-        try {
-            return new Date(dateString).toLocaleString();
-        } catch (e) {
-            return 'Invalid date';
-        }
+    // Method to check if auth has been verified
+    isAuthChecked() {
+        return this.authChecked;
     }
 }
 
-// Initialize admin panel when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Small delay to ensure all DOM elements are fully loaded
-    setTimeout(() => {
-        new AdminPanel();
-    }, 100);
-});
+    // Expose the class on window for other scripts and to avoid redeclaration
+    window.SharedAdminAuth = SharedAdminAuth;
+}
 
-// Add global error handler for uncaught errors
-window.addEventListener('error', (event) => {
-    console.error('Global error:', event.error);
-});
-
-// Add global promise rejection handler
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled promise rejection:', event.reason);
-});
+// Initialize shared auth when DOM is loaded (only once)
+if (!window.__sharedAdminAuthInitialized) {
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            // store on window so dev tools can access it if needed
+            window.sharedAuth = new window.SharedAdminAuth();
+        } catch (e) {
+            console.error('Failed to initialize SharedAdminAuth:', e);
+        }
+    });
+    window.__sharedAdminAuthInitialized = true;
+}
