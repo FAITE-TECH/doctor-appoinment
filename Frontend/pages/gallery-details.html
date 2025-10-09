@@ -17,7 +17,7 @@
     />
     
   <!-- Safari and Cross-browser compatibility -->
-  <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
   <script src="../public/js/browser-compat.js"></script>
   <script src="../public/js/cross-platform-utils.js"></script>
   </head>
@@ -107,7 +107,11 @@
       // Fetch gallery from API
       async function fetchGallery() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('public_gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'public_gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/public_gallery.php')));
+          const response = await fetch(
+            window.buildApiUrl
+              ? window.buildApiUrl('public_gallery.php')
+              : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'public_gallery.php' : 'https://spchospital.com/Backend/api/public_gallery.php')
+          );
           
           if (!response.ok) {
             throw new Error('Failed to load gallery');
@@ -380,8 +384,8 @@
         });
     </script>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="shared-nav.js"></script>
   </body>
 </html>

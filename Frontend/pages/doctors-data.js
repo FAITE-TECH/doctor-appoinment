@@ -3,7 +3,7 @@ let doctors = [];
 
 async function fetchDoctorsData(searchTerm = '') {
   try {
-  let url = (window.buildApiUrl ? window.buildApiUrl('doctors.php?action=doctors') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'doctors.php?action=doctors' : window.location.origin + '/doctor-appoinment/Backend/api/doctors.php?action=doctors'));
+  let url = (window.buildApiUrl ? window.buildApiUrl('doctors.php?action=doctors') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'doctors.php?action=doctors' : 'https://spchospital.com/Backend/api/doctors.php?action=doctors'));
     if (searchTerm) {
       url += '&search=' + encodeURIComponent(searchTerm);
     }

@@ -199,9 +199,9 @@
         </div>
     </div>
 
-    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
-    <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
-    <script src="/doctor-appoinment/Frontend/pages/admin/js/shared-auth.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/admin/js/shared-auth.js"></script>
     <script>
         // Users management functionality
         let users = [];
@@ -217,7 +217,9 @@
                     return;
                 }
 
-                let url = (window.buildApiUrl ? window.buildApiUrl('users.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'users.php' : window.location.origin + '/doctor-appoinment/Backend/api/users.php'));
+                    let url = window.buildApiUrl
+                      ? window.buildApiUrl('users.php')
+                      : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'users.php' : 'https://spchospital.com/Backend/api/users.php');
                 if (searchTerm) {
                     url += '?search=' + encodeURIComponent(searchTerm);
                 }

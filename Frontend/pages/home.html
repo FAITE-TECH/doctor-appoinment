@@ -21,6 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <link rel="stylesheet" href="../public/css/styles.css" />
+    <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -989,7 +990,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const departmentImage = department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : `/doctor-appoinment/uploads/departments/${department.image_path}`) : "../public/assets/nephrology.jpg";
+          const departmentImage = department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : 'https://spchospital.com/uploads/departments/' + department.image_path) : "../public/assets/nephrology.jpg";
           const departmentName = department.name || "Department";
           const departmentDescription = department.description || "Specialized medical department providing quality healthcare services.";
 
@@ -1687,7 +1688,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const serviceImage = service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : `/doctor-appoinment/uploads/services/${service.image_path}`) : "../public/assets/eyecare.jpg";
+          const serviceImage = service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : 'https://spchospital.com/uploads/services/' + service.image_path) : "../public/assets/eyecare.jpg";
           const serviceName = service.name || "Service";
           const serviceDescription = service.description || "Quality healthcare service provided by our experienced team.";
 
@@ -1792,7 +1793,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : `/doctor-appoinment/uploads/events/${event.image_path}`) : "../public/assets/eyecare.jpg";
+          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : 'https://spchospital.com/uploads/events/' + event.image_path) : "../public/assets/eyecare.jpg";
           const eventTitle = event.title || "Event";
           const eventDescription = event.description || "Join us for this special event.";
           const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";
@@ -1916,6 +1917,8 @@
 
   <script src="../public/js/config.js"></script>
   <script src="../public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="shared-nav.js"></script>
     <!-- Footer -->
     <div id="footer"></div>

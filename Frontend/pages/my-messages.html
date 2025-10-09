@@ -135,7 +135,7 @@
             const messagesContainer = document.getElementById('messagesContainer');
             
             try {
-                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=me'))), {
+                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'))), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -168,7 +168,7 @@
             const noMessagesState = document.getElementById('noMessagesState');
             
             try {
-                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=50') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php?page=1&limit=50' : window.location.origin + '/doctor-appoinment/Backend/api/contact.php?page=1&limit=50')), {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=50') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php?page=1&limit=50' : 'https://spchospital.com/Backend/api/contact.php?page=1&limit=50')), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -313,7 +313,7 @@
         // Mark message as read (if user has replied)
         async function markAsRead(messageId) {
             try {
-                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php' : window.location.origin + '/doctor-appoinment/Backend/api/contact.php')), {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php' : 'https://spchospital.com/Backend/api/contact.php')), {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'

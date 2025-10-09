@@ -191,13 +191,13 @@
         </div>
     </div>
 
-    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
-    <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
-    <script src="/doctor-appoinment/Frontend/pages/admin/js/shared-auth.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/admin/js/shared-auth.js"></script>
     <script>
         class DoctorsManager {
             constructor() {
-                this.apiBase = (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : (window.buildApiUrl ? window.buildApiUrl('admin.php') : (window.location.origin + '/doctor-appoinment/Backend/api/admin.php')));
+                this.apiBase = (window.buildApiUrl ? window.buildApiUrl('admin.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : 'https://spchospital.com/Backend/api/admin.php'));
                 this.doctors = [];
                 this.departments = [];
                 this.editingDoctorId = null;

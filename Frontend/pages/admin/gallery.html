@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Gallery - SPC Hospital Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../../public/css/styles.css">
+    <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css">
     <style>
     </style>
-    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
 </head>
 <body class="bg-gray-100">
     <!-- Admin Navigation -->
@@ -198,9 +198,9 @@
                 }
 
                 console.log('✅ User authenticated, fetching gallery...');
-                console.log('🔗 API URL:', (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/gallery.php')));
+                console.log('🔗 API URL:', (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : 'https://spchospital.com/Backend/api/gallery.php')));
 
-                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/gallery.php')), {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : 'https://spchospital.com/Backend/api/gallery.php')), {
                     credentials: 'include',
                     cache: 'no-cache'
                 });
@@ -222,7 +222,7 @@
                             <div class="bg-red-50 border border-red-200 rounded-lg p-6">
                                 <div class="text-red-800 mb-2 font-semibold">API Error</div>
                                 <div class="text-red-700 mb-4">Gallery API endpoint not found. Please check server configuration.</div>
-                                <div class="text-sm text-red-600">Error: 404 - ${window.location.origin}/doctor-appoinment/Backend/api/gallery.php</div>
+                                <div class="text-sm text-red-600">Error: 404 - https://spchospital.com/Backend/api/gallery.php</div>
                             </div>
                         </div>
                     `;
@@ -281,7 +281,7 @@
                 card.className = 'bg-white rounded-lg shadow-lg overflow-hidden';
                 card.innerHTML = `
                     <div class="relative">
-                        <img src="../../../uploads/gallery/${image.image_path}" 
+                    <img src="https://spchospital.com/uploads/gallery/${image.image_path}" 
                              alt="${image.title}" 
                              class="w-full h-48 object-cover">
                         <div class="absolute top-2 right-2 flex space-x-2">
@@ -348,7 +348,7 @@
         async function deleteImage(id) {
             if (confirm('Are you sure you want to delete this image?')) {
                 try {
-                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${id}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `gallery.php?id=${id}` : window.location.origin + `/doctor-appoinment/Backend/api/gallery.php?id=${id}`)), {
+                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${id}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `gallery.php?id=${id}` : 'https://spchospital.com/Backend/api/gallery.php?id=${id}')), {
                         method: 'DELETE'
                     });
                     if (response.ok) {
@@ -369,8 +369,8 @@
             
             try {
                 const url = editingImageId 
-                    ? (window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${editingImageId}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `gallery.php?id=${editingImageId}` : window.location.origin + `/doctor-appoinment/Backend/api/gallery.php?id=${editingImageId}`))
-                    : (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/gallery.php'));
+                    ? (window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${editingImageId}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `gallery.php?id=${editingImageId}` : 'https://spchospital.com/Backend/api/gallery.php?id=${editingImageId}'))
+                    : (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : 'https://spchospital.com/Backend/api/gallery.php'));
                 
                 const method = editingImageId ? 'PUT' : 'POST';
                 
@@ -418,9 +418,9 @@
     </script>
     
     <!-- Load scripts in proper order -->
-    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
-    <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
-    <script src="/doctor-appoinment/Frontend/pages/admin/js/shared-auth.js"></script>
-    <script src="/doctor-appoinment/Frontend/pages/admin/js/admin.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/admin/js/shared-auth.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/admin/js/admin.js"></script>
 </body>
 </html>

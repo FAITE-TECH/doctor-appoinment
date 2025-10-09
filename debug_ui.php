@@ -54,7 +54,7 @@
         }
         
         function checkAuth() {
-            const authUrl = (window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : '/doctor-appoinment/Backend/api/auth.php?action=me'));
+            const authUrl = (window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : 'https://spchospital.com/Backend/api/auth.php?action=me'));
             fetch(authUrl)
                 .then(response => response.json())
                 .then(data => {

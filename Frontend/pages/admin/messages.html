@@ -253,7 +253,7 @@
         // Fallback authentication check
         async function checkAuth() {
             try {
-                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=me'))), {
+                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'))), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -277,7 +277,9 @@
             
             showLoading(true);
             
-            let url = (window.buildApiUrl ? window.buildApiUrl(`contact.php?page=${page}&limit=10`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `contact.php?page=${page}&limit=10` : window.location.origin + `/doctor-appoinment/Backend/api/contact.php?page=${page}&limit=10`));
+                        let url = window.buildApiUrl
+                            ? window.buildApiUrl(`contact.php?page=${page}&limit=10`)
+                            : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `contact.php?page=${page}&limit=10` : 'https://spchospital.com/Backend/api/contact.php?page=${page}&limit=10');
             if (currentStatus) {
                 url += `&status=${currentStatus}`;
             }
@@ -492,7 +494,7 @@
             
             showLoading(true);
             
-            fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php' : window.location.origin + '/doctor-appoinment/Backend/api/contact.php')), {
+            fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php' : 'https://spchospital.com/Backend/api/contact.php')), {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -525,7 +527,7 @@
         function updateStatus(messageId, newStatus) {
             showLoading(true);
             
-            fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php' : window.location.origin + '/doctor-appoinment/Backend/api/contact.php')), {
+            fetch((window.buildApiUrl ? window.buildApiUrl('contact.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php' : 'https://spchospital.com/Backend/api/contact.php')), {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -696,7 +698,7 @@
         // Load unread messages count for badge
         async function loadUnreadMessagesCount() {
             try {
-                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=1&status=new') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php?page=1&limit=1&status=new' : window.location.origin + '/doctor-appoinment/Backend/api/contact.php?page=1&limit=1&status=new')), {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('contact.php?page=1&limit=1&status=new') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'contact.php?page=1&limit=1&status=new' : 'https://spchospital.com/Backend/api/contact.php?page=1&limit=1&status=new')), {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -724,7 +726,7 @@
                 sharedAuth.logout();
             } else {
                 try {
-                    await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=signout'))), {
+                    await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'))), {
                         method: 'POST',
                         credentials: 'include'
                     });
@@ -735,9 +737,9 @@
             }
         }
     </script>
-    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
-    <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
-    <script src="/doctor-appoinment/Frontend/pages/admin/js/shared-auth.js"></script>
-    <script src="/doctor-appoinment/Frontend/pages/admin/js/admin.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/admin/js/shared-auth.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/admin/js/admin.js"></script>
 </body>
 </html>

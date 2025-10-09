@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - SPC Hospital</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../../public/css/styles.css">
+    <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css">
 </head>
 <body class="bg-gray-100">
     <div class="min-h-screen flex items-center justify-center">
@@ -46,8 +46,8 @@
     </div>
 
     <!-- Central config: dynamic API folder detection (Hostinger vs local) -->
-        <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
-        <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script>
         // Handle admin login directly
         document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
@@ -62,7 +62,7 @@
             }
             
                 try {
-                const apiUrl = (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php') + '?action=signin'));
+                const apiUrl = (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signin' : 'https://spchospital.com/Backend/api/auth.php?action=signin')));
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {

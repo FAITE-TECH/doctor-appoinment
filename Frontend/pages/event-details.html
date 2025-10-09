@@ -17,7 +17,7 @@
     />
     
   <!-- Safari and Cross-browser compatibility -->
-  <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
   <script src="../public/js/browser-compat.js"></script>
   <script src="../public/js/cross-platform-utils.js"></script>
   </head>
@@ -107,7 +107,11 @@
       // Fetch events from API
       async function fetchEvents() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('events.php?action=public') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'events.php?action=public' : window.location.origin + '/doctor-appoinment/Backend/api/events.php?action=public')));
+          const response = await fetch(
+            window.buildApiUrl
+              ? window.buildApiUrl('events.php?action=public')
+              : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'events.php?action=public' : 'https://spchospital.com/Backend/api/events.php?action=public')
+          );
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -148,7 +152,7 @@
           let eventImage = currentEvent.image_path || "../public/assets/eyecare.jpg";
           // Handle image path properly
           if (currentEvent.image_path && !currentEvent.image_path.startsWith('http') && !currentEvent.image_path.startsWith('/')) {
-            eventImage = window.buildUploadUrl ? window.buildUploadUrl(`events/${currentEvent.image_path}`) : `/doctor-appoinment/uploads/events/${currentEvent.image_path}`;
+            eventImage = window.buildUploadUrl ? window.buildUploadUrl(`events/${currentEvent.image_path}`) : 'https://spchospital.com/uploads/events/' + currentEvent.image_path;
           } else if (currentEvent.image_path && currentEvent.image_path.startsWith('/')) {
             eventImage = currentEvent.image_path;
           }
@@ -252,7 +256,7 @@
           .map((event) => {
             let eventImage = event.image_path || "../public/assets/eyecare.jpg";
             if (event.image_path && !event.image_path.startsWith('http') && !event.image_path.startsWith('/')) {
-              eventImage = window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : `/doctor-appoinment/uploads/events/${event.image_path}`;
+              eventImage = window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : 'https://spchospital.com/uploads/events/' + event.image_path;
             } else if (event.image_path && event.image_path.startsWith('/')) {
               eventImage = event.image_path;
             }

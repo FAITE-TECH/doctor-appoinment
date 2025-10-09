@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../public/css/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -107,7 +108,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : `/doctor-appoinment/uploads/events/${event.image_path}`) : "../public/assets/eyecare.jpg";
+          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : 'https://spchospital.com/uploads/events/' + event.image_path) : "../public/assets/eyecare.jpg";
           const eventTitle = event.title || "Event";
           const eventDescription = event.description || "Join us for this special event.";
           const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";
@@ -200,6 +201,8 @@
 
   <script src="../public/js/config.js"></script>
   <script src="../public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="shared-nav.js"></script>
   </body>
 </html>

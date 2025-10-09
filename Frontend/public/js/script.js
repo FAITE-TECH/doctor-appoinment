@@ -40,7 +40,7 @@
       const root = computeProjectRoot();
       if (host && host.indexOf('spchospital.com') !== -1) return 'https://spchospital.com/Backend/api/';
       return window.location.origin + (root || '/doctor-appoinment') + '/Backend/api/';
-    } catch (e) { return window.location.origin + '/doctor-appoinment/Backend/api/'; }
+  } catch (e) { return window.location.origin + '/doctor-appoinment/Backend/api/'; }
   })();
 
   window.APP_API_BASE = window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php');

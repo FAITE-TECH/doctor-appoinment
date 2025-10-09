@@ -3,7 +3,11 @@ let services = [];
 
 async function fetchServicesData() {
   try {
-  const response = await fetch((window.buildApiUrl ? window.buildApiUrl('services.php?action=public') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php?action=public' : window.location.origin + '/doctor-appoinment/Backend/api/services.php?action=public')));
+  const response = await fetch(
+    window.buildApiUrl
+      ? window.buildApiUrl('services.php?action=public')
+      : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php?action=public' : 'https://spchospital.com/Backend/api/services.php?action=public')
+  );
     const data = await response.json();
     
     if (data.status === 'success') {
@@ -12,7 +16,7 @@ async function fetchServicesData() {
         id: service.id,
         type: service.name,
         description: service.description || "Quality healthcare service provided by our experienced team.",
-  img: service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : `/doctor-appoinment/uploads/services/${service.image_path}`) : "../public/assets/eyecare.jpg",
+  img: service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : (`https://spchospital.com/uploads/services/${service.image_path}`)) : "../public/assets/eyecare.jpg",
         price: service.price ? parseFloat(service.price) : 0
       }));
       

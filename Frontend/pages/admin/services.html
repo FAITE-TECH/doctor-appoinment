@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Services - SPC Hospital Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../../public/css/styles.css">
+    <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css">
     <script src="./shared/admin-nav.js"></script>
     <style>
     </style>
@@ -213,9 +213,9 @@
         </div>
     </div>
 
-    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
-    <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
-    <script src="/doctor-appoinment/Frontend/pages/admin/js/shared-auth.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/admin/js/shared-auth.js"></script>
     <script>
         // Service management functionality
         let services = [];
@@ -232,7 +232,7 @@
                     return;
                 }
 
-                let url = (window.buildApiUrl ? window.buildApiUrl('services.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php' : window.location.origin + '/doctor-appoinment/Backend/api/services.php'));
+                let url = (window.buildApiUrl ? window.buildApiUrl('services.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php' : 'https://spchospital.com/Backend/api/services.php'));
                 if (searchTerm) {
                     url += '?search=' + encodeURIComponent(searchTerm);
                 }
@@ -326,7 +326,7 @@
         async function deleteService(id) {
             if (confirm('Are you sure you want to delete this service?')) {
                 try {
-                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`services.php?id=${id}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `services.php?id=${id}` : window.location.origin + `/doctor-appoinment/Backend/api/services.php?id=${id}`)), {
+                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`services.php?id=${id}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `services.php?id=${id}` : `https://spchospital.com/Backend/api/services.php?id=${id}`)), {
                         method: 'DELETE'
                     });
                     if (response.ok) {
@@ -386,8 +386,8 @@
             
             try {
                 const url = editingServiceId 
-                    ? (window.buildApiUrl ? window.buildApiUrl(`services.php?id=${editingServiceId}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `services.php?id=${editingServiceId}` : window.location.origin + `/doctor-appoinment/Backend/api/services.php?id=${editingServiceId}`))
-                    : (window.buildApiUrl ? window.buildApiUrl('services.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php' : window.location.origin + '/doctor-appoinment/Backend/api/services.php'));
+                    ? (window.buildApiUrl ? window.buildApiUrl(`services.php?id=${editingServiceId}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `services.php?id=${editingServiceId}` : `https://spchospital.com/Backend/api/services.php?id=${editingServiceId}`))
+                    : (window.buildApiUrl ? window.buildApiUrl('services.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php' : 'https://spchospital.com/Backend/api/services.php'));
                 
                 const method = editingServiceId ? 'PUT' : 'POST';
                 
