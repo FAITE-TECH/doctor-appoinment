@@ -304,6 +304,74 @@ if ($method === 'POST' && $action === 'add_doctor') {
     }
 }
 
+// Support multipart/form-data updates (useful for editing a doctor including an image)
+if ($method === 'POST' && $action === 'update_doctor') {
+    checkAdminAuth();
+    $isMultipart = !empty($_POST) || !empty($_FILES);
+    if (!$isMultipart) {
+        json_response(['error' => 'Expected multipart/form-data for update with file'], 400);
+    }
+
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    if ($id <= 0) json_response(['error' => 'Invalid doctor ID'], 400);
+
+    $name = trim($_POST['name'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
+    $specialization = trim($_POST['specialization'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $departmentId = isset($_POST['department_id']) && $_POST['department_id'] !== '' ? intval($_POST['department_id']) : null;
+
+    if ($name === '' || $email === '' || $specialization === '') {
+        json_response(['error' => 'Name, email, and specialization are required'], 422);
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        json_response(['error' => 'Invalid email format'], 422);
+    }
+    if ($departmentId !== null) {
+        $deptCheck = $GLOBALS['conn']->query("SELECT id FROM departments WHERE id = $departmentId");
+        if (!$deptCheck || $deptCheck->num_rows === 0) {
+            json_response(['error' => 'Invalid department selected'], 422);
+        }
+    }
+
+    $imagePath = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $allowed = ['image/jpeg','image/png','image/gif'];
+        if (!in_array($_FILES['image']['type'], $allowed)) {
+            json_response(['error' => 'Invalid image type'], 422);
+        }
+        $uploadDir = __DIR__ . '/../../uploads/doctors/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $filename = uniqid('', true) . '.' . $ext;
+        $dest = $uploadDir . $filename;
+        if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
+            json_response(['error' => 'Failed to upload image'], 500);
+        }
+        $imagePath = get_upload_url('doctors/' . $filename);
+    }
+
+    try {
+        if ($imagePath !== null) {
+            $stmt = $GLOBALS['conn']->prepare('UPDATE doctors SET name=?, email=?, specialization=?, phone=?, description=?, department_id=?, image_path=? WHERE id=?');
+            $stmt->bind_param('sssssisi', $name, $email, $specialization, $phone, $description, $departmentId, $imagePath, $id);
+        } else {
+            $stmt = $GLOBALS['conn']->prepare('UPDATE doctors SET name=?, email=?, specialization=?, phone=?, description=?, department_id=? WHERE id=?');
+            $stmt->bind_param('sssssii', $name, $email, $specialization, $phone, $description, $departmentId, $id);
+        }
+
+        if ($stmt->execute()) {
+            json_response(['success' => true, 'message' => 'Doctor updated successfully']);
+        } else {
+            json_response(['error' => 'Failed to update doctor: ' . $stmt->error], 500);
+        }
+    } catch (Exception $e) {
+        json_response(['error' => 'Failed to update doctor: ' . $e->getMessage()], 500);
+    }
+}
+
+// Existing JSON PUT handler continues below
 if ($method === 'PUT' && $action === 'update_doctor') {
     checkAdminAuth();
     $body = get_json_body();

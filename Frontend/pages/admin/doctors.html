@@ -141,7 +141,7 @@
             </div>
 
             <!-- Doctors Cards Grid -->
-            <div class="bg-white rounded-lg shadow overflow-hidden" id="doctorsTable">
+            <div class="rounded-lg overflow-hidden" id="doctorsTable">
                 <div class="p-4">
                     <div id="doctorsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="col-span-full text-center text-gray-500">Loading...</div>
@@ -170,6 +170,7 @@
                 </select>
                 <input type="text" name="description" placeholder="Description" class="px-3 py-2 border rounded md:col-span-2">
                 <input type="file" name="image" accept="image/*" class="px-3 py-2 border rounded md:col-span-2">
+                <div class="text-xs text-gray-500 md:col-span-2">Leave image empty to keep the current photo when editing.</div>
                 <div class="md:col-span-2 flex justify-end gap-3">
                     <button type="button" id="cancelAddDoctor" class="px-4 py-2 rounded border">Cancel</button>
                     <button type="submit" id="saveDoctorBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Save</button>
@@ -328,7 +329,7 @@
                     }
 
                     return `
-                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col">
+                        <div class="bg-transparent border border-gray-200/50 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col">
                             <div class="h-48 w-full overflow-hidden bg-gray-100 flex items-center justify-center">
                                 <img src="${img}" alt="${doctor.name}" class="object-cover w-full h-full" onerror="this.onerror=null;this.src='${assetAvatar}';" />
                             </div>
@@ -436,34 +437,23 @@
                             return;
                         }
                         if (this.editingDoctorId) {
-                            // Update via JSON (ignore image during edit for now)
-                            const fd = new FormData(form);
-                            const payload = {
-                                id: this.editingDoctorId,
-                                name: fd.get('name') || '',
-                                email: fd.get('email') || '',
-                                specialization: fd.get('specialization') || '',
-                                phone: fd.get('phone') || '',
-                                department_id: fd.get('department_id') || null
-                            };
+                            // Update via multipart FormData so an image can be uploaded when editing
+                            const formData = new FormData(form);
+                            formData.append('id', this.editingDoctorId);
                             try {
                                 const updateUrl = (typeof window.buildApiUrl === 'function') ? window.buildApiUrl('admin.php?action=update_doctor') : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php?action=update_doctor') : 'https://spchospital.com/Backend/api/admin.php?action=update_doctor');
-                                const response = await fetch(updateUrl, {
-                                    method: 'PUT',
-                                    credentials: 'include',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify(payload)
-                                });
-                                const data = await response.json();
-                                if (response.ok && data.success) {
-                                    closeModal();
-                                    await this.loadDoctors();
-                                } else {
-                                    alert(data.error || 'Failed to update doctor');
-                                }
+
+                                // Use XHR helper to show progress if a file is included; works for no-file as well
+                                await this.uploadWithProgress(updateUrl, formData);
+
+                                // On success
+                                closeModal();
+                                await this.loadDoctors();
                             } catch (err) {
                                 console.error('Update doctor failed:', err);
-                                alert('Failed to update doctor');
+                                alert(err && err.message ? err.message : 'Failed to update doctor');
+                            } finally {
+                                this.setUploading(false);
                             }
                         } else {
                             // Create via multipart FormData (supports image)
