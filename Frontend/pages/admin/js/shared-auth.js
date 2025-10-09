@@ -123,11 +123,11 @@ class SharedAdminAuth {
                 credentials: 'include'
             });
             this.clearCachedAuth();
-            window.location.href = '../signin.html';
+            window.location.href = 'login.html';
         } catch (error) {
             console.error('Logout failed:', error);
             this.clearCachedAuth();
-            window.location.href = '../signin.html';
+            window.location.href = 'login.html';
         }
     }
 
@@ -145,7 +145,7 @@ class SharedAdminAuth {
                     <div class="text-center py-12">
                         <h2 class="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h2>
                         <p class="text-gray-600 mb-6">You need to be logged in as an administrator to access this page.</p>
-                        <a href="../signin.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                        <a href="login.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
                             Go to Login
                         </a>
                     </div>

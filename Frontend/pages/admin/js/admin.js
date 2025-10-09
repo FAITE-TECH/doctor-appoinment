@@ -296,10 +296,10 @@ class AdminPanel {
             await this.handleApiCall((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : '/doctor-appoinment/Backend/api/auth.php?action=signout')), {
                 method: 'POST'
             });
-            window.location.href = '../signin.html';
+            window.location.href = 'login.html';
         } catch (error) {
             console.error('Logout failed:', error);
-            window.location.href = '../signin.html';
+            window.location.href = 'login.html';
         }
     }
 }
