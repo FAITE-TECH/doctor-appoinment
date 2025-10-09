@@ -107,7 +107,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const eventImage = event.image_path ? `/doctor-appoinment/uploads/events/${event.image_path}` : "../public/assets/eyecare.jpg";
+          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : `/doctor-appoinment/uploads/events/${event.image_path}`) : "../public/assets/eyecare.jpg";
           const eventTitle = event.title || "Event";
           const eventDescription = event.description || "Join us for this special event.";
           const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";

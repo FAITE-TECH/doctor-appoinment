@@ -146,7 +146,7 @@
           let serviceImage = currentService.image_path || "../public/assets/eyecare.jpg";
           // Handle image path properly
           if (currentService.image_path && !currentService.image_path.startsWith('http') && !currentService.image_path.startsWith('/')) {
-            serviceImage = `/doctor-appoinment/uploads/services/${currentService.image_path}`;
+            serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${currentService.image_path}`) : `/doctor-appoinment/uploads/services/${currentService.image_path}`;
           } else if (currentService.image_path && currentService.image_path.startsWith('/')) {
             serviceImage = currentService.image_path;
           }
@@ -217,7 +217,7 @@
           .map((service) => {
             let serviceImage = service.image_path || "../public/assets/eyecare.jpg";
             if (service.image_path && !service.image_path.startsWith('http') && !service.image_path.startsWith('/')) {
-              serviceImage = `/doctor-appoinment/uploads/services/${service.image_path}`;
+              serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : `/doctor-appoinment/uploads/services/${service.image_path}`;
             } else if (service.image_path && service.image_path.startsWith('/')) {
               serviceImage = service.image_path;
             }

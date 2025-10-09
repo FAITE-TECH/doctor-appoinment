@@ -130,7 +130,8 @@ switch ($method) {
             if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
                 json_response(['error' => 'Failed to upload image'], 500);
             }
-            $imagePath = $filename;
+            // Store web-accessible upload URL for compatibility across hosts
+            $imagePath = get_upload_url('departments/' . $filename);
         }
 
         $stmt = $conn->prepare('INSERT INTO departments (name, description, image_path) VALUES (?, ?, ?)');

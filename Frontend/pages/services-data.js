@@ -12,7 +12,7 @@ async function fetchServicesData() {
         id: service.id,
         type: service.name,
         description: service.description || "Quality healthcare service provided by our experienced team.",
-        img: service.image_path ? `/doctor-appoinment/uploads/services/${service.image_path}` : "../public/assets/eyecare.jpg",
+  img: service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : `/doctor-appoinment/uploads/services/${service.image_path}`) : "../public/assets/eyecare.jpg",
         price: service.price ? parseFloat(service.price) : 0
       }));
       

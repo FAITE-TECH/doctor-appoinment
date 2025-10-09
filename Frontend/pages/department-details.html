@@ -147,7 +147,7 @@
           let departmentImage = currentDepartment.image_path || "../public/assets/nephrology.jpg";
           // Handle image path properly
           if (currentDepartment.image_path && !currentDepartment.image_path.startsWith('http') && !currentDepartment.image_path.startsWith('/')) {
-            departmentImage = `/doctor-appoinment/uploads/departments/${currentDepartment.image_path}`;
+            departmentImage = window.buildUploadUrl ? window.buildUploadUrl(`departments/${currentDepartment.image_path}`) : `/doctor-appoinment/uploads/departments/${currentDepartment.image_path}`;
           } else if (currentDepartment.image_path && currentDepartment.image_path.startsWith('/')) {
             departmentImage = currentDepartment.image_path;
           }
@@ -211,7 +211,7 @@
           .map((department) => {
             let departmentImage = department.image_path || "../public/assets/nephrology.jpg";
             if (department.image_path && !department.image_path.startsWith('http') && !department.image_path.startsWith('/')) {
-              departmentImage = `/doctor-appoinment/uploads/departments/${department.image_path}`;
+              departmentImage = window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : `/doctor-appoinment/uploads/departments/${department.image_path}`;
             } else if (department.image_path && department.image_path.startsWith('/')) {
               departmentImage = department.image_path;
             }

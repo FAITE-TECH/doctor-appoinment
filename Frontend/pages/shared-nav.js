@@ -14,7 +14,8 @@
     } else if (path.indexOf('/doctor-appoinment') !== -1) {
       projectRoot = '/doctor-appoinment';
     } else if (path.indexOf('/doctor-appointment') !== -1) {
-      projectRoot = '/doctor-appointment';
+      // Accept both spellings but default to the repo folder name to match server paths
+      projectRoot = '/doctor-appoinment';
     }
     if (projectRoot && projectRoot.charAt(0) !== '/') projectRoot = '/' + projectRoot;
     projectRoot = projectRoot.replace(/\/+$/,'');

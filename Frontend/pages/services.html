@@ -108,7 +108,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const serviceImage = service.image_path ? `/doctor-appoinment/uploads/services/${service.image_path}` : "../public/assets/eyecare.jpg";
+          const serviceImage = service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : `/doctor-appoinment/uploads/services/${service.image_path}`) : "../public/assets/eyecare.jpg";
           const serviceName = service.name || "Service";
           const serviceDescription = service.description || "Quality healthcare service provided by our experienced team.";
           const servicePrice = service.price ? parseFloat(service.price) : 0;

@@ -108,7 +108,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const departmentImage = department.image_path ? `/doctor-appoinment/uploads/departments/${department.image_path}` : "../public/assets/nephrology.jpg";
+          const departmentImage = department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : `/doctor-appoinment/uploads/departments/${department.image_path}`) : "../public/assets/nephrology.jpg";
           const departmentName = department.name || "Department";
           const departmentDescription = department.description || "Specialized medical department providing quality healthcare services.";
 

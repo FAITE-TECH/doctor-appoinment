@@ -77,7 +77,9 @@ if ($action === 'doctors') {
             $filepath = $uploadDir . $filename;
 
             if (move_uploaded_file($_FILES['image']['tmp_name'], $filepath)) {
-                $imagePath = '/doctor-appoinment/uploads/doctors/' . $filename; // save web-accessible path
+                // Use config-aware upload URL for hosted environments
+                $upload_web_root = get_upload_url('doctors/' . $filename);
+                $imagePath = $upload_web_root;
             }
         }
 

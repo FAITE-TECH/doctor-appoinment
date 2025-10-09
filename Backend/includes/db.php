@@ -27,13 +27,32 @@ try {
     $error_msg .= "Project root: " . $env_info['project_root'] . "\n";
     
     error_log($error_msg);
-    
-    // User-friendly error message
-    if ($config_instance->isProduction()) {
-        die("Database connection error. Please contact the administrator.");
-    } else {
-        die("Database connection failed: " . $e->getMessage() . 
-            " (Environment: " . $env_info['os'] . ")");
+
+    // If running from CLI, write to STDERR and exit
+    if (php_sapi_name() === 'cli') {
+        fwrite(STDERR, $error_msg);
+        exit(1);
     }
+
+    // Ensure API/clients receive JSON instead of plain-text HTML
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+    }
+    http_response_code(500);
+
+    // Minimal, safe JSON for production, more details in non-production
+    if ($config_instance->isProduction()) {
+        echo json_encode(['error' => 'Database connection error. Please contact the administrator.']);
+    } else {
+        echo json_encode([
+            'error' => 'Database connection failed: ' . $e->getMessage(),
+            'environment' => [
+                'os' => $env_info['os'],
+                'server' => $env_info['server_software'],
+                'project_root' => $env_info['project_root']
+            ]
+        ]);
+    }
+    exit;
 }
 ?>

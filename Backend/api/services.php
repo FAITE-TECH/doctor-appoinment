@@ -131,7 +131,7 @@ switch ($method) {
             if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
                 json_response(['error' => 'Failed to upload image'], 500);
             }
-            $imagePath = $filename;
+            $imagePath = get_upload_url('services/' . $filename);
         }
 
         $stmt = $conn->prepare('INSERT INTO services (name, description, price, image_path) VALUES (?, ?, ?, ?)');

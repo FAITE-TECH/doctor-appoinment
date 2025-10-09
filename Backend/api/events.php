@@ -178,7 +178,8 @@ switch ($method) {
                 ], 500);
             }
 
-            $imagePath = $filename; // Only store filename in DB
+            // Store full web path for hosted compatibility
+            $imagePath = get_upload_url('events/' . $filename);
         }
         
         $stmt = $conn->prepare('INSERT INTO events (title, description, event_date, event_time, location, image_path) VALUES (?, ?, ?, ?, ?, ?)');

@@ -284,8 +284,8 @@ if ($method === 'POST' && $action === 'add_doctor') {
             if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
                 json_response(['error' => 'Failed to upload image'], 500);
             }
-            // Store a web-accessible path for the frontend
-            $imagePath = '/doctor-appoinment/uploads/doctors/' . $filename;
+            // Store a web-accessible path for the frontend (config-aware)
+            $imagePath = get_upload_url('doctors/' . $filename);
         }
 
         // Insert with optional department and description
@@ -407,7 +407,7 @@ if ($method === 'POST' && $action === 'upload_image') {
     if (!in_array($file['type'],$allowed)) json_response(['error'=>'Invalid file type'],400);
     if ($file['size']>5*1024*1024) json_response(['error'=>'File too large'],400);
 
-    $uploadDir = '../../uploads/gallery/';
+    $uploadDir = __DIR__ . '/../../uploads/gallery/';
     if (!is_dir($uploadDir)) mkdir($uploadDir,0755,true);
 
     $ext = pathinfo($file['name'],PATHINFO_EXTENSION);
@@ -416,8 +416,10 @@ if ($method === 'POST' && $action === 'upload_image') {
 
     if (move_uploaded_file($file['tmp_name'],$filepath)) {
         try {
+            // Store web-accessible path for gallery image
+            $webPath = get_upload_url('gallery/' . $filename);
             $stmt = $GLOBALS['conn']->prepare('INSERT INTO gallery (title, description, image_path) VALUES (?,?,?)');
-            $stmt->bind_param('sss',$title,$description,$filename);
+            $stmt->bind_param('sss',$title,$description,$webPath);
             
             if ($stmt->execute()) {
                 json_response(['success'=>true,'message'=>'Image uploaded successfully'],201);

@@ -95,12 +95,17 @@
     // Provide a lightweight BASE_URL fallback that matches the project's rules
     (function(){
       var host = window.location.hostname || '';
+      var root = getBasePath();
       if (host === 'localhost' || host === '127.0.0.1') {
-        window.APP_API_FOLDER = 'http://localhost/doctor-appointment/Backend/api/';
+        if (root) {
+          window.APP_API_FOLDER = window.location.origin + (root || '') + '/Backend/api/';
+        } else {
+          // Fallback to the actual repo folder name used here
+          window.APP_API_FOLDER = window.location.origin + '/doctor-appoinment/Backend/api/';
+        }
       } else if (host.indexOf('spchospital.com') !== -1) {
         window.APP_API_FOLDER = 'https://spchospital.com/Backend/api/';
       } else {
-        var root = getBasePath();
         window.APP_API_FOLDER = window.location.origin + (root || '') + '/Backend/api/';
       }
     })();
@@ -189,6 +194,9 @@
     
     return basePath + '/uploads/' + cleanPath;
   }
+
+  // Expose upload builder globally for pages to use (host-agnostic)
+  window.buildUploadUrl = window.buildUploadUrl || buildUploadUrl;
 
   // Build asset URL for frontend assets
   function buildAssetUrl(assetPath) {

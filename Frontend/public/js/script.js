@@ -10,7 +10,8 @@
     } else if (path.indexOf('/doctor-appoinment') !== -1) {
       projectRoot = '/doctor-appoinment';
     } else if (path.indexOf('/doctor-appointment') !== -1) {
-      projectRoot = '/doctor-appointment';
+      // Accept both spellings but prefer the repo's actual folder name
+      projectRoot = '/doctor-appoinment';
     }
     if (projectRoot && !projectRoot.startsWith('/')) projectRoot = '/' + projectRoot;
     projectRoot = projectRoot.replace(/\/+$|\/?$/,'').replace(/\/+$/,'');
@@ -21,13 +22,19 @@
 
   const BASE_URL = (function() {
     const host = window.location.hostname || '';
+    const root = computeProjectRoot();
+
+    // For local development prefer using the detected project root when available
     if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://localhost/doctor-appointment/Backend/api/';
+      if (root) return window.location.origin + root + '/Backend/api/';
+      // Fallback to the repo folder spelling used here
+      return window.location.origin + '/doctor-appoinment/Backend/api/';
     }
+
     if (host.endsWith('spchospital.com')) {
       return 'https://spchospital.com/Backend/api/';
     }
-    const root = computeProjectRoot();
+
     return window.location.origin + root + '/Backend/api/';
   })();
 
