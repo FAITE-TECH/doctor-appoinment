@@ -201,7 +201,13 @@
             </div>
           `;
         } else {
-          document.getElementById("serviceDetail").innerHTML = '<p class="text-red-500 font-semibold">Service not found. The service with ID ' + serviceId + ' does not exist.</p>';
+          // If the service was deleted or not found, redirect back to services list
+          try {
+            window.location.replace('services.html');
+          } catch (e) {
+            // Fallback: update UI if redirect fails
+            document.getElementById("serviceDetail").innerHTML = '<p class="text-red-500 font-semibold">Service not found.</p>';
+          }
         }
       }
 
