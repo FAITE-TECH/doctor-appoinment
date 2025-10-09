@@ -147,12 +147,17 @@
 
         if (currentService) {
           // Use the image from database or fallback to default
-          let serviceImage = currentService.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${currentService.image_path}`) : 'https://spchospital.com/uploads/services/' + currentService.image_path) : "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
-          // Handle image path properly
-          if (currentService.image_path && !currentService.image_path.startsWith('http') && !currentService.image_path.startsWith('/')) {
-            serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${currentService.image_path}`) : 'https://spchospital.com/uploads/services/' + currentService.image_path;
-          } else if (currentService.image_path && currentService.image_path.startsWith('/')) {
-            serviceImage = currentService.image_path;
+          // Normalize image path: extract the filename to avoid duplicate '/uploads/services' segments
+          let serviceImage = "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
+          if (currentService.image_path) {
+            const imgName = String(currentService.image_path).split('/').pop();
+            if (imgName && !imgName.startsWith('http')) {
+              serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${imgName}`) : 'https://spchospital.com/uploads/services/' + imgName;
+            } else if (String(currentService.image_path).startsWith('http')) {
+              serviceImage = currentService.image_path;
+            } else if (String(currentService.image_path).startsWith('/')) {
+              serviceImage = currentService.image_path;
+            }
           }
           
           const serviceName = currentService.name || "Service";
@@ -219,11 +224,17 @@
 
         serviceContainer.innerHTML = displayServices
           .map((service) => {
-            let serviceImage = service.image_path || "../public/assets/eyecare.jpg";
-            if (service.image_path && !service.image_path.startsWith('http') && !service.image_path.startsWith('/')) {
-              serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : 'https://spchospital.com/uploads/services/' + service.image_path;
-            } else if (service.image_path && service.image_path.startsWith('/')) {
-              serviceImage = service.image_path;
+            // Normalize related service image path
+            let serviceImage = "../public/assets/eyecare.jpg";
+            if (service.image_path) {
+              const imgName = String(service.image_path).split('/').pop();
+              if (imgName && !imgName.startsWith('http')) {
+                serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${imgName}`) : 'https://spchospital.com/uploads/services/' + imgName;
+              } else if (String(service.image_path).startsWith('http')) {
+                serviceImage = service.image_path;
+              } else if (String(service.image_path).startsWith('/')) {
+                serviceImage = service.image_path;
+              }
             }
 
             const servicePrice = service.price ? parseFloat(service.price) : 0;
