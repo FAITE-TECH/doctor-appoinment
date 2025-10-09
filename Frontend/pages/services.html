@@ -73,7 +73,10 @@
       // Fetch services from API
       async function fetchServices() {
         try {
-          const response = await fetch(window.buildApiUrl('services.php?action=public'), { credentials: 'include' });
+          const response = await fetch(
+            (window.buildApiUrl ? window.buildApiUrl('services.php?action=public') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php?action=public' : 'https://spchospital.com/Backend/api/services.php?action=public')),
+            { credentials: 'include' }
+          );
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -109,7 +112,12 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const serviceImage = service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : 'https://spchospital.com/uploads/services/' + service.image_path) : "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
+          // Sanitize stored path: some records include full paths (e.g. '/uploads/services/..')
+          // so extract the filename to avoid duplicating '/uploads/services/' when building URLs.
+          const imgName = service.image_path ? String(service.image_path).split('/').pop() : '';
+          const serviceImage = imgName
+            ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${imgName}`) : 'https://spchospital.com/uploads/services/' + imgName)
+            : "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
           const serviceName = service.name || "Service";
           const serviceDescription = service.description || "Quality healthcare service provided by our experienced team.";
           const servicePrice = service.price ? parseFloat(service.price) : 0;
@@ -141,6 +149,13 @@
 
       // Initialize when page loads
       document.addEventListener("DOMContentLoaded", () => {
+        // Sanity check: ensure buildApiUrl is a function before attempting fetch
+        try {
+          console.log('DEBUG: buildApiUrl type =', typeof window.buildApiUrl);
+          if (typeof window.buildApiUrl !== 'function') {
+            console.warn('buildApiUrl is not a function. Falling back to APP_API_FOLDER usage.');
+          }
+        } catch (e) {}
         fetchServices();
       });
     </script>
