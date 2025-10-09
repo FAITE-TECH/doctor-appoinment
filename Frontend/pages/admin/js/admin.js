@@ -1,7 +1,7 @@
 // Admin Panel JavaScript
 class AdminPanel {
     constructor() {
-        this.apiBase = (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'admin.php' : window.buildApiUrl ? window.buildApiUrl('admin.php') : (window.location.origin + '/doctor-appoinment/Backend/api/admin.php'));
+    this.apiBase = (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php') : (window.buildApiUrl ? window.buildApiUrl('admin.php') : (window.location.origin + '/doctor-appoinment/Backend/api/admin.php')));
         this.init();
     }
 
@@ -63,7 +63,7 @@ class AdminPanel {
     async checkAdminAuth() {
         try {
             console.log('AdminPanel: Checking admin authentication...');
-            const authUrl = window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment/Backend/api/auth.php') + '?action=me');
+            const authUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=me') : (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=me'));
             const data = await this.handleApiCall(authUrl);
             console.log('AdminPanel: Auth response:', data);
             

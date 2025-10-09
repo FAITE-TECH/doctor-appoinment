@@ -9,9 +9,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <!-- Load shared scripts -->
-    <script src="shared-nav.js"></script>
-    <script src="footer.js"></script>
+  <!-- Load shared scripts -->
+  <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+  <script src="shared-nav.js"></script>
+  <script src="footer.js"></script>
     <style>
       /* Ensure proper page structure */
       body {
@@ -128,7 +129,7 @@
       // Fetch doctors from API
       async function fetchDoctors(searchTerm = '') {
         try {
-          let url = (window.buildApiUrl ? window.buildApiUrl('doctors.php?action=doctors') : '../../Backend/api/doctors.php?action=doctors');
+          let url = (window.buildApiUrl ? window.buildApiUrl('doctors.php?action=doctors') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'doctors.php?action=doctors' : window.location.origin + '/doctor-appoinment/Backend/api/doctors.php?action=doctors'));
           if (searchTerm) {
             url += '&search=' + encodeURIComponent(searchTerm);
           }

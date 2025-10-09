@@ -10,7 +10,8 @@
     />
     <link rel="icon" type="image/png" href="../public/assets/logo.png" />
 
-    <title>Gallery</title>
+  <title>Gallery</title>
+  <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
   </head>
   <body>
     <!-- Header -->
@@ -89,7 +90,7 @@
     // Load gallery images from API
     async function loadGallery() {
       try {
-  const response = await fetch((window.buildApiUrl ? window.buildApiUrl('public_gallery.php') : '../../Backend/api/public_gallery.php'));
+  const response = await fetch((window.buildApiUrl ? window.buildApiUrl('public_gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'public_gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/public_gallery.php')));
         
         if (!response.ok) {
           throw new Error('Failed to load gallery');

@@ -57,7 +57,7 @@
             statusDiv.innerHTML = '<p>Checking authentication...</p>';
             
             try {
-                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : '../../../Backend/api/auth.php?action=me')), {
+                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=me'))), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -101,7 +101,7 @@
             const password = document.getElementById('testPassword').value;
             
             try {
-                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : '../../../Backend/api/auth.php?action=signin')), {
+                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signin' : window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=signin'))), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -126,7 +126,7 @@
         // Logout
         async function logout() {
             try {
-                await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : '../../../Backend/api/auth.php?action=signout')), {
+                await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=signout'))), {
                     method: 'POST',
                     credentials: 'include'
                 });

@@ -16,9 +16,10 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
     
-    <!-- Safari and Cross-browser compatibility -->
-    <script src="../public/js/browser-compat.js"></script>
-    <script src="../public/js/cross-platform-utils.js"></script>
+  <!-- Safari and Cross-browser compatibility -->
+  <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+  <script src="../public/js/browser-compat.js"></script>
+  <script src="../public/js/cross-platform-utils.js"></script>
   </head>
   <body class="bg-gray-50" style="min-height: 100vh; display: flex; flex-direction: column;">
 
@@ -106,7 +107,7 @@
       // Fetch gallery from API
       async function fetchGallery() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('public_gallery.php') : '../../Backend/api/public_gallery.php'));
+          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('public_gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'public_gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/public_gallery.php')));
           
           if (!response.ok) {
             throw new Error('Failed to load gallery');

@@ -1,49 +1,48 @@
-// Global frontend config: set API base for different hosts
-// The user requested a small, explicit detection snippet for Hostinger vs local dev.
-// Ensure this appears at the very top so other scripts can rely on window.APP_API_*.
+// Global frontend config: APP API path detection and helper
 (function(){
-  try {
-    // User-provided snippet: prefer hostinger production when hostname includes 'spchospital.com'
-    if (window.location && window.location.hostname && window.location.hostname.includes('spchospital.com')) {
-      // Production (Hostinger)
-      window.APP_API_FOLDER = 'https://spchospital.com/Backend/api/';
-    } else {
-      // Local development
-      window.APP_API_FOLDER = '/doctor-appoinment/Backend/api/';
-    }
-    window.APP_API_BASE = window.APP_API_FOLDER + 'auth.php';
-  } catch (e) {
-    // noop - fall through to later heuristics
+  const host = (window && window.location && window.location.hostname) ? window.location.hostname : '';
+
+  // Production host uses the deployed absolute API path
+  if (host.includes('spchospital.com')) {
+    window.APP_API_FOLDER = 'https://spchospital.com/Backend/api/';
+  } else {
+    // Local / development: build using origin so scripts can work when served from filesystem or dev server
+    window.APP_API_FOLDER = window.location.origin + '/doctor-appoinment/Backend/api/';
   }
-})();
 
-// Provide a minimal buildApiUrl helper and a conservative fetch rewrite early
-(function(){
+  // auth.php is a special endpoint (session and cookies). Keep a direct base for it.
+  window.APP_API_BASE = window.APP_API_FOLDER + 'auth.php';
+
+  // Build full API URL for an endpoint like 'doctors.php?action=doctors' or 'auth.php?action=me'
+  window.buildApiUrl = window.buildApiUrl || function(endpoint){
+    try {
+      if (!endpoint) return window.APP_API_FOLDER;
+      // If caller already passed absolute URL, return it unchanged
+      if (/^https?:\/\//i.test(endpoint)) return endpoint;
+      // If absolute path (starts with /) return as-is - caller expects site-root path
+      if (endpoint.startsWith('/')) return endpoint;
+      const lower = endpoint.toLowerCase();
+      if (lower.startsWith('auth.php')) {
+        const suffix = endpoint.substring('auth.php'.length);
+        return (window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php')) + suffix;
+      }
+      // Ensure folder ends with slash, endpoint does not start with slash
+      const base = (window.APP_API_FOLDER || (window.location.origin + '/doctor-appoinment/Backend/api/'));
+      return (base.endsWith('/') ? base : base + '/') + endpoint.replace(/^\/+/, '');
+    } catch (e) {
+      return endpoint;
+    }
+  };
+
+  // Optional: lightweight fetch wrapper that rewrites common relative Backend/api paths to canonical APP_API_FOLDER
   try {
-    // buildApiUrl: prefer APP_API_BASE for auth.php, else APP_API_FOLDER + endpoint
-    window.buildApiUrl = window.buildApiUrl || function(endpoint){
-      try {
-        endpoint = endpoint || '';
-        if (/^https?:\/\//i.test(endpoint)) return endpoint;
-        if (endpoint.startsWith('/')) return endpoint; // absolute path intentionally left as-is
-        if (endpoint.toLowerCase().startsWith('auth.php')) {
-          const suffix = endpoint.substring('auth.php'.length);
-          return (window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php')) + suffix;
-        }
-        const folder = window.APP_API_FOLDER || (window.location.origin + '/doctor-appoinment/Backend/api/');
-        return (folder.endsWith('/') ? folder : folder + '/') + endpoint.replace(/^\/+/, '');
-      } catch (e) { return endpoint; }
-    };
-
-    // Lightweight fetch wrapper: rewrite string URLs that reference Backend/api or bare auth.php
     if (window.fetch) {
-      const originalFetch = window.fetch.bind(window);
+      const _fetch = window.fetch.bind(window);
       window.fetch = function(input, init) {
         try {
           if (typeof input === 'string') {
             const low = input.toLowerCase();
             if (low.indexOf('backend/api/') !== -1) {
-              // extract the part after backend/api/
               const parts = input.split(/backend\/api\//i);
               const rest = parts.length > 1 ? parts[1] : '';
               const folder = window.APP_API_FOLDER || (window.location.origin + '/doctor-appoinment/Backend/api/');
@@ -54,8 +53,9 @@
             }
           }
         } catch (e) {}
-        return originalFetch(input, init);
+        return _fetch(input, init);
       };
     }
   } catch (e) {}
+
 })();

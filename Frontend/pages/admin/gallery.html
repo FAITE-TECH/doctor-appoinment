@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../../public/css/styles.css">
     <style>
     </style>
+    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
 </head>
 <body class="bg-gray-100">
     <!-- Admin Navigation -->
@@ -197,9 +198,9 @@
                 }
 
                 console.log('✅ User authenticated, fetching gallery...');
-                console.log('🔗 API URL:', (window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../../Backend/api/gallery.php'));
+                console.log('🔗 API URL:', (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/gallery.php')));
 
-                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../../Backend/api/gallery.php'), {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/gallery.php')), {
                     credentials: 'include',
                     cache: 'no-cache'
                 });
@@ -347,7 +348,7 @@
         async function deleteImage(id) {
             if (confirm('Are you sure you want to delete this image?')) {
                 try {
-                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${id}`) : `../../../Backend/api/gallery.php?id=${id}`), {
+                    const response = await fetch((window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${id}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `gallery.php?id=${id}` : window.location.origin + `/doctor-appoinment/Backend/api/gallery.php?id=${id}`)), {
                         method: 'DELETE'
                     });
                     if (response.ok) {
@@ -368,8 +369,8 @@
             
             try {
                 const url = editingImageId 
-                    ? (window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${editingImageId}`) : `../../../Backend/api/gallery.php?id=${editingImageId}`)
-                    : (window.buildApiUrl ? window.buildApiUrl('gallery.php') : '../../../Backend/api/gallery.php');
+                    ? (window.buildApiUrl ? window.buildApiUrl(`gallery.php?id=${editingImageId}`) : (window.APP_API_FOLDER ? window.APP_API_FOLDER + `gallery.php?id=${editingImageId}` : window.location.origin + `/doctor-appoinment/Backend/api/gallery.php?id=${editingImageId}`))
+                    : (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : window.location.origin + '/doctor-appoinment/Backend/api/gallery.php'));
                 
                 const method = editingImageId ? 'PUT' : 'POST';
                 
@@ -417,9 +418,9 @@
     </script>
     
     <!-- Load scripts in proper order -->
-    <script src="./js/shared-auth.js"></script>
-    <script src="./js/admin.js"></script>
-    <script src="../../public/js/config.js"></script>
-    <script src="../../public/js/script.js"></script>
+    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+    <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
+    <script src="/doctor-appoinment/Frontend/pages/admin/js/shared-auth.js"></script>
+    <script src="/doctor-appoinment/Frontend/pages/admin/js/admin.js"></script>
 </body>
 </html>

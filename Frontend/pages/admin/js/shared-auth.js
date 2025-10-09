@@ -56,9 +56,9 @@ if (typeof window.SharedAdminAuth === 'undefined') {
     async checkAuth() {
         try {
             console.log('Checking authentication...');
-            // Use global config when available
-            const authEndpoint = window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment/Backend/api/auth.php'));
-            const response = await fetch(authEndpoint + '?action=me', {
+            // Use APP_API_BASE or buildApiUrl helper when available
+            const authUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=me') : (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=me'));
+            const response = await fetch(authUrl, {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
             });
@@ -121,8 +121,8 @@ if (typeof window.SharedAdminAuth === 'undefined') {
     async logout() {
         try {
             // Reuse same resolver used for auth checks to avoid inconsistent endpoints
-            const signoutEndpoint = (window.APP_API_BASE || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php' : (window.location.origin + '/doctor-appoinment/Backend/api/auth.php'))) + '?action=signout';
-            await fetch(signoutEndpoint, {
+            const signoutUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=signout') : (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (window.location.origin + '/doctor-appoinment/Backend/api/auth.php?action=signout'));
+            await fetch(signoutUrl, {
                 method: 'POST',
                 credentials: 'include'
             });

@@ -4,8 +4,7 @@ var latestNews = [];
 // Cross-browser fetch implementation
 function fetchLatestNewsData() {
   // Get the base path dynamically to work across different server setups
-  var basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-  var apiUrl = (window.buildApiUrl ? window.buildApiUrl('events.php?action=public') : basePath.replace('/pages', '') + '/../Backend/api/events.php?action=public');
+  var apiUrl = (window.buildApiUrl ? window.buildApiUrl('events.php?action=public') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'events.php?action=public' : window.location.origin + '/doctor-appoinment/Backend/api/events.php?action=public'));
   
   // Use our polyfilled fetch or native fetch
   window.fetch(apiUrl)

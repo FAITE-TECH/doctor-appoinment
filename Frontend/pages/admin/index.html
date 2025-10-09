@@ -223,12 +223,13 @@
         </div>
     </div>
 
-    <script src="../../public/js/config.js"></script>
-    <script src="../../public/js/script.js"></script>
+    <!-- Load config first so other scripts can use window.buildApiUrl / APP_API_* -->
+    <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+    <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
     <!-- Shared nav helper (initializes mobile menu toggle behavior if present) -->
-    <script src="../shared-nav.js"></script>
-    <script src="./js/shared-auth.js"></script>
-    <script src="./js/admin.js"></script>
+    <script src="/doctor-appoinment/Frontend/pages/shared-nav.js"></script>
+    <script src="/doctor-appoinment/Frontend/pages/admin/js/shared-auth.js"></script>
+    <script src="/doctor-appoinment/Frontend/pages/admin/js/admin.js"></script>
 
     <!-- Mobile menu overlay and drawer for admin sidebar (used on small screens) -->
     <div id="mobileMenuOverlay" class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"></div>

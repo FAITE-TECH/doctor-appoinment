@@ -46,8 +46,8 @@
     </div>
 
     <!-- Central config: dynamic API folder detection (Hostinger vs local) -->
-    <script src="../../public/js/config.js"></script>
-    <script src="../../public/js/script.js"></script>
+        <script src="/doctor-appoinment/Frontend/public/js/config.js"></script>
+        <script src="/doctor-appoinment/Frontend/public/js/script.js"></script>
     <script>
         // Handle admin login directly
         document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
@@ -62,7 +62,7 @@
             }
             
                 try {
-                const apiUrl = (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php')) + '?action=signin';
+                const apiUrl = (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : (window.APP_API_BASE || (window.location.origin + '/doctor-appoinment' + '/Backend/api/auth.php') + '?action=signin'));
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {

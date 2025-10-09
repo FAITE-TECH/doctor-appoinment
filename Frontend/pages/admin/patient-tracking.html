@@ -322,7 +322,7 @@
 
         async function loadPatients(searchTerm = '') {
             try {
-                let url = (window.buildApiUrl ? window.buildApiUrl('appointments.php?action=list&limit=1000') : '/doctor-appoinment/Backend/api/appointments.php?action=list&limit=1000');
+                let url = (window.buildApiUrl ? window.buildApiUrl('appointments.php?action=list&limit=1000') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'appointments.php?action=list&limit=1000' : window.location.origin + '/doctor-appoinment/Backend/api/appointments.php?action=list&limit=1000'));
                 if (searchTerm) {
                     url += '&search=' + encodeURIComponent(searchTerm);
                 }

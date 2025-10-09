@@ -105,7 +105,7 @@
       // Fetch services from API
       async function fetchServices() {
         try {
-          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('services.php?action=public') : '../../Backend/api/services.php?action=public'));
+          const response = await fetch((window.buildApiUrl ? window.buildApiUrl('services.php?action=public') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'services.php?action=public' : window.location.origin + '/doctor-appoinment/Backend/api/services.php?action=public')));
           const data = await response.json();
           
           if (data.status === 'success') {
