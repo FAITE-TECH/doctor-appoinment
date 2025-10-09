@@ -3,16 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
 
     <title>Doctor Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <!-- Load shared scripts -->
+  <!-- Load config first so window.buildApiUrl is available -->
   <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
-  <script src="shared-nav.js"></script>
-  <script src="footer.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <style>
       /* Ensure proper page structure */
       body {
@@ -28,24 +27,23 @@
   <body>
     <div id="header"></div>
     <script>
-      // Load navigation content
-      fetch("shared-nav.html?v=" + Date.now())
+      // Load navigation content (production absolute path)
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
-          document.getElementById("header").innerHTML = data;
-          // Initialize navigation after content is loaded
+          document.getElementById('header').innerHTML = data;
           setTimeout(() => {
             if (typeof initMobileMenu === 'function') {
               initMobileMenu();
               setActiveNavLink();
             }
           }, 100);
-        });
+        }).catch(e => console.warn('Failed to load nav:', e));
     </script>
 
     <div class="relative w-full h-32 sm:h-40 max-w-6xl mx-auto mx-4 sm:mx-auto">
       <img
-        src="../public/assets/eyecare.jpg"
+  src="https://spchospital.com/Frontend/public/assets/eyecare.jpg"
         alt="services"
         class="w-full h-full object-cover rounded-lg"
       />
@@ -136,7 +134,7 @@
             url += '&search=' + encodeURIComponent(searchTerm);
           }
           
-          const response = await fetch(url);
+          const response = await fetch(url, { credentials: 'include' });
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -184,14 +182,8 @@
           doctorCard.className =
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
 
-          // Use the image from database or fallback to default
-          let doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
-          // If image_path is absolute, use it as is, otherwise make it relative
-          if (doctor.image_path && !doctor.image_path.startsWith('http') && !doctor.image_path.startsWith('/')) {
-            doctorImage = "../" + doctor.image_path;
-          } else if (doctor.image_path && doctor.image_path.startsWith('/')) {
-            doctorImage = doctor.image_path;
-          }
+          // Use the image from database or fallback to default (prefer buildUploadUrl)
+          let doctorImage = doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`doctors/${doctor.image_path}`) : ('https://spchospital.com/uploads/doctors/' + doctor.image_path)) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
           const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
           const doctorDescription = doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
 
@@ -348,7 +340,7 @@
 
     <script>
       // Load spinner markup
-      fetch("spinner.html")
+  fetch('https://spchospital.com/Frontend/pages/spinner.html')
         .then(res => res.text())
         .then(data => {
           document.getElementById("spinner").innerHTML = data;

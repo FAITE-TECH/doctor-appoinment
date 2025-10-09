@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Service Details</title>
-    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"
@@ -16,8 +16,8 @@
     />
     
     <!-- Safari and Cross-browser compatibility -->
-    <script src="../public/js/browser-compat.js"></script>
-    <script src="../public/js/cross-platform-utils.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/browser-compat.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/cross-platform-utils.js"></script>
   </head>
   <body class="bg-gray-50" style="min-height: 100vh; display: flex; flex-direction: column;">
 
@@ -34,7 +34,7 @@
           return;
         }
         
-        fetch("shared-nav.html?v=" + Date.now(), {
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now(), {
           method: 'GET',
           cache: 'no-cache',
           headers: {
@@ -147,7 +147,7 @@
 
         if (currentService) {
           // Use the image from database or fallback to default
-          let serviceImage = currentService.image_path || "../public/assets/eyecare.jpg";
+          let serviceImage = currentService.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${currentService.image_path}`) : 'https://spchospital.com/uploads/services/' + currentService.image_path) : "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
           // Handle image path properly
           if (currentService.image_path && !currentService.image_path.startsWith('http') && !currentService.image_path.startsWith('/')) {
             serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${currentService.image_path}`) : 'https://spchospital.com/uploads/services/' + currentService.image_path;
@@ -284,7 +284,7 @@
           return;
         }
         
-        fetch("footer.html?v=" + Date.now(), {
+  fetch('https://spchospital.com/Frontend/pages/footer.html?v=' + Date.now(), {
           method: 'GET',
           cache: 'no-cache',
           headers: {
@@ -323,7 +323,7 @@
 
     <script>
       // Load spinner markup
-      fetch("spinner.html")
+  fetch('https://spchospital.com/Frontend/pages/spinner.html')
         .then(res => res.text())
         .then(data => {
           document.getElementById("spinner").innerHTML = data;
@@ -369,8 +369,8 @@
         });
     </script>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="shared-nav.js"></script>
   </body>
 </html>

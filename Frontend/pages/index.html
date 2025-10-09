@@ -7,13 +7,13 @@
   <title>SPC Hospital - Doctor Appointment System</title>
   
   <!-- Cross-browser compatibility polyfills - Load first -->
-  <script src="../public/js/browser-compat.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/browser-compat.js"></script>
   
   <!-- External CSS and JS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../public/css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="icon" type="image/png" href="../public/assets/logo.png">
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png">
   
   <!-- Tailwind config for cross-browser support -->
   <script>
@@ -33,7 +33,7 @@
 <body class="bg-gray-100">
   <div id="header"></div>
   <script>
-    fetch("shared-nav.html?v=" + Date.now())
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
       .then((res) => res.text())
       .then((data) => {
         document.getElementById("header").innerHTML = data;

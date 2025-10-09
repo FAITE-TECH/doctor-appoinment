@@ -8,16 +8,17 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
 
   <title>Gallery</title>
   <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
   </head>
   <body>
     <!-- Header -->
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html?v=" + Date.now())
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
@@ -31,7 +32,7 @@
     <!-- Hero -->
     <div class="relative w-full h-40 mx-auto">
       <img
-        src="../public/assets/doctor1.jpg"
+  src="https://spchospital.com/Frontend/public/assets/doctor1.jpg"
         alt="doctor"
         class="w-full h-full object-cover rounded-lg"
       />
@@ -90,11 +91,7 @@
     // Load gallery images from API
     async function loadGallery() {
       try {
-  const response = await fetch(
-    window.buildApiUrl
-      ? window.buildApiUrl('public_gallery.php')
-      : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'public_gallery.php' : 'https://spchospital.com/Backend/api/public_gallery.php')
-  );
+  const response = await fetch(window.buildApiUrl ? window.buildApiUrl('public_gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'public_gallery.php' : 'https://spchospital.com/Backend/api/public_gallery.php'), { credentials: 'include' });
         
         if (!response.ok) {
           throw new Error('Failed to load gallery');
@@ -123,7 +120,7 @@
 
           card.innerHTML = `
             <div class="relative group" onclick="viewImage('${image.id}')">
-              <img src="../../uploads/gallery/${image.image_path}" 
+              <img src="${window.buildUploadUrl ? window.buildUploadUrl('gallery/' + image.image_path) : 'https://spchospital.com/uploads/gallery/' + image.image_path}" 
                    alt="${image.title}" 
                    class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105">
               <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
@@ -173,11 +170,11 @@
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-      fetch("footer.html?v=" + Date.now())
+      fetch('https://spchospital.com/Frontend/pages/footer.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
-          document.getElementById("footer").innerHTML = data;
-        });
+          document.getElementById('footer').innerHTML = data;
+        }).catch(e => console.warn('Failed to load footer:', e));
     </script>
 
     <!--  Spinner -->
@@ -185,7 +182,7 @@
 
     <script>
       // Load spinner markup
-      fetch("spinner.html")
+  fetch('https://spchospital.com/Frontend/pages/spinner.html')
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("spinner").innerHTML = data;
@@ -234,8 +231,8 @@
         });
     </script>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
-    <script src="shared-nav.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+    <script src="https://spchospital.com/Frontend/pages/shared-nav.js"></script>
   </body>
 </html>

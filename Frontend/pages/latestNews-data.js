@@ -19,7 +19,7 @@ function fetchLatestNewsData() {
           var event = data.data[i];
           
           // Create cross-platform image path
-          var imagePath = "../public/assets/eyecare.jpg"; // Default fallback
+          var imagePath = "https://spchospital.com/Frontend/public/assets/eyecare.jpg"; // Default fallback
           if (event.image_path) {
             // Use relative path that works across different server setups
             imagePath = "../../uploads/events/" + event.image_path;

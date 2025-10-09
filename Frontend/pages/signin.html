@@ -10,7 +10,7 @@
 <body class="bg-gray-100">
   <div id="header"></div>
   <script>
-    fetch("shared-nav.html?v=" + Date.now())
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
       .then((res) => res.text())
       .then((data) => {
         document.getElementById("header").innerHTML = data;
@@ -126,8 +126,8 @@
       </div>
     </section>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
       <script src="shared-nav.js"></script>
       <script>
         // Check if this is an admin redirect

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doctor Details</title>
-      <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script
@@ -17,8 +17,8 @@
     />
     
     <!-- Safari and Cross-browser compatibility -->
-    <script src="../public/js/browser-compat.js"></script>
-    <script src="../public/js/cross-platform-utils.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/browser-compat.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/cross-platform-utils.js"></script>
   </head>
   <body class="bg-gray-50" style="min-height: 100vh; display: flex; flex-direction: column;">
 
@@ -27,7 +27,7 @@
 
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html")
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
@@ -166,7 +166,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
 
           // Use the image from database or fallback to default
-          let doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
+          let doctorImage = doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`doctors/${doctor.image_path}`) : 'https://spchospital.com/uploads/doctors/' + doctor.image_path) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
           // If image_path is absolute, use it as is, otherwise make it relative
           if (doctor.image_path && !doctor.image_path.startsWith('http') && !doctor.image_path.startsWith('/')) {
             doctorImage = "../" + doctor.image_path;
@@ -329,7 +329,7 @@
 
         if (currentDoctor) {
           // Use the image from database or fallback to default
-          let doctorImage = currentDoctor.image_path || "../public/assets/doctor1.jpg";
+          let doctorImage = currentDoctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`doctors/${currentDoctor.image_path}`) : 'https://spchospital.com/uploads/doctors/' + currentDoctor.image_path) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
           // If image_path is absolute, use it as is, otherwise make it relative
           if (currentDoctor.image_path && !currentDoctor.image_path.startsWith('http') && !currentDoctor.image_path.startsWith('/')) {
             doctorImage = "../" + currentDoctor.image_path;
@@ -745,7 +745,7 @@
           return;
         }
         
-        fetch("footer.html?v=" + Date.now(), {
+  fetch('https://spchospital.com/Frontend/pages/footer.html?v=' + Date.now(), {
           method: 'GET',
           cache: 'no-cache',
           headers: {
@@ -785,7 +785,7 @@
 
 <script>
   // Load spinner markup
-  fetch("spinner.html")
+  fetch('https://spchospital.com/Frontend/pages/spinner.html')
     .then(res => res.text())
     .then(data => {
       document.getElementById("spinner").innerHTML = data;
@@ -831,8 +831,8 @@
     });
 </script>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="shared-nav.js"></script>
   </body>
 </html>

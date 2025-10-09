@@ -16,26 +16,26 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-  <link rel="icon" type="image/png" href="../public/assets/logo.png" />
-
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <title>Departments</title>
   </head>
   <body>
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html?v=" + Date.now())
+      fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
-          document.getElementById("header").innerHTML = data;
-          // Initialize navigation after it's loaded
+          document.getElementById('header').innerHTML = data;
           if (window.initNavigationAfterLoad) {
             window.initNavigationAfterLoad();
           }
-        });
+        }).catch(e => console.warn('Failed to load nav:', e));
     </script>
 
     <div class="relative w-full h-32 sm:h-40 max-w-6xl mx-auto mx-4 sm:mx-auto">
-            <img src="../public/assets/eyecare.jpg" alt="services" class="w-full h-full object-cover rounded-lg">
+            <img src="https://spchospital.com/Frontend/public/assets/eyecare.jpg" alt="services" class="w-full h-full object-cover rounded-lg">
             <h1 class="absolute bottom-2 left-2 text-lg sm:text-xl font-bold text-white bg-black/50 px-2 py-1 rounded">
                  Departments
             </h1>
@@ -72,7 +72,7 @@
       // Fetch departments from API
       async function fetchDepartments() {
         try {
-          const response = await fetch(window.buildApiUrl('departments.php?action=public'));
+          const response = await fetch(window.buildApiUrl('departments.php?action=public'), { credentials: 'include' });
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -108,7 +108,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const departmentImage = department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : 'https://spchospital.com/uploads/departments/' + department.image_path) : "../public/assets/nephrology.jpg";
+          const departmentImage = department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : 'https://spchospital.com/uploads/departments/' + department.image_path) : "https://spchospital.com/Frontend/public/assets/nephrology.jpg";
           const departmentName = department.name || "Department";
           const departmentDescription = department.description || "Specialized medical department providing quality healthcare services.";
 
@@ -140,11 +140,11 @@
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-      fetch("footer.html")
+      fetch('https://spchospital.com/Frontend/pages/footer.html')
         .then((res) => res.text())
         .then((data) => {
-          document.getElementById("footer").innerHTML = data;
-        });
+          document.getElementById('footer').innerHTML = data;
+        }).catch(e => console.warn('Failed to load footer:', e));
     </script>
 
 
@@ -153,7 +153,7 @@
 
 <script>
   // Load spinner markup
-  fetch("spinner.html")
+  fetch('https://spchospital.com/Frontend/pages/spinner.html')
     .then(res => res.text())
     .then(data => {
       document.getElementById("spinner").innerHTML = data;

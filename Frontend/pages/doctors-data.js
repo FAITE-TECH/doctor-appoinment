@@ -17,7 +17,7 @@ async function fetchDoctorsData(searchTerm = '') {
         id: doctor.id,
         name: doctor.name,
         special: doctor.department_name || doctor.specialization || 'General',
-        img: doctor.image_path || "../public/assets/doctor1.jpg",
+  img: doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`doctors/${doctor.image_path}`) : ('https://spchospital.com/uploads/doctors/' + doctor.image_path)) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg",
         description: doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.",
         email: doctor.email || "contact@hospital.com",
         phone: doctor.phone || "123-456-7890",

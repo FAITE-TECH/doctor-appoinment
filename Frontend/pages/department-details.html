@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Department Details</title>
-    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script
@@ -17,8 +17,8 @@
     />
     
     <!-- Safari and Cross-browser compatibility -->
-    <script src="../public/js/browser-compat.js"></script>
-    <script src="../public/js/cross-platform-utils.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/browser-compat.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/cross-platform-utils.js"></script>
   </head>
   <body class="bg-white" style="min-height: 100vh; display: flex; flex-direction: column;">
 
@@ -35,7 +35,7 @@
           return;
         }
         
-        fetch("shared-nav.html?v=" + Date.now(), {
+          fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now(), {
           method: 'GET',
           cache: 'no-cache',
           headers: {
@@ -148,7 +148,7 @@
 
         if (currentDepartment) {
           // Use the image from database or fallback to default
-          let departmentImage = currentDepartment.image_path || "../public/assets/nephrology.jpg";
+            let departmentImage = currentDepartment.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${currentDepartment.image_path}`) : 'https://spchospital.com/uploads/departments/' + currentDepartment.image_path) : "https://spchospital.com/Frontend/public/assets/nephrology.jpg";
           // Handle image path properly
           if (currentDepartment.image_path && !currentDepartment.image_path.startsWith('http') && !currentDepartment.image_path.startsWith('/')) {
             departmentImage = window.buildUploadUrl ? window.buildUploadUrl(`departments/${currentDepartment.image_path}`) : 'https://spchospital.com/uploads/departments/' + currentDepartment.image_path;
@@ -312,7 +312,7 @@
 
     <script>
       // Load spinner markup
-      fetch("spinner.html")
+        fetch('https://spchospital.com/Frontend/pages/spinner.html')
         .then(res => res.text())
         .then(data => {
           document.getElementById("spinner").innerHTML = data;
@@ -358,8 +358,8 @@
         });
     </script>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="shared-nav.js"></script>
   </body>
 </html>

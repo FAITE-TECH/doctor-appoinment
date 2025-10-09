@@ -9,7 +9,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
 
-    <link rel="stylesheet" href="../public/css/styles.css" />
+  <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css" />
@@ -23,7 +23,7 @@
   <body>
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html?v=" + Date.now())
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
@@ -108,7 +108,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : 'https://spchospital.com/uploads/events/' + event.image_path) : "../public/assets/eyecare.jpg";
+          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : 'https://spchospital.com/uploads/events/' + event.image_path) : "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
           const eventTitle = event.title || "Event";
           const eventDescription = event.description || "Join us for this special event.";
           const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";
@@ -142,7 +142,7 @@
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-      fetch("footer.html?v=" + Date.now())
+  fetch('https://spchospital.com/Frontend/pages/footer.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("footer").innerHTML = data;
@@ -153,7 +153,7 @@
 
 <script>
   // Load spinner markup
-  fetch("spinner.html")
+  fetch('https://spchospital.com/Frontend/pages/spinner.html')
     .then(res => res.text())
     .then(data => {
       document.getElementById("spinner").innerHTML = data;
@@ -199,8 +199,8 @@
     });
 </script>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
     <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <script src="shared-nav.js"></script>

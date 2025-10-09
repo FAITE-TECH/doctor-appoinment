@@ -20,22 +20,21 @@
     <!-- jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <link rel="stylesheet" href="../public/css/styles.css" />
-    <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css" />
+  <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
 
     <title>SPC Hospital</title>
   </head>
   <body>
     <div id="header"></div>
     <script>
-      fetch("shared-nav.html?v=" + Date.now())
+      fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
@@ -54,13 +53,13 @@
         <img
           id="slider-image"
           class="w-full h-full object-cover absolute top-0 left-0 opacity-100 transition-opacity duration-1000 ease-in-out"
-          src="../public/assets/doctor1.jpg"
+          src="https://spchospital.com/Frontend/public/assets/doctor1.jpg"
           alt="Hero Image"
         />
         <img
           id="slider-image-next"
           class="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-1000 ease-in-out"
-          src="../public/assets/doctor1.jpg"
+          src="https://spchospital.com/Frontend/public/assets/doctor1.jpg"
           alt="Hero Image"
         />
       </div>
@@ -97,9 +96,9 @@
 
     <script>
       const images = [
-        "../public/assets/hero1.jpg",
-        "../public/assets/hero2.jpg",
-        "../public/assets/hero3.jpg",
+        "https://spchospital.com/Frontend/public/assets/hero1.jpg",
+        "https://spchospital.com/Frontend/public/assets/hero2.jpg",
+        "https://spchospital.com/Frontend/public/assets/hero3.jpg",
       ];
 
       let index = 0;
@@ -1866,7 +1865,7 @@
 
     <script>
       // Load spinner markup
-      fetch("spinner.html")
+      fetch('https://spchospital.com/Frontend/pages/spinner.html')
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("spinner").innerHTML = data;
@@ -1915,15 +1914,12 @@
         });
     </script>
 
-  <script src="../public/js/config.js"></script>
-  <script src="../public/js/script.js"></script>
-    <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
-    <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
-    <script src="shared-nav.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
     <!-- Footer -->
     <div id="footer"></div>
     <script>
-      fetch("footer.html")
+      fetch('https://spchospital.com/Frontend/pages/footer.html')
         .then((response) => response.text())
         .then((data) => {
           document.getElementById("footer").innerHTML = data;

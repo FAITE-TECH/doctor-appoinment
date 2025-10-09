@@ -16,7 +16,7 @@ async function fetchDepartmentsData() {
         id: department.id,
         name: department.name,
         description: department.description || "Specialized medical department providing quality healthcare services.",
-  img: department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : (`https://spchospital.com/uploads/departments/${department.image_path}`)) : "../public/assets/nephrology.jpg",
+  img: department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : (`https://spchospital.com/uploads/departments/${department.image_path}`)) : "https://spchospital.com/Frontend/public/assets/nephrology.jpg",
         email: "contact@hospital.com",
         phone: "123-456-7890"
       }));

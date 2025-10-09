@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gallery Details</title>
-    <link rel="icon" type="image/png" href="../public/assets/logo.png" />
+  <link rel="icon" type="image/png" href="https://spchospital.com/Frontend/public/assets/logo.png" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script
@@ -18,8 +18,8 @@
     
   <!-- Safari and Cross-browser compatibility -->
   <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
-  <script src="../public/js/browser-compat.js"></script>
-  <script src="../public/js/cross-platform-utils.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/browser-compat.js"></script>
+  <script src="https://spchospital.com/Frontend/public/js/cross-platform-utils.js"></script>
   </head>
   <body class="bg-gray-50" style="min-height: 100vh; display: flex; flex-direction: column;">
 
@@ -36,7 +36,7 @@
           return;
         }
         
-        fetch("shared-nav.html?v=" + Date.now(), {
+  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now(), {
           method: 'GET',
           cache: 'no-cache',
           headers: {
@@ -147,7 +147,7 @@
         currentGalleryItem = galleryItems.find((item) => parseInt(item.id) === galleryId);
 
         if (currentGalleryItem) {
-          const imagePath = `../../uploads/gallery/${currentGalleryItem.image_path}`;
+          const imagePath = (window.buildUploadUrl ? window.buildUploadUrl(`gallery/${currentGalleryItem.image_path}`) : 'https://spchospital.com/uploads/gallery/' + currentGalleryItem.image_path);
           const title = currentGalleryItem.title || "Gallery Image";
           const description = currentGalleryItem.description || "Beautiful image from our gallery.";
           const createdDate = new Date(currentGalleryItem.created_at).toLocaleDateString();
@@ -299,7 +299,7 @@
           return;
         }
         
-        fetch("footer.html?v=" + Date.now(), {
+  fetch('https://spchospital.com/Frontend/pages/footer.html?v=' + Date.now(), {
           method: 'GET',
           cache: 'no-cache',
           headers: {
@@ -338,7 +338,7 @@
 
     <script>
       // Load spinner markup
-      fetch("spinner.html")
+  fetch('https://spchospital.com/Frontend/pages/spinner.html')
         .then(res => res.text())
         .then(data => {
           document.getElementById("spinner").innerHTML = data;
