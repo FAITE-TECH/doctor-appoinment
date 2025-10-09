@@ -185,9 +185,16 @@
                 <input type="file" name="image" accept="image/*" class="px-3 py-2 border rounded md:col-span-2">
                 <div class="md:col-span-2 flex justify-end gap-3">
                     <button type="button" id="cancelAddDoctor" class="px-4 py-2 rounded border">Cancel</button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Save</button>
+                    <button type="submit" id="saveDoctorBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Save</button>
                 </div>
             </form>
+            <!-- Upload progress (hidden until an upload starts) -->
+            <div class="p-4">
+                <div id="uploadProgress" class="w-full bg-gray-200 h-3 rounded overflow-hidden hidden">
+                    <div id="uploadProgressBar" class="h-full bg-green-600 w-0"></div>
+                </div>
+                <div id="uploadProgressText" class="text-sm text-gray-600 mt-2 hidden">Uploading: <span id="uploadProgressPercent">0%</span></div>
+            </div>
         </div>
     </div>
 
@@ -434,26 +441,118 @@
                             const formData = new FormData(form);
                             try {
                                 const addUrl = (typeof window.buildApiUrl === 'function') ? window.buildApiUrl('admin.php?action=add_doctor') : (window.APP_API_FOLDER ? (window.APP_API_FOLDER + 'admin.php?action=add_doctor') : 'https://spchospital.com/Backend/api/admin.php?action=add_doctor');
-                                const response = await fetch(addUrl, {
-                                    method: 'POST',
-                                    credentials: 'include',
-                                    body: formData
-                                });
-                                const data = await response.json();
-                                if (response.ok && data.success) {
-                                    form.reset();
-                                    closeModal();
-                                    await this.loadDoctors();
-                                } else {
-                                    alert(data.error || 'Failed to add doctor');
-                                }
+
+                                // Use XHR to get upload progress events
+                                await this.uploadWithProgress(addUrl, formData);
+
+                                // On success
+                                form.reset();
+                                closeModal();
+                                await this.loadDoctors();
                             } catch (err) {
                                 console.error('Add doctor failed:', err);
-                                alert('Failed to add doctor');
+                                alert(err && err.message ? err.message : 'Failed to add doctor');
+                            } finally {
+                                // Ensure UI is re-enabled
+                                this.setUploading(false);
                             }
                         }
                     });
                 }
+            }
+
+            // Upload helper: uses XMLHttpRequest to report progress and returns a Promise
+            uploadWithProgress(url, formData) {
+                const self = this;
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', url, true);
+                    xhr.withCredentials = true;
+
+                    xhr.upload.addEventListener('progress', function(e) {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            self.updateUploadProgress(percent);
+                        }
+                    });
+
+                    xhr.addEventListener('load', function() {
+                        try {
+                            const ct = xhr.getResponseHeader('content-type') || '';
+                            const text = xhr.responseText || '';
+                            if (!xhr.status || xhr.status < 200 || xhr.status >= 300) {
+                                return reject(new Error('Upload failed: HTTP ' + xhr.status + ' - ' + text.slice(0,200)));
+                            }
+                            if (ct.indexOf('application/json') === -1) {
+                                // Try to parse if possible, otherwise treat as error
+                                try { var parsed = JSON.parse(text); } catch (e) { return reject(new Error('Invalid server response')) }
+                            } else {
+                                var parsed = JSON.parse(text);
+                            }
+
+                            if (parsed && parsed.success) {
+                                resolve(parsed);
+                            } else {
+                                reject(new Error(parsed && parsed.error ? parsed.error : 'Server reported failure'));
+                            }
+                        } catch (e) {
+                            reject(e);
+                        }
+                    });
+
+                    xhr.addEventListener('error', function() {
+                        reject(new Error('Network error during upload'));
+                    });
+
+                    // Before sending, disable UI
+                    this.setUploading(true);
+                    // small delay to allow UI update
+                    setTimeout(() => {
+                        xhr.send(formData);
+                    }, 50);
+                });
+            }
+
+            // UI helpers for upload progress and disabling
+            setUploading(isUploading) {
+                const modal = document.getElementById('addDoctorModal');
+                const saveBtn = document.getElementById('saveDoctorBtn');
+                const cancelBtn = document.getElementById('cancelAddDoctor');
+                const form = document.getElementById('addDoctorForm');
+
+                if (isUploading) {
+                    if (saveBtn) {
+                        saveBtn.disabled = true;
+                        saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                    if (cancelBtn) cancelBtn.disabled = true;
+                    if (form) Array.from(form.elements).forEach(el => el.disabled = true);
+                    // show progress UI
+                    const progress = document.getElementById('uploadProgress');
+                    const text = document.getElementById('uploadProgressText');
+                    if (progress) progress.classList.remove('hidden');
+                    if (text) text.classList.remove('hidden');
+                    this.updateUploadProgress(0);
+                } else {
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                    if (cancelBtn) cancelBtn.disabled = false;
+                    if (form) Array.from(form.elements).forEach(el => el.disabled = false);
+                    const progress = document.getElementById('uploadProgress');
+                    const text = document.getElementById('uploadProgressText');
+                    if (progress) progress.classList.add('hidden');
+                    if (text) text.classList.add('hidden');
+                    this.updateUploadProgress(0);
+                }
+            }
+
+            updateUploadProgress(percent) {
+                const bar = document.getElementById('uploadProgressBar');
+                const txt = document.getElementById('uploadProgressPercent');
+                if (bar) bar.style.width = (percent || 0) + '%';
+                if (txt) txt.textContent = (percent || 0) + '%';
             }
 
             openEditDoctor(id) {
