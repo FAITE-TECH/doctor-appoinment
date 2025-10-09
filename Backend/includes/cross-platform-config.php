@@ -173,6 +173,8 @@ class CrossPlatformConfig {
     
     private function setupDatabase() {
         // Database configuration with cross-platform MySQL socket detection
+        // Default (production/hosted) credentials. These will be overridden
+        // automatically when running in local XAMPP/localhost development.
         $this->config['database'] = [
             'host' => 'localhost',
             'username' => 'u697508608_doctor',
@@ -212,6 +214,21 @@ class CrossPlatformConfig {
         }
         
         $this->config['database']['socket'] = $socket;
+
+        // If running on a local development server (localhost / XAMPP / MAMP),
+        // many dev environments use the MySQL root user with no password and
+        // a local database named `doctor`. Override the credentials in that
+        // case to avoid 'Access denied' errors during local development.
+        $server_name = $_SERVER['SERVER_NAME'] ?? '';
+        $is_localhost = in_array($server_name, ['localhost', '127.0.0.1', '::1']) || $this->config['is_xampp'] || $this->config['is_mamp'];
+
+        if ($is_localhost) {
+            // Prefer the default XAMPP MySQL root user and the 'doctor' database
+            $this->config['database']['username'] = 'root';
+            $this->config['database']['password'] = '';
+            // Use 'doctor' if it exists, otherwise keep existing name
+            $this->config['database']['database'] = 'doctor';
+        }
     }
     
     public function get($key = null) {
