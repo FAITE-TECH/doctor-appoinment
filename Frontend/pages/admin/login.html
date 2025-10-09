@@ -45,6 +45,14 @@
         </div>
     </div>
 
+    <!-- Force correct API base on hosted environment to avoid incorrect URL detection -->
+    <script>
+        if (window.location && window.location.hostname && window.location.hostname.indexOf('spchospital.com') !== -1) {
+            // Production API location on the host
+            window.APP_API_FOLDER = 'https://spchospital.com/Backend/api/';
+            window.APP_API_BASE = 'https://spchospital.com/Backend/api/auth.php';
+        }
+    </script>
     <script src="../../public/js/script.js"></script>
     <script>
         // Handle admin login directly
