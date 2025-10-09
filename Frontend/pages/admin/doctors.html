@@ -319,11 +319,12 @@
                         } else if (imgName) {
                             // Relative upload filename; try buildUploadUrl or construct relative to app root
                             if (typeof window.buildUploadUrl === 'function') {
-                                img = window.buildUploadUrl(`doctors/${imgName}`);
+                                // Pass stored filename/path directly; buildUploadUrl will normalize
+                                img = window.buildUploadUrl(imgName);
                             } else {
                                 // construct a path relative to the current host and project root
                                 const basePath = window.location.pathname.includes('/doctor-appoinment') ? window.location.pathname.split('/doctor-appoinment')[0] + '/doctor-appoinment' : '';
-                                img = window.location.origin + basePath + '/uploads/doctors/' + imgName;
+                                img = imgName.indexOf('uploads/') !== -1 ? (window.location.origin + '/' + imgName.replace(/^\//, '')) : (window.location.origin + basePath + '/uploads/doctors/' + imgName);
                             }
                         }
                     }

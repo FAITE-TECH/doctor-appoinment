@@ -183,7 +183,9 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
 
           // Use the image from database or fallback to default (prefer buildUploadUrl)
-          let doctorImage = doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`doctors/${doctor.image_path}`) : ('https://spchospital.com/uploads/doctors/' + doctor.image_path)) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
+          // Use stored image_path as-is; buildUploadUrl normalizes and will
+          // handle paths that already contain 'uploads/' or are absolute URLs.
+          let doctorImage = doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(doctor.image_path) : (doctor.image_path.indexOf('uploads/') !== -1 ? ('https://spchospital.com/' + doctor.image_path.replace(/^\//, '')) : ('https://spchospital.com/uploads/doctors/' + doctor.image_path))) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
           const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
           const doctorDescription = doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
 

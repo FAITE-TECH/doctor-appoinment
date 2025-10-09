@@ -17,7 +17,9 @@ async function fetchDoctorsData(searchTerm = '') {
         id: doctor.id,
         name: doctor.name,
         special: doctor.department_name || doctor.specialization || 'General',
-  img: doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`doctors/${doctor.image_path}`) : ('https://spchospital.com/uploads/doctors/' + doctor.image_path)) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg",
+  // Pass the stored image_path directly; buildUploadUrl will normalize paths that
+  // already contain 'uploads/' or are absolute URLs.
+  img: doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(doctor.image_path) : (doctor.image_path.indexOf('uploads/') !== -1 ? ('https://spchospital.com/' + doctor.image_path.replace(/^\//, '')) : ('https://spchospital.com/uploads/doctors/' + doctor.image_path))) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg",
         description: doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.",
         email: doctor.email || "contact@hospital.com",
         phone: doctor.phone || "123-456-7890",

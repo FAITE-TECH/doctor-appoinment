@@ -191,7 +191,23 @@
     if (cleanPath.charAt(0) === '/') {
       cleanPath = cleanPath.substring(1);
     }
-    
+    // If the incoming path is already an absolute URL, return as-is
+    if (/^https?:\/\//i.test(uploadPath)) {
+      return uploadPath;
+    }
+
+    // If the incoming path already contains an uploads/ segment (for
+    // example backend stored '/doctor-appoinment/uploads/doctors/..' or
+    // 'uploads/doctors/...'), treat it as a full web path and return a
+    // normalized, absolute URL to avoid duplicating the uploads prefix.
+    if (cleanPath.indexOf('uploads/') !== -1) {
+      // Ensure leading slash for absolute path
+      var absPath = cleanPath.charAt(0) === '/' ? cleanPath : '/' + cleanPath;
+      // Use window.location.origin so this works both in local and prod
+      var origin = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+      return origin + absPath;
+    }
+
     return basePath + '/uploads/' + cleanPath;
   }
 
