@@ -191,9 +191,35 @@
     if (cleanPath.charAt(0) === '/') {
       cleanPath = cleanPath.substring(1);
     }
-    // If the incoming path is already an absolute URL, return as-is
+    // If the incoming path is already an absolute URL, ensure it's valid.
+    // Fix malformed host-only absolute URLs like 'https://uploads/...' which
+    // incorrectly use 'uploads' as the hostname (causes ERR_NAME_NOT_RESOLVED).
     if (/^https?:\/\//i.test(uploadPath)) {
-      return uploadPath;
+      try {
+        var urlObj = new URL(uploadPath);
+        // If hostname is 'uploads' (or 'uploads' + port), treat this as a malformed
+        // absolute URL created by joining protocol + path. Rebuild using current origin.
+        if (urlObj.hostname === 'uploads') {
+          var origin = window.location.origin || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
+          var fixed = origin.replace(/\/$/, '') + (urlObj.pathname.charAt(0) === '/' ? '' : '/') + urlObj.pathname.replace(/(^\/+|\/+$)/g, '/') ;
+          if (cleanPath.indexOf('uploads') !== -1 || cleanPath.indexOf('doctors') !== -1) {
+            console.warn('[buildUploadUrl] fixed malformed absolute URL', uploadPath, '=>', fixed);
+          }
+          return fixed;
+        }
+
+        // URL seems well-formed; debug-log if it points to uploads/doctors for tracing.
+        if (urlObj.pathname.indexOf('/uploads') !== -1 || urlObj.pathname.indexOf('/doctors') !== -1) {
+          console.debug('[buildUploadUrl] received absolute URL:', uploadPath);
+        }
+        return uploadPath;
+      } catch (e) {
+        // If URL parsing failed, fall back to treating it as a path.
+        console.warn('[buildUploadUrl] unable to parse absolute URL, treating as path:', uploadPath, e.message);
+        // strip protocol if present and keep remainder as path
+        uploadPath = uploadPath.replace(/^https?:\/\//i, '');
+        cleanPath = normalizePath(uploadPath);
+      }
     }
 
     // If the incoming path already contains an uploads/ segment (for
@@ -204,11 +230,26 @@
       // Ensure leading slash for absolute path
       var absPath = cleanPath.charAt(0) === '/' ? cleanPath : '/' + cleanPath;
       // Use window.location.origin so this works both in local and prod
-      var origin = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
-      return origin + absPath;
+      // Prefer window.location.origin which is supported in modern browsers
+      // and always includes protocol + hostname (+ port). Only fall back to
+      // manual construction if it's missing. If hostname is empty for some
+      // reason, fall back to the production domain to avoid generating
+      // 'https:///uploads/...' which the browser interprets as
+      // 'https://uploads/...'.
+      var origin = window.location.origin || (window.location.protocol + '//' + (window.location.hostname || 'spchospital.com') + (window.location.port ? ':' + window.location.port : ''));
+      var res = origin.replace(/\/$/, '') + absPath;
+      // Debug log when building upload URLs to trace malformed outputs
+      if (cleanPath.indexOf('uploads') !== -1 || cleanPath.indexOf('doctors') !== -1) {
+        console.debug('[buildUploadUrl] input:', uploadPath, 'cleanPath:', cleanPath, 'origin:', origin, '=>', res);
+      }
+      return res;
     }
 
-    return basePath + '/uploads/' + cleanPath;
+    var res = basePath + '/uploads/' + cleanPath;
+    if (cleanPath.indexOf('uploads') !== -1 || cleanPath.indexOf('doctors') !== -1) {
+      console.debug('[buildUploadUrl] input:', uploadPath, 'cleanPath:', cleanPath, 'basePath:', basePath, '=>', res);
+    }
+    return res;
   }
 
   // Expose upload builder globally for pages to use (host-agnostic)
