@@ -64,23 +64,23 @@
     document.head.appendChild(script);
   });
 
-  // Initialize navigation after script is loaded
+  // Initialize navigation after script is loaded. Prefer the initializer
+  // exposed by `shared-nav.js` (window.initNavigationAfterLoad). Do not
+  // overwrite that global function here — call it when available. This
+  // avoids calling internal functions that are intentionally scoped
+  // inside the navigation script and prevents runtime errors on pages
+  // where those functions are not globally available.
   window.navScriptLoaded.then(() => {
-    if (typeof initMobileMenu === 'function') {
-      initMobileMenu();
-      setActiveNavLink();
+    if (typeof window.initNavigationAfterLoad === 'function') {
+      // Use the global initializer provided by the script
+      window.initNavigationAfterLoad();
+    } else {
+      // Fallback: if the script exposed functions directly (older build),
+      // call them if available.
+      if (typeof initMobileMenu === 'function') initMobileMenu();
+      if (typeof setActiveNavLink === 'function') setActiveNavLink();
     }
   }).catch(error => {
     console.error('Error loading navigation script:', error);
   });
-  
-  // Also expose initialization function for dynamic loading
-  window.initNavigationAfterLoad = function() {
-    window.navScriptLoaded.then(() => {
-      if (typeof initMobileMenu === 'function') {
-        initMobileMenu();
-        setActiveNavLink();
-      }
-    });
-  };
 </script>

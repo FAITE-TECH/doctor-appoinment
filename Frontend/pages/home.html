@@ -34,14 +34,38 @@
   <body>
     <div id="header"></div>
     <script>
+      // Fetch the shared navigation HTML and insert it into the page.
+      // Some browsers do not execute <script> tags that are injected via
+      // innerHTML, so we also dynamically load the `shared-nav.js` script
+      // after insertion to ensure the navigation initializer is available.
       fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
-          // Initialize navigation after it's loaded
-          if (window.initNavigationAfterLoad) {
-            window.initNavigationAfterLoad();
+
+          // Ensure the navigation script is loaded. Avoid adding duplicate
+          // script tags if it's already present on the page.
+          var existing = document.querySelector('script[src="shared-nav.js"]');
+          if (!existing) {
+            var s = document.createElement('script');
+            s.src = 'shared-nav.js';
+            s.onload = function() {
+              if (window.initNavigationAfterLoad) {
+                window.initNavigationAfterLoad();
+              }
+            };
+            s.onerror = function(e) {
+              console.error('Failed to load shared-nav.js', e);
+            };
+            document.head.appendChild(s);
+          } else {
+            // If the script is already loaded, call the initializer directly.
+            if (window.initNavigationAfterLoad) {
+              window.initNavigationAfterLoad();
+            }
           }
+        }).catch(function(e) {
+          console.error('Failed to load shared-nav.html', e);
         });
     </script>
     <!-- Hero Image -->

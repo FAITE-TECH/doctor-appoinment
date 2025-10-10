@@ -176,6 +176,10 @@
   // Set active navigation link - cross-browser compatible
   function setActiveNavLink() {
     var currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+    // Normalize common homepage filenames and root path to 'home'
+    if (!currentPage || currentPage === '' || currentPage === 'index' || currentPage === 'index.php') {
+      currentPage = 'home';
+    }
     var navLinks = document.querySelectorAll ? 
       document.querySelectorAll('[data-nav]') : 
       document.getElementsByTagName('a'); // Fallback for older browsers
