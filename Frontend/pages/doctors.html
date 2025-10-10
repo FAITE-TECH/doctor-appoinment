@@ -27,17 +27,39 @@
   <body>
     <div id="header"></div>
     <script>
-      // Load navigation content (production absolute path)
-  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
+      // Load the shared navigation HTML and ensure the navigation script
+      // runs. Scripts inside injected HTML do not reliably execute, so we
+      // dynamically load `shared-nav.js` after insertion and call the
+      // exposed initializer when available.
+      fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById('header').innerHTML = data;
-          setTimeout(() => {
-            if (typeof initMobileMenu === 'function') {
-              initMobileMenu();
-              setActiveNavLink();
+
+          // Load shared-nav.js if it's not already present on the page.
+          var existing = document.querySelector('script[src="shared-nav.js"]');
+          if (!existing) {
+            var s = document.createElement('script');
+            s.src = 'shared-nav.js';
+            s.onload = function() {
+              if (window.initNavigationAfterLoad) {
+                window.initNavigationAfterLoad();
+              } else {
+                // Fallback: call the functions directly if they were exposed.
+                if (typeof initMobileMenu === 'function') initMobileMenu();
+                if (typeof setActiveNavLink === 'function') setActiveNavLink();
+              }
+            };
+            s.onerror = function(e) { console.error('Failed to load shared-nav.js', e); };
+            document.head.appendChild(s);
+          } else {
+            if (window.initNavigationAfterLoad) {
+              window.initNavigationAfterLoad();
+            } else {
+              if (typeof initMobileMenu === 'function') initMobileMenu();
+              if (typeof setActiveNavLink === 'function') setActiveNavLink();
             }
-          }, 100);
+          }
         }).catch(e => console.warn('Failed to load nav:', e));
     </script>
 
