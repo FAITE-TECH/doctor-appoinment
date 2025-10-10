@@ -12,11 +12,27 @@ async function fetchDepartmentsData() {
     
     if (data.status === 'success') {
       // Transform the data to match the expected format for gallery
+      // Helper to normalize image path like in departments.html
+      function resolveImagePath(path) {
+        const fallback = "https://spchospital.com/Frontend/public/assets/nephrology.jpg";
+        if (!path) return fallback;
+        const p = String(path || '').trim();
+        if (!p) return fallback;
+        if (/^https?:\/\//i.test(p)) return p;
+        if (p.startsWith('/')) return window.location.origin.replace(/\/+$|$/, '') + p;
+        if (p.indexOf('uploads/') !== -1) return window.location.origin.replace(/\/+$|$/, '') + '/' + p.replace(/^\/+/, '');
+        const filename = p.split('/').pop();
+        if (typeof window.buildUploadUrl === 'function') {
+          try { return window.buildUploadUrl('departments/' + filename); } catch (e) {}
+        }
+        return 'https://spchospital.com/uploads/departments/' + filename;
+      }
+
       departments = data.data.map(department => ({
         id: department.id,
         name: department.name,
         description: department.description || "Specialized medical department providing quality healthcare services.",
-  img: department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : (`https://spchospital.com/uploads/departments/${department.image_path}`)) : "https://spchospital.com/Frontend/public/assets/nephrology.jpg",
+        img: resolveImagePath(department.image_path),
         email: "contact@hospital.com",
         phone: "123-456-7890"
       }));
