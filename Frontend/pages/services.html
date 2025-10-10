@@ -25,12 +25,36 @@
   <body>
     <div id="header"></div>
     <script>
-  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
+      // Fetch the shared navigation and ensure the nav script runs.
+      fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById('header').innerHTML = data;
-          if (window.initNavigationAfterLoad) {
-            window.initNavigationAfterLoad();
+
+          // Ensure the shared-nav script is loaded and then call its
+          // initializer. This prevents issues where scripts inside
+          // injected HTML don't execute.
+          var existing = document.querySelector('script[src="shared-nav.js"]');
+          if (!existing) {
+            var s = document.createElement('script');
+            s.src = 'shared-nav.js';
+            s.onload = function() {
+              if (window.initNavigationAfterLoad) {
+                window.initNavigationAfterLoad();
+              } else {
+                if (typeof initMobileMenu === 'function') initMobileMenu();
+                if (typeof setActiveNavLink === 'function') setActiveNavLink();
+              }
+            };
+            s.onerror = function(e) { console.error('Failed to load shared-nav.js', e); };
+            document.head.appendChild(s);
+          } else {
+            if (window.initNavigationAfterLoad) {
+              window.initNavigationAfterLoad();
+            } else {
+              if (typeof initMobileMenu === 'function') initMobileMenu();
+              if (typeof setActiveNavLink === 'function') setActiveNavLink();
+            }
           }
         }).catch(e => console.warn('Failed to load nav:', e));
     </script>
