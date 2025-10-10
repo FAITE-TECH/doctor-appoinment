@@ -242,10 +242,18 @@
       if (cleanPath.indexOf('uploads') !== -1 || cleanPath.indexOf('doctors') !== -1) {
         console.debug('[buildUploadUrl] input:', uploadPath, 'cleanPath:', cleanPath, 'origin:', origin, '=>', res);
       }
-      return res;
+      // Normalize to avoid protocol-relative URLs like 'https://uploads/...'
+      return res.replace(/([^:])\/\/+/, function(m, g1) { return g1 + '/'; });
     }
 
-    var res = basePath + '/uploads/' + cleanPath;
+    // Ensure basePath is usable; if empty, use origin + project root
+    var normalizedBase = basePath || '';
+    // If basePath is empty, construct using current origin and assume project at '/doctor-appoinment'
+    if (!normalizedBase) {
+      normalizedBase = window.location.origin + '/doctor-appoinment';
+    }
+    // Ensure no duplicate slashes while concatenating
+    var res = normalizedBase.replace(/\/$/, '') + '/uploads/' + cleanPath.replace(/^\//, '');
     if (cleanPath.indexOf('uploads') !== -1 || cleanPath.indexOf('doctors') !== -1) {
       console.debug('[buildUploadUrl] input:', uploadPath, 'cleanPath:', cleanPath, 'basePath:', basePath, '=>', res);
     }
@@ -255,7 +263,7 @@
   // Expose upload builder globally for pages to use (host-agnostic)
   window.buildUploadUrl = window.buildUploadUrl || buildUploadUrl;
 
-  // Build asset URL for frontend assets
+  // Build asset URL for frontend assetsa
   function buildAssetUrl(assetPath) {
     var currentPath = window.location.pathname;
     var cleanAssetPath = normalizePath(assetPath);

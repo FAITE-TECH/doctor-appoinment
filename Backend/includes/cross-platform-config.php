@@ -339,7 +339,30 @@ class CrossPlatformConfig {
     }
     
     public function getUploadUrl($path = '') {
-        return $this->config['urls']['uploads'] . ($path ? '/' . ltrim($path, '/') : '');
+        $uploads = $this->config['urls']['uploads'] ?? '';
+
+        // If uploads URL looks like an absolute URL (has scheme), keep and normalize trailing slashes
+        if (preg_match('#^https?://#i', $uploads)) {
+            $base = rtrim($uploads, '/');
+        } else {
+            // Normalize to a single leading slash then the uploads path (avoid '//' which becomes protocol-relative when used in HTML)
+            $base = '/' . trim($uploads, '/');
+        }
+
+        $suffix = $path ? '/' . ltrim($path, '/') : '';
+        // Ensure we don't accidentally produce double slashes when concatenating
+        $result = $base . $suffix;
+        // Final normalization: replace multiple consecutive slashes (but preserve '://' in URLs)
+        if (strpos($result, '://') !== false) {
+            // split at '://' and normalize the path part only
+            list($schemePart, $rest) = explode('://', $result, 2);
+            $rest = preg_replace('#/+#', '/', $rest);
+            $result = $schemePart . '://' . $rest;
+        } else {
+            $result = preg_replace('#/+#', '/', $result);
+        }
+
+        return $result;
     }
     
     public function getAssetUrl($path = '') {
