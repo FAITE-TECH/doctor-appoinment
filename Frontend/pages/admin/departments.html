@@ -379,6 +379,8 @@
                 editingDepartmentId = id;
                 document.getElementById('departmentName').value = dept.name;
                 document.getElementById('departmentDescription').value = dept.description || '';
+                // populate hidden id so FormData will include it for multipart POST updates
+                try { document.getElementById('departmentId').value = id; } catch (e) {}
                 showDepartmentModal(true);
             }
         }
@@ -516,7 +518,54 @@
                 } else {
                     // For edits or creations without file, use fetch
                     let response;
-                    if (editingDepartmentId) {
+                    if (editingDepartmentId && hasFile) {
+                        // Edit with file selected -> send multipart POST with id via XHR to show progress
+                        const percentText = document.getElementById('uploadProgressPercent');
+                        progressContainer.classList.remove('hidden');
+                        progressBar.style.width = '0%';
+                        if (percentText) percentText.textContent = '0%';
+
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', url, true);
+                        xhr.withCredentials = true;
+
+                        xhr.upload.addEventListener('progress', (evt) => {
+                            if (evt.lengthComputable) {
+                                const percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                                progressBar.style.width = percentComplete + '%';
+                                if (percentText) percentText.textContent = percentComplete + '%';
+                            }
+                        });
+
+                        xhr.onload = function() {
+                            saveBtn.disabled = false;
+                            if (percentText) percentText.textContent = '100%';
+                            setTimeout(() => { if (progressContainer) progressContainer.classList.add('hidden'); }, 600);
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                hideDepartmentModal();
+                                loadDepartments();
+                            } else if (xhr.status === 403) {
+                                showAuthMessage();
+                            } else {
+                                console.error('Upload failed', xhr.status, xhr.responseText);
+                            }
+                        };
+
+                        xhr.onerror = function() {
+                            saveBtn.disabled = false;
+                            if (percentText) percentText.textContent = '0%';
+                            if (progressContainer) progressContainer.classList.add('hidden');
+                            console.error('Network error while uploading department');
+                        };
+
+                        const formData = new FormData(e.target);
+                        // ensure id present in FormData
+                        if (!formData.get('id') && editingDepartmentId) formData.append('id', editingDepartmentId);
+                        xhr.send(formData);
+                        // we already handled the response via XHR callbacks
+                        saveBtn.disabled = false;
+                        return;
+                    } else if (editingDepartmentId) {
                         const formData = new FormData(e.target);
                         const departmentData = {
                             name: formData.get('name'),
