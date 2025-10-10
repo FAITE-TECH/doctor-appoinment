@@ -150,6 +150,27 @@
       let availableDepartments = new Set();
       let doctorContainer;
 
+      // Helper: build a safe absolute URL for uploaded images
+      function safeBuildUploadUrl(pathOrName, folder) {
+        if (!pathOrName) return '';
+        // If it's already an absolute URL, return as-is
+        if (String(pathOrName).startsWith('http')) return pathOrName;
+
+        // If buildUploadUrl is provided by cross-platform utils, prefer it
+        if (typeof window.buildUploadUrl === 'function') {
+          try {
+            return window.buildUploadUrl(pathOrName.startsWith(folder || '') ? pathOrName : (folder ? (folder + '/' + pathOrName) : pathOrName));
+          } catch (e) {
+            // fallthrough to manual build
+          }
+        }
+
+        // Normalize path: remove leading slashes
+        const cleaned = String(pathOrName).replace(/^\/+/, '');
+        const base = 'https://spchospital.com/uploads/';
+        return folder ? (base + folder + '/' + cleaned) : (base + cleaned);
+      }
+
       // Render doctors function (global scope)
       function renderDoctors(filteredDoctors) {
         // Clear container
@@ -166,14 +187,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col transform opacity-0 animate-fadeIn";
 
           // Use the image from database or fallback to default
-          // Use stored image_path directly and let buildUploadUrl normalize it.
-          let doctorImage = doctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(doctor.image_path) : (doctor.image_path.indexOf('uploads/') !== -1 ? ('https://spchospital.com/' + doctor.image_path.replace(/^\//, '')) : 'https://spchospital.com/uploads/doctors/' + doctor.image_path)) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
-          // If image_path is absolute, use it as is, otherwise make it relative
-          if (doctor.image_path && !doctor.image_path.startsWith('http') && !doctor.image_path.startsWith('/')) {
-            doctorImage = "../" + doctor.image_path;
-          } else if (doctor.image_path && doctor.image_path.startsWith('/')) {
-            doctorImage = doctor.image_path;
-          }
+          let doctorImage = doctor.image_path ? safeBuildUploadUrl(doctor.image_path, 'doctors') : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
           const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
           const doctorDescription = doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
 
@@ -330,13 +344,7 @@
 
         if (currentDoctor) {
           // Use the image from database or fallback to default
-          let doctorImage = currentDoctor.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(currentDoctor.image_path) : (currentDoctor.image_path.indexOf('uploads/') !== -1 ? ('https://spchospital.com/' + currentDoctor.image_path.replace(/^\//, '')) : 'https://spchospital.com/uploads/doctors/' + currentDoctor.image_path)) : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
-          // If image_path is absolute, use it as is, otherwise make it relative
-          if (currentDoctor.image_path && !currentDoctor.image_path.startsWith('http') && !currentDoctor.image_path.startsWith('/')) {
-            doctorImage = "../" + currentDoctor.image_path;
-          } else if (currentDoctor.image_path && currentDoctor.image_path.startsWith('/')) {
-            doctorImage = currentDoctor.image_path;
-          }
+          let doctorImage = currentDoctor.image_path ? safeBuildUploadUrl(currentDoctor.image_path, 'doctors') : "https://spchospital.com/Frontend/public/assets/doctor1.jpg";
           const doctorSpecialization = currentDoctor.specialization || currentDoctor.department_name || "General";
           const doctorDescription = currentDoctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
 

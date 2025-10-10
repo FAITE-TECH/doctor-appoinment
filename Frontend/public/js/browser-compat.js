@@ -206,27 +206,53 @@
   }
 
   // Add classList support for older browsers
-  if (!Element.prototype.classList) {
-    Element.prototype.classList = {
-      add: function(className) {
-        if (!this.contains(className)) {
-          this.className += (this.className ? ' ' : '') + className;
+  // Provide a getter that returns an object bound to each element so
+  // native element methods aren't called with the wrong `this` context.
+  if (!('classList' in Element.prototype)) {
+    Object.defineProperty(Element.prototype, 'classList', {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        var el = this;
+        function getClasses() {
+          return (el.className || '').trim().split(/\s+/).filter(Boolean);
         }
-      },
-      remove: function(className) {
-        this.className = this.className.replace(new RegExp('(^|\\s)' + className + '(\\s|$)', 'g'), '$2');
-      },
-      contains: function(className) {
-        return new RegExp('(^|\\s)' + className + '(\\s|$)').test(this.className);
-      },
-      toggle: function(className) {
-        if (this.contains(className)) {
-          this.remove(className);
-        } else {
-          this.add(className);
-        }
+
+        return {
+          add: function(className) {
+            if (!className) return;
+            var classes = getClasses();
+            if (classes.indexOf(className) === -1) {
+              classes.push(className);
+              el.className = classes.join(' ');
+            }
+          },
+          remove: function(className) {
+            if (!className) return;
+            var classes = getClasses();
+            var idx;
+            while ((idx = classes.indexOf(className)) !== -1) {
+              classes.splice(idx, 1);
+            }
+            el.className = classes.join(' ');
+          },
+          contains: function(className) {
+            if (!className) return false;
+            var classes = getClasses();
+            return classes.indexOf(className) !== -1;
+          },
+          toggle: function(className) {
+            if (this.contains(className)) {
+              this.remove(className);
+              return false;
+            } else {
+              this.add(className);
+              return true;
+            }
+          }
+        };
       }
-    };
+    });
   }
 
   // Console polyfill for older browsers
