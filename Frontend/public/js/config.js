@@ -8,7 +8,11 @@
     window.APP_API_BASE = 'https://spchospital.com/Backend/api/auth.php';
   } else {
     // Local / development XAMPP fallback
-    window.APP_API_FOLDER = window.APP_API_FOLDER || (window.location.origin + '/doctor-appoinment/Backend/api/');
+    // Ensure APP_API_FOLDER is absolute and points to the project's Backend/api
+    const inferredFolder = window.location.origin + '/doctor-appoinment/Backend/api/';
+    window.APP_API_FOLDER = window.APP_API_FOLDER || inferredFolder;
+    // Normalize folder to end with '/'
+    if (!window.APP_API_FOLDER.endsWith('/')) window.APP_API_FOLDER += '/';
     window.APP_API_BASE = window.APP_API_BASE || (window.APP_API_FOLDER + 'auth.php');
   }
 
@@ -22,7 +26,14 @@
       try {
         if (!endpoint) return window.APP_API_FOLDER;
         if (/^https?:\/\//i.test(endpoint)) return endpoint;
-        if (endpoint.startsWith('/')) return endpoint;
+        // If caller passed an absolute path that starts with '/', make it absolute against origin
+        if (endpoint.startsWith('/')) return window.location.origin.replace(/\/$/, '') + endpoint;
+        // Handle common mistake where a script builds a path like 'Frontend/Backend/api/...'
+        if (/frontend\/backend\/api\//i.test(endpoint)) {
+          const parts = endpoint.split(/frontend\/backend\/api\//i);
+          const rest = parts[1] || '';
+          return (window.APP_API_FOLDER || '') + rest.replace(/^\/+/, '');
+        }
         const lower = endpoint.toLowerCase();
         if (lower.startsWith('auth.php')) {
           const suffix = endpoint.substring('auth.php'.length);

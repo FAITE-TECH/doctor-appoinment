@@ -56,8 +56,24 @@ if (typeof window.SharedAdminAuth === 'undefined') {
     async checkAuth() {
         try {
             console.log('Checking authentication...');
-            // Use APP_API_BASE or buildApiUrl helper when available
-            const authUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=me') : (typeof window.buildApiUrl === 'function' ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'));
+            // Prefer buildApiUrl (more robust) and fall back to APP_API_BASE.
+            // This avoids accidentally using a relative APP_API_BASE like '/Frontend/Backend/api/...'
+            let authUrl;
+            if (typeof window.buildApiUrl === 'function') {
+                authUrl = window.buildApiUrl('auth.php?action=me');
+            } else if (window.APP_API_BASE) {
+                // Ensure APP_API_BASE is absolute (prefix origin if it starts with a single '/').
+                authUrl = window.APP_API_BASE;
+                if (authUrl.startsWith('/')) {
+                    authUrl = window.location.origin.replace(/\/$/, '') + authUrl;
+                }
+                // If APP_API_BASE already contains query string, avoid duplicating '?'
+                authUrl = authUrl.includes('?') ? authUrl + '&action=me' : authUrl + '?action=me';
+            } else if (window.APP_API_FOLDER) {
+                authUrl = (window.APP_API_FOLDER.endsWith('/') ? window.APP_API_FOLDER : window.APP_API_FOLDER + '/') + 'auth.php?action=me';
+            } else {
+                authUrl = 'https://spchospital.com/Backend/api/auth.php?action=me';
+            }
             const response = await fetch(authUrl, {
                 credentials: 'include',
                 cache: 'no-cache' // Ensure fresh auth check
@@ -121,7 +137,18 @@ if (typeof window.SharedAdminAuth === 'undefined') {
     async logout() {
         try {
             // Reuse same resolver used for auth checks to avoid inconsistent endpoints
-            const signoutUrl = (window.APP_API_BASE) ? (window.APP_API_BASE + '?action=signout') : (typeof window.buildApiUrl === 'function' ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'));
+            let signoutUrl;
+            if (typeof window.buildApiUrl === 'function') {
+                signoutUrl = window.buildApiUrl('auth.php?action=signout');
+            } else if (window.APP_API_BASE) {
+                signoutUrl = window.APP_API_BASE;
+                if (signoutUrl.startsWith('/')) signoutUrl = window.location.origin.replace(/\/$/, '') + signoutUrl;
+                signoutUrl = signoutUrl.includes('?') ? signoutUrl + '&action=signout' : signoutUrl + '?action=signout';
+            } else if (window.APP_API_FOLDER) {
+                signoutUrl = (window.APP_API_FOLDER.endsWith('/') ? window.APP_API_FOLDER : window.APP_API_FOLDER + '/') + 'auth.php?action=signout';
+            } else {
+                signoutUrl = 'https://spchospital.com/Backend/api/auth.php?action=signout';
+            }
             await fetch(signoutUrl, {
                 method: 'POST',
                 credentials: 'include'
