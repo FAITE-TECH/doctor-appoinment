@@ -153,21 +153,38 @@
       // Helper: build a safe absolute URL for uploaded images
       function safeBuildUploadUrl(pathOrName, folder) {
         if (!pathOrName) return '';
-        // If it's already an absolute URL, return as-is
-        if (String(pathOrName).startsWith('http')) return pathOrName;
 
-        // If buildUploadUrl is provided by cross-platform utils, prefer it
-        if (typeof window.buildUploadUrl === 'function') {
+        var str = String(pathOrName);
+
+        // If looks like a full absolute URL, try to detect malformed host like 'uploads'
+        if (/^https?:\/\//i.test(str)) {
           try {
-            return window.buildUploadUrl(pathOrName.startsWith(folder || '') ? pathOrName : (folder ? (folder + '/' + pathOrName) : pathOrName));
+            var u = new URL(str);
+            if (u.hostname === 'uploads') {
+              // Rebuild using current origin + pathname
+              var origin = window.location.origin || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
+              return origin.replace(/\/$/, '') + u.pathname;
+            }
+            return str; // well-formed
           } catch (e) {
-            // fallthrough to manual build
+            // fallthrough to treat as path
+            str = str.replace(/^https?:\/\//i, '');
           }
         }
 
-        // Normalize path: remove leading slashes
-        const cleaned = String(pathOrName).replace(/^\/+/, '');
-        const base = 'https://spchospital.com/uploads/';
+        // If cross-platform builder is available, prefer it (it already handles many edge cases)
+        if (typeof window.buildUploadUrl === 'function') {
+          try {
+            var candidate = (folder && !str.startsWith(folder) ? folder + '/' + str : str);
+            return window.buildUploadUrl(candidate);
+          } catch (e) {
+            // fallthrough to manual
+          }
+        }
+
+        // Manual fallback: normalize and build absolute URL against production host
+        var cleaned = str.replace(/^\/+/, '');
+        var base = 'https://spchospital.com/uploads/';
         return folder ? (base + folder + '/' + cleaned) : (base + cleaned);
       }
 

@@ -162,16 +162,55 @@
       var elements = [];
       var element;
       
-      document.documentElement.firstChild.appendChild(style);
+      // Ensure we have a head element to append into and avoid calling
+      // methods with a wrong `this` (which can cause Illegal invocation).
+      var head = document.documentElement && document.documentElement.firstChild ? document.documentElement.firstChild : document.getElementsByTagName('head')[0] || document.body;
+      if (!head) head = document.body || document.documentElement;
+      head.appendChild(style);
       document._qsa = [];
 
-      style.styleSheet.cssText = selector + '{x-qsa:expression(document._qsa && document._qsa.push(this))}';
-      window.scrollBy(0, 0);
-      style.parentNode.removeChild(style);
+      // Some environments may not support style.styleSheet; guard access.
+      try {
+        if (style.styleSheet) {
+          style.styleSheet.cssText = selector + '{x-qsa:expression(document._qsa && document._qsa.push(this))}';
+        } else {
+          // fallback for standards-based browsers — insert CSS text node
+          style.appendChild(document.createTextNode(selector + '{x-qsa:expression(document._qsa && document._qsa.push(this))}'));
+        }
+      } catch (e) {
+        // If the engine throws (older/newer combos), silently continue.
+        try { style.innerHTML = selector + '{x-qsa:expression(document._qsa && document._qsa.push(this))}'; } catch (e2) {}
+      }
 
-      while (document._qsa.length) {
+      // Some browsers may not expose scrollBy as a global function or may
+      // restrict its invocation; call via window.scrollTo as safer alternative.
+      try {
+        if (typeof window.scrollBy === 'function') {
+          window.scrollBy(0, 0);
+        } else if (typeof window.scrollTo === 'function') {
+          window.scrollTo(window.pageXOffset || 0, window.pageYOffset || 0);
+        }
+      } catch (e) {
+        // ignore any errors here
+      }
+
+      // Remove style only if parentNode exists to avoid Illegal invocation
+      if (style.parentNode && typeof style.parentNode.removeChild === 'function') {
+        style.parentNode.removeChild(style);
+      }
+
+      while (document._qsa && document._qsa.length) {
         element = document._qsa.shift();
-        element.style.removeAttribute('x-qsa');
+        try {
+          if (element && element.style && typeof element.style.removeAttribute === 'function') {
+            element.style.removeAttribute('x-qsa');
+          } else if (element && element.removeAttribute) {
+            // fallback to element.removeAttribute if style.removeAttribute is not available
+            element.removeAttribute('x-qsa');
+          }
+        } catch (e) {
+          // ignore errors removing the attribute
+        }
         elements.push(element);
       }
       document._qsa = null;
