@@ -4,6 +4,39 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0); // Turn off HTML error display
 ini_set('log_errors', 1);
 
+// Basic file logging for fatal errors to aid remote debugging when Apache logs
+// are not accessible. Logs are written to Backend/logs/admin_errors.log
+// Ensure this directory is writable by the webserver.
+register_shutdown_function(function() {
+    $err = error_get_last();
+    if ($err && in_array($err['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE])) {
+        $logDir = __DIR__ . '/../logs/';
+        if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+        $logFile = $logDir . 'admin_errors.log';
+        $msg = "[SHUTDOWN] " . date('c') . " - Fatal error: " . json_encode($err) . "\n";
+        @file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+            http_response_code(500);
+            echo json_encode(['error' => 'Server encountered a fatal error. Check server logs.']);
+        }
+    }
+});
+
+set_exception_handler(function($ex) {
+    $logDir = __DIR__ . '/../logs/';
+    if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+    $logFile = $logDir . 'admin_errors.log';
+    $msg = "[EXCEPTION] " . date('c') . " - " . $ex->getMessage() . " in " . $ex->getFile() . ":" . $ex->getLine() . "\n" . $ex->getTraceAsString() . "\n";
+    @file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['error' => 'Unhandled exception occurred. Check server logs.']);
+    }
+    exit(1);
+});
+
 header('Content-Type: application/json');
 
 // Include session configuration first
@@ -291,6 +324,12 @@ if ($method === 'POST' && $action === 'add_doctor') {
         // Insert with optional department and description
         $sql = 'INSERT INTO doctors (name, email, specialization, phone, image_path, description, department_id) VALUES (?,?,?,?,?,?,?)';
         $stmt = $GLOBALS['conn']->prepare($sql);
+        if (!$stmt) {
+            // Return a JSON error instead of letting a PHP fatal occur when
+            // calling methods on a non-object. Also log the DB error for admins.
+            error_log('add_doctor prepare failed: ' . ($GLOBALS['conn']->error ?? 'unknown'));
+            json_response(['error' => 'Failed to prepare database statement: ' . ($GLOBALS['conn']->error ?? 'unknown')], 500);
+        }
         $deptParam = $departmentId ? $departmentId : null;
         $stmt->bind_param('ssssssi', $name, $email, $specialization, $phone, $imagePath, $description, $deptParam);
         if ($stmt->execute()) {
@@ -355,9 +394,17 @@ if ($method === 'POST' && $action === 'update_doctor') {
     try {
         if ($imagePath !== null) {
             $stmt = $GLOBALS['conn']->prepare('UPDATE doctors SET name=?, email=?, specialization=?, phone=?, description=?, department_id=?, image_path=? WHERE id=?');
+            if (!$stmt) {
+                error_log('update_doctor (with image) prepare failed: ' . ($GLOBALS['conn']->error ?? 'unknown'));
+                json_response(['error' => 'Failed to prepare database statement: ' . ($GLOBALS['conn']->error ?? 'unknown')], 500);
+            }
             $stmt->bind_param('sssssisi', $name, $email, $specialization, $phone, $description, $departmentId, $imagePath, $id);
         } else {
             $stmt = $GLOBALS['conn']->prepare('UPDATE doctors SET name=?, email=?, specialization=?, phone=?, description=?, department_id=? WHERE id=?');
+            if (!$stmt) {
+                error_log('update_doctor (no image) prepare failed: ' . ($GLOBALS['conn']->error ?? 'unknown'));
+                json_response(['error' => 'Failed to prepare database statement: ' . ($GLOBALS['conn']->error ?? 'unknown')], 500);
+            }
             $stmt->bind_param('sssssii', $name, $email, $specialization, $phone, $description, $departmentId, $id);
         }
 

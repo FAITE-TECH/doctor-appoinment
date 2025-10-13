@@ -510,7 +510,10 @@
                             const ct = xhr.getResponseHeader('content-type') || '';
                             const text = xhr.responseText || '';
                             if (!xhr.status || xhr.status < 200 || xhr.status >= 300) {
-                                return reject(new Error('Upload failed: HTTP ' + xhr.status + ' - ' + text.slice(0,200)));
+                                // Include raw server response text in the error to make debugging
+                                // server-side 500 responses easier to diagnose from the browser.
+                                const serverText = text ? text : '<no response body>';
+                                return reject(new Error('Upload failed: HTTP ' + xhr.status + ' - ' + serverText.slice(0,200)));
                             }
                             if (ct.indexOf('application/json') === -1) {
                                 // Try to parse if possible, otherwise treat as error
