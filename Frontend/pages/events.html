@@ -69,27 +69,74 @@
       // Global variable to store events data
       let events = [];
 
+      // Safe helper to build API URLs. Prefer window.buildApiUrl when available,
+      // otherwise fall back to APP_API_FOLDER or a production URL. This mirrors
+      // other pages in the project and prevents errors when the config script
+      // didn't load or was blocked.
+      function apiUrl(endpoint) {
+        try {
+          if (typeof window.buildApiUrl === 'function') return window.buildApiUrl(endpoint);
+          var ep = endpoint || '';
+          if (ep.startsWith('/')) ep = ep.substring(1);
+          var folder = window.APP_API_FOLDER || 'https://spchospital.com/Backend/api/';
+          if (!folder.endsWith('/')) folder = folder + '/';
+          return folder + ep;
+        } catch (e) {
+          return 'https://spchospital.com/Backend/api/' + (endpoint || '');
+        }
+      }
+
       // Fetch events from API
       async function fetchEvents() {
         try {
-          const response = await fetch(window.buildApiUrl('events.php?action=public'));
+          const response = await fetch(apiUrl('events.php?action=public'), { credentials: 'include' });
           const data = await response.json();
-          
-          if (data.status === 'success') {
-            events = data.data;
+
+          if (data.status === 'success' || Array.isArray(data.data)) {
+            // Some endpoints return { status: 'success', data: [...] }
+            // while others may return { events: [...] }. Try to be flexible.
+            events = data.data || data.events || data || [];
             renderEvents();
           } else {
-            console.error('Failed to fetch events:', data.message);
+            console.error('Failed to fetch events:', data.message || data);
             // Fallback to empty state
-            const serviceContainer = document.getElementById("serviceContainer");
+            const serviceContainer = document.getElementById('serviceContainer');
             serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">No events available at the moment.</p>';
           }
         } catch (error) {
           console.error('Error fetching events:', error);
           // Fallback to empty state
-          const serviceContainer = document.getElementById("serviceContainer");
+          const serviceContainer = document.getElementById('serviceContainer');
           serviceContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">Unable to load events. Please try again later.</p>';
         }
+      }
+
+      // Helper to build event image URL. Accepts a filename, relative path, or absolute URL
+      // and returns a usable image URL without duplicating path segments.
+      function buildEventImageUrl(imagePath) {
+        if (!imagePath) return null;
+        const imgPath = String(imagePath || '');
+        if (imgPath.startsWith('http')) return imgPath;
+        // If it already contains the uploads path, normalize to origin + path
+        if (imgPath.indexOf('/uploads/events/') !== -1) {
+          // Remove duplicate leading slashes
+          const cleaned = imgPath.replace(/\/\/+/, '/');
+          if (cleaned.startsWith('/')) return window.location.origin + cleaned;
+          return window.location.origin + '/' + cleaned;
+        }
+
+        // If it starts with a slash, treat as absolute path
+        if (imgPath.startsWith('/')) return window.location.origin + imgPath;
+
+        // Otherwise, try to use buildUploadUrl if available, or construct a path
+        const imgName = imgPath.split('/').pop();
+        if (!imgName) return null;
+        if (typeof window.buildUploadUrl === 'function') {
+          return window.buildUploadUrl('events/' + imgName);
+        }
+        // Attempt to construct a relative uploads path depending on app path
+        const basePath = window.location.pathname.includes('/doctor-appoinment') ? window.location.pathname.split('/doctor-appoinment')[0] + '/doctor-appoinment' : '';
+        return window.location.origin + basePath + '/uploads/events/' + imgName;
       }
 
       // Render events on the page
@@ -107,8 +154,9 @@
           eventCard.className =
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
-          // Use the image from database or fallback to default
-          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : 'https://spchospital.com/uploads/events/' + event.image_path) : "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
+          // Use the image from database or fallback to default. Use a helper
+          // to normalize values that may already include paths or full URLs.
+          const eventImage = buildEventImageUrl(event.image_path) || "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
           const eventTitle = event.title || "Event";
           const eventDescription = event.description || "Join us for this special event.";
           const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";
