@@ -32,6 +32,103 @@
     <title>SPC Hospital</title>
   </head>
   <body>
+    <script>
+      // Fallback: ensure global URL builder helpers exist even if config.js
+      // failed to load or defines them differently. This prevents runtime
+      // TypeError: window.buildApiUrl is not a function when pages call it
+      // directly.
+      if (typeof window.buildApiUrl !== 'function') {
+        window.buildApiUrl = function(endpoint) {
+          try {
+            var ep = endpoint || '';
+            if (ep.startsWith('/')) ep = ep.substring(1);
+            var folder = window.APP_API_FOLDER || (window.APP_API_BASE ? window.APP_API_BASE : 'https://spchospital.com/Backend/api/');
+            if (!folder.endsWith('/')) folder = folder + '/';
+            return folder + ep;
+          } catch (e) {
+            return 'https://spchospital.com/Backend/api/' + (endpoint || '');
+          }
+        };
+      }
+
+      if (typeof window.buildUploadUrl !== 'function') {
+        window.buildUploadUrl = function(path) {
+          try {
+            var p = path || '';
+            if (p.startsWith('/')) p = p.substring(1);
+            // If an explicit uploads base is provided, prefer it
+            if (window.APP_UPLOADS_BASE) {
+              var base = window.APP_UPLOADS_BASE;
+              if (!base.endsWith('/')) base = base + '/';
+              return base + p;
+            }
+            var origin = window.location.origin || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
+            return origin.replace(/\/$/, '') + '/uploads/' + p;
+          } catch (e) {
+            return 'https://spchospital.com/uploads/' + (path || '');
+          }
+        };
+      }
+
+      // Robust upload URL builder that tolerates different stored paths
+      // and prevents double '/uploads/...' prefixes. Use this instead of
+      // calling window.buildUploadUrl directly when the stored image_path
+      // may already contain 'uploads/...'.
+      function safeBuildUploadUrl(pathOrName, folder) {
+        if (!pathOrName) return '';
+
+        var str = String(pathOrName).trim();
+        var origin = window.location.origin || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
+
+        // If it's already a full URL, return it (fix host 'uploads' -> origin + pathname)
+        if (/^https?:\/\//i.test(str)) {
+          try {
+            var u = new URL(str);
+            if (u.hostname && u.hostname.toLowerCase() === 'uploads') {
+              return origin.replace(/\/$/, '') + u.pathname;
+            }
+            return str;
+          } catch (e) {
+            // parsing failed, strip protocol and continue
+            str = str.replace(/^https?:\/\//i, '');
+          }
+        }
+
+        // Normalize leading slashes
+        var cleaned = str.replace(/^\/+/, '');
+
+        // If value already contains 'uploads/<folder>/' somewhere, take the last occurrence
+        if (folder && cleaned.indexOf('uploads/' + folder + '/') !== -1) {
+          var idx = cleaned.lastIndexOf('uploads/' + folder + '/');
+          var tail = cleaned.substring(idx); // from uploads/<folder>/...
+          return origin.replace(/\/$/, '') + '/' + tail.replace(/^\/+/, '');
+        }
+
+        // If value already starts with 'uploads/' take that as the path
+        if (cleaned.indexOf('uploads/') === 0) {
+          return origin.replace(/\/$/, '') + '/' + cleaned;
+        }
+
+        // If value already starts with the folder (e.g., 'doctors/filename'), build /uploads/<folder>/...
+        if (folder && cleaned.indexOf(folder + '/') === 0) {
+          return origin.replace(/\/$/, '') + '/uploads/' + cleaned;
+        }
+
+        // Use buildUploadUrl if present; ensure we don't prefix folder twice
+        if (typeof window.buildUploadUrl === 'function') {
+          try {
+            var candidate = (folder && !cleaned.startsWith(folder + '/')) ? folder + '/' + cleaned : cleaned;
+            return window.buildUploadUrl(candidate);
+          } catch (e) {
+            // fallthrough to manual
+          }
+        }
+
+        // Manual fallback: production uploads base
+        var base = origin.replace(/\/$/, '') + '/uploads/';
+        return folder ? (base + folder + '/' + cleaned) : (base + cleaned);
+      }
+    </script>
     <div id="header"></div>
     <script>
       // Fetch the shared navigation HTML and insert it into the page.
@@ -426,8 +523,10 @@
           doctorCard.className =
             "bg-white border my-7 rounded-lg shadow p-6 flex flex-col md:flex-row items-center gap-4 transition hover:shadow-lg ";
 
-          // Use the image from database or fallback to default
-          const doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
+          // Use the image from database or fallback to default. Build using safeBuildUploadUrl to avoid double '/uploads' prefixes.
+          const doctorImage = doctor.image_path
+            ? safeBuildUploadUrl(doctor.image_path, 'doctors')
+            : "../public/assets/doctor1.jpg";
           const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
 
           doctorCard.innerHTML = `
@@ -632,7 +731,7 @@
             try {
               console.log('Sending appointment data:', JSON.stringify(appointmentData, null, 2));
               
-              const response = await fetch(window.buildApiUrl('appointments.php?action=book'), {
+              const response = await fetch(apiUrl('appointments.php?action=book'), {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -849,10 +948,25 @@
       let currentStartDate = new Date();
       let scheduleData = {};
 
+      // Safe helper to build API URLs. Prefer window.buildApiUrl when available,
+      // otherwise fall back to APP_API_FOLDER or a production URL.
+      function apiUrl(endpoint) {
+        try {
+          if (typeof window.buildApiUrl === 'function') return window.buildApiUrl(endpoint);
+          var ep = endpoint || '';
+          if (ep.startsWith('/')) ep = ep.substring(1);
+          var folder = window.APP_API_FOLDER || 'https://spchospital.com/Backend/api/';
+          if (!folder.endsWith('/')) folder = folder + '/';
+          return folder + ep;
+        } catch (e) {
+          return 'https://spchospital.com/Backend/api/' + (endpoint || '');
+        }
+      }
+
       // Fetch departments from API
       async function fetchDepartments() {
         try {
-          const response = await fetch(window.buildApiUrl('departments.php?action=public'));
+          const response = await fetch(apiUrl('departments.php?action=public'), { credentials: 'include' });
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -870,7 +984,7 @@
       // Fetch doctors from API
       async function fetchDoctors() {
         try {
-          const response = await fetch(window.buildApiUrl('doctors.php?action=doctors'));
+          const response = await fetch(apiUrl('doctors.php?action=doctors'), { credentials: 'include' });
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -938,8 +1052,10 @@
           doctorCard.className =
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
-          // Use the image from database or fallback to default
-          const doctorImage = doctor.image_path || "../public/assets/doctor1.jpg";
+          // Use the image from database or fallback to default. Build using safeBuildUploadUrl to avoid double '/uploads' prefixes.
+          const doctorImage = doctor.image_path
+            ? safeBuildUploadUrl(doctor.image_path, 'doctors')
+            : "../public/assets/doctor1.jpg";
           const doctorSpecialization = doctor.specialization || doctor.department_name || "General";
           const doctorDescription = doctor.description || "Experienced medical professional dedicated to providing quality healthcare services.";
 
@@ -1013,7 +1129,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const departmentImage = department.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : 'https://spchospital.com/uploads/departments/' + department.image_path) : "../public/assets/nephrology.jpg";
+          const departmentImage = department.image_path ? safeBuildUploadUrl(department.image_path, 'departments') : "../public/assets/nephrology.jpg";
           const departmentName = department.name || "Department";
           const departmentDescription = department.description || "Specialized medical department providing quality healthcare services.";
 
@@ -1123,9 +1239,7 @@
         
         try {
           // Check if user is authenticated
-          const response = await fetch(window.buildApiUrl('auth.php?action=me'), {
-            credentials: 'include'
-          });
+          const response = await fetch(apiUrl('auth.php?action=me'), { credentials: 'include' });
           const data = await response.json();
           
           if (data.authenticated && data.user && data.user.email) {
@@ -1672,7 +1786,7 @@
       // Fetch services from API
       async function fetchServices() {
         try {
-          const response = await fetch(window.buildApiUrl('services.php?action=public'));
+          const response = await fetch(apiUrl('services.php?action=public'));
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -1711,7 +1825,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const serviceImage = service.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`services/${service.image_path}`) : 'https://spchospital.com/uploads/services/' + service.image_path) : "../public/assets/eyecare.jpg";
+          const serviceImage = service.image_path ? safeBuildUploadUrl(service.image_path, 'services') : "../public/assets/eyecare.jpg";
           const serviceName = service.name || "Service";
           const serviceDescription = service.description || "Quality healthcare service provided by our experienced team.";
 
@@ -1779,7 +1893,7 @@
       // Fetch events from API
       async function fetchEvents() {
         try {
-          const response = await fetch(window.buildApiUrl('events.php?action=public'));
+          const response = await fetch(apiUrl('events.php?action=public'));
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -1816,7 +1930,7 @@
             "bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col";
 
           // Use the image from database or fallback to default
-          const eventImage = event.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`events/${event.image_path}`) : 'https://spchospital.com/uploads/events/' + event.image_path) : "../public/assets/eyecare.jpg";
+          const eventImage = event.image_path ? safeBuildUploadUrl(event.image_path, 'events') : "../public/assets/eyecare.jpg";
           const eventTitle = event.title || "Event";
           const eventDescription = event.description || "Join us for this special event.";
           const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString() : "TBA";
