@@ -214,25 +214,10 @@
                 </div>
             </div>
 
-            <!-- Events List -->
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="eventsTableBody" class="bg-white divide-y divide-gray-200">
-                            <!-- Events will be loaded here -->
-                        </tbody>
-                    </table>
+            <!-- Events Cards Grid (cards only; no surrounding panel) -->
+            <div class="max-w-7xl mx-auto px-4">
+                <div id="eventsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full text-center text-gray-500">Loading...</div>
                 </div>
             </div>
         </div>
@@ -285,15 +270,24 @@
                                 class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                             Cancel
                         </button>
-                        <button type="submit" 
+                        <button type="submit" id="saveEventBtn"
                                 class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                             Save
                         </button>
                     </div>
                 </form>
+                <!-- Inline upload progress shown here while uploading -->
+                <div id="modalUploadProgress" class="hidden mt-4">
+                    <div id="modalUploadProgressBarBg" class="w-full bg-gray-200 h-3 rounded overflow-hidden">
+                        <div id="modalUploadProgressBar" class="h-full bg-blue-600 w-0"></div>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-700">Uploading: <span id="modalUploadProgressPercent">0%</span></div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- modal-local upload progress (will be shown under form buttons inside modal) -->
 
     <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
     <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
@@ -333,6 +327,25 @@
             });
         }
 
+        // Helper to build API URLs with sensible fallbacks when window.buildApiUrl
+        // is not available (e.g. script failed to load or blocked). Other pages
+        // in the project use a similar pattern; keep the same fallback behavior
+        // so admin pages work both locally and when served from production.
+        function apiUrl(endpoint) {
+            try {
+                if (typeof window.buildApiUrl === 'function') return window.buildApiUrl(endpoint);
+                // Normalize endpoint
+                var ep = endpoint || '';
+                if (ep.startsWith('/')) ep = ep.substring(1);
+                var folder = window.APP_API_FOLDER || 'https://spchospital.com/Backend/api/';
+                if (!folder.endsWith('/')) folder = folder + '/';
+                return folder + ep;
+            } catch (e) {
+                // As last resort, return a production absolute URL
+                return 'https://spchospital.com/Backend/api/' + (endpoint || '');
+            }
+        }
+
         function showError(fieldId, message) {
             const field = document.getElementById(fieldId);
             const errorElement = document.getElementById(fieldId + 'Error');
@@ -347,6 +360,23 @@
             }
         }
 
+        // Helper to build image URL for event uploads (mirrors doctors logic)
+        function buildEventImageUrl(imagePath) {
+            if (!imagePath) return null;
+            const imgPath = String(imagePath || '');
+            if (imgPath.startsWith('http')) return imgPath;
+            if (imgPath.startsWith('/')) return window.location.origin + imgPath;
+
+            // If only filename stored, attempt to use buildUploadUrl or construct relative path
+            const imgName = imgPath.split('/').pop();
+            if (!imgName) return null;
+            if (typeof window.buildUploadUrl === 'function') {
+                return window.buildUploadUrl('events/' + imgName);
+            }
+            const basePath = window.location.pathname.includes('/doctor-appoinment') ? window.location.pathname.split('/doctor-appoinment')[0] + '/doctor-appoinment' : '';
+            return window.location.origin + basePath + '/uploads/events/' + imgName;
+        }
+
         // Load events
         async function loadEvents(searchTerm = '') {
             try {
@@ -359,7 +389,7 @@
                     return;
                 }
 
-                let url = window.buildApiUrl('events.php');
+                let url = apiUrl('events.php');
                 if (searchTerm) {
                     url += '?search=' + encodeURIComponent(searchTerm);
                 }
@@ -388,49 +418,58 @@
         }
 
         function showAuthMessage() {
-            const tbody = document.getElementById('eventsTableBody');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" class="px-6 py-4 text-center">
-                        <div class="text-gray-500 mb-2">Authentication required to view events</div>
-                        <a href="login.html" class="text-blue-600 hover:text-blue-800 underline">Click here to login</a>
-                    </td>
-                </tr>
+            const container = document.getElementById('eventsContainer');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="col-span-full text-center py-8">
+                    <div class="text-gray-500 mb-2">Authentication required to view events</div>
+                    <a href="login.html" class="text-blue-600 hover:text-blue-800 underline">Click here to login</a>
+                </div>
             `;
         }
 
-        // Display events in table
+        // Display events as responsive cards (mobile-first)
         function displayEvents() {
-            const tbody = document.getElementById('eventsTableBody');
-            tbody.innerHTML = '';
+            const container = document.getElementById('eventsContainer');
+            if (!container) return;
 
-            if (events.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                            No events found. Click "Add Event" to create one.
-                        </td>
-                    </tr>
-                `;
+            if (!events || events.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No events found. Click "Add Event" to create one.</div>';
                 return;
             }
 
-            events.forEach(event => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${event.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${event.title}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">${event.description || 'No description'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(event.event_date).toLocaleDateString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${event.event_time || 'No time'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${event.location || 'No location'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="editEvent(${event.id})" class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                        <button onclick="deleteEvent(${event.id})" class="text-red-600 hover:text-red-900">Delete</button>
-                    </td>
+            container.innerHTML = events.map(event => {
+                const imgUrl = buildEventImageUrl(event.image_path) || ((typeof window.buildAssetUrl === 'function') ? window.buildAssetUrl('assets/event-placeholder.png') : (window.location.origin + '/Frontend/public/assets/event-placeholder.png'));
+                return `
+                    <div class="bg-transparent border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col">
+                        <div class="h-44 w-full bg-gray-100 overflow-hidden flex items-center justify-center">
+                            <img src="${imgUrl}" alt="${escapeHtml(event.title)}" class="object-cover w-full h-full" onerror="this.onerror=null;this.src='${imgUrl}';" />
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col relative pb-12">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-1">${escapeHtml(event.title)}</h3>
+                            <p class="text-sm text-gray-600 mb-2 truncate">${escapeHtml(event.description || '')}</p>
+                            <div class="text-sm text-gray-500 mb-2">${new Date(event.event_date).toLocaleDateString()} ${event.event_time ? '• ' + event.event_time : ''}</div>
+                            <div class="text-sm text-gray-500 mb-2">${escapeHtml(event.location || '')}</div>
+
+                            <div class="absolute bottom-3 left-3 flex gap-2">
+                                <button class="text-blue-600 hover:text-blue-900 px-2 py-1 rounded" onclick="editEvent(${event.id})">Edit</button>
+                                <button class="text-red-600 hover:text-red-900 px-2 py-1 rounded" onclick="deleteEvent(${event.id})">Delete</button>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                tbody.appendChild(row);
-            });
+            }).join('');
+        }
+
+        // Simple escaping for text to avoid HTML injection
+        function escapeHtml(unsafe) {
+            if (!unsafe && unsafe !== 0) return '';
+            return String(unsafe)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
         }
 
         // Show modal for adding/editing
@@ -476,7 +515,7 @@
             if (confirm('Are you sure you want to delete this event?')) {
                 try {
                     showLoading();
-                    const response = await fetch(window.buildApiUrl(`events.php?id=${id}`), {
+                    const response = await fetch(apiUrl(`events.php?id=${id}`), {
                         method: 'DELETE'
                     });
                     
@@ -541,79 +580,112 @@
         document.getElementById('addEventBtn').addEventListener('click', () => showEventModal(false));
         document.getElementById('cancelEventBtn').addEventListener('click', hideEventModal);
         
-        document.getElementById('eventForm').addEventListener('submit', async (e) => {
+        document.getElementById('eventForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             clearErrors();
-            
-            const formData = new FormData(e.target);
-            const eventData = {
-                title: formData.get('title').trim(),
-                description: formData.get('description').trim(),
-                event_date: formData.get('event_date'),
-                event_time: formData.get('event_time') || null,
-                location: formData.get('location') || null
-            };
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const title = (formData.get('title') || '').trim();
+            const eventDate = formData.get('event_date');
 
             // Client-side validation
             let isValid = true;
-            if (!eventData.title) {
+            if (!title) {
                 showError('eventTitle', 'Title is required');
                 isValid = false;
             }
-            
-            if (!eventData.event_date) {
+            if (!eventDate) {
                 showError('eventDate', 'Date is required');
                 isValid = false;
             }
-            
             if (!isValid) {
                 showNotification('Please fix the validation errors', 'error');
                 return;
             }
 
-            try {
-                showLoading();
-                
-                // Always use FormData for both create & update
-const fd = new FormData(e.target);
-
-// If editing, include event id
-if (editingEventId) {
-    fd.append('id', editingEventId);
-}
-
-const response = await fetch(window.buildApiUrl('events.php'), {
-    method: 'POST',   // ✅ Always POST
-    credentials: 'include',
-    body: fd
-});
-
-
-                const responseData = await response.json();
-                
-                if (response.ok) {
-                    showNotification(editingEventId ? 'Event updated successfully' : 'Event created successfully');
-                    hideEventModal();
-                    loadEvents();
-                } else if (response.status === 422) {
-                    // Handle validation errors from server
-                    if (responseData.errors) {
-                        // Show field-specific errors
-                        Object.keys(responseData.errors).forEach(field => {
-                            showError(`event${field.charAt(0).toUpperCase() + field.slice(1)}`, responseData.errors[field]);
-                        });
-                    }
-                    showNotification(responseData.message || 'Validation error occurred', 'error');
-                } else {
-                    throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('Error saving event:', error);
-                showNotification(error.message || 'Failed to save event. Please try again.', 'error');
-            } finally {
-                hideLoading();
+            // Prepare FormData and include id if editing
+            if (editingEventId) {
+                formData.append('id', editingEventId);
             }
+
+            // Use XMLHttpRequest to track upload progress
+            const xhr = new XMLHttpRequest();
+            const url = apiUrl('events.php');
+
+            // Modal-local progress UI and Save button
+            const progressWrapper = document.getElementById('modalUploadProgress');
+            const progressBar = document.getElementById('modalUploadProgressBar');
+            const progressPercent = document.getElementById('modalUploadProgressPercent');
+            const saveBtn = document.getElementById('saveEventBtn');
+            if (progressWrapper) progressWrapper.classList.remove('hidden');
+            if (progressBar) progressBar.style.width = '0%';
+            if (progressPercent) progressPercent.textContent = '0%';
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.classList.add('opacity-60', 'cursor-not-allowed'); }
+
+            xhr.open('POST', url, true);
+            xhr.withCredentials = true;
+
+            xhr.upload.addEventListener('progress', (evt) => {
+                if (evt.lengthComputable) {
+                    const percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                    if (progressBar) progressBar.style.width = percentComplete + '%';
+                    if (progressPercent) progressPercent.textContent = percentComplete + '%';
+                }
+            });
+
+            // When the upload stream completes (client finished sending), show 100% and 'Processing…'
+            xhr.upload.addEventListener('loadend', () => {
+                if (progressBar) progressBar.style.width = '100%';
+                if (progressPercent) progressPercent.textContent = 'Processing…';
+            });
+
+            // Set a reasonable timeout (ms) for the entire request/response
+            xhr.timeout = 120000; // 120s
+            xhr.ontimeout = function() {
+                if (progressWrapper) progressWrapper.classList.add('hidden');
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
+                showNotification('Server did not respond in time. Try again or check server logs.', 'error');
+            };
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    try {
+                        const responseData = JSON.parse(xhr.responseText || '{}');
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            showNotification(editingEventId ? 'Event updated successfully' : 'Event created successfully');
+                            hideEventModal();
+                            loadEvents();
+                        } else if (xhr.status === 422) {
+                            if (responseData.errors) {
+                                Object.keys(responseData.errors).forEach(field => {
+                                    showError(`event${field.charAt(0).toUpperCase() + field.slice(1)}`, responseData.errors[field]);
+                                });
+                            }
+                            showNotification(responseData.message || 'Validation error occurred', 'error');
+                        } else {
+                            showNotification(responseData.error || 'Failed to save event. Please try again.', 'error');
+                        }
+                    } catch (err) {
+                        console.error('Invalid JSON response', err, xhr.responseText);
+                        showNotification('Unexpected server response', 'error');
+                    } finally {
+                        // hide/reset progress UI
+                        if (progressWrapper) setTimeout(() => progressWrapper.classList.add('hidden'), 800);
+                        if (progressBar) progressBar.style.width = '0%';
+                        if (progressPercent) progressPercent.textContent = '0%';
+                        if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
+                    }
+                }
+            };
+
+            xhr.onerror = function() {
+                showNotification('Network error while uploading (connection interrupted). Please try again.', 'error');
+                if (progressWrapper) progressWrapper.classList.add('hidden');
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
+            };
+            xhr.send(formData);
         });
 
         // Load events on page load
