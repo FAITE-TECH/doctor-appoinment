@@ -54,7 +54,8 @@
         }
         
         function checkAuth() {
-            const authUrl = (window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : 'https://spchospital.com/Backend/api/auth.php?action=me'));
+            const _norm = (v)=>{ try{ if(!v) return v; if(/^https?:\/\//i.test(v)) return v; if(v.startsWith('/')) return window.location.origin.replace(/\/$/,'')+v; return v;}catch(e){return v}};
+            const authUrl = (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (_norm(window.APP_API_BASE) || 'https://spchospital.com/Backend/api/auth.php?action=me'));
             fetch(authUrl)
                 .then(response => response.json())
                 .then(data => {

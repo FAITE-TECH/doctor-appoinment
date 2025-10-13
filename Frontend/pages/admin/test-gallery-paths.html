@@ -16,7 +16,7 @@
             
             const pathsToTest = [
                 (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : 'https://spchospital.com/Backend/api/gallery.php')),
-                (window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'))),
+                (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : ((function(v){ try{ if(!v) return v; if(/^https?:\/\//i.test(v)) return v; if(v.startsWith('/')) return window.location.origin.replace(/\/$/,'')+v; return v;}catch(e){return v}})(window.APP_API_BASE) || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'))),
                 (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : 'https://spchospital.com/Backend/api/gallery.php')),
                 (window.buildApiUrl ? window.buildApiUrl('gallery.php') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'gallery.php' : 'https://spchospital.com/Backend/api/gallery.php'))
             ];

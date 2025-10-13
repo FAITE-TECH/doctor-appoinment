@@ -9,6 +9,32 @@ if (typeof window.SharedAdminAuth === 'undefined') {
         this.init();
     }
 
+    normalizeApiBase(val) {
+        try {
+            if (!val) return val;
+            if (/^https?:\/\//i.test(val)) return val;
+            var pathname = window.location.pathname || '';
+            var idx = pathname.indexOf('/Frontend');
+            var projectRoot = '';
+            if (idx !== -1) projectRoot = pathname.substring(0, idx);
+            if (!projectRoot) projectRoot = '/doctor-appoinment';
+            var cleaned = val;
+            cleaned = cleaned.replace(/^\/Frontend\//i, '/');
+            if (cleaned.charAt(0) !== '/') cleaned = '/' + cleaned;
+            if (/^\/Backend\//i.test(cleaned)) {
+                return window.location.origin.replace(/\/$/, '') + projectRoot.replace(/\/$/, '') + cleaned;
+            }
+            var m = cleaned.match(/(\/Backend\/api\/.*)$/i);
+            if (m && m[1]) {
+                return window.location.origin.replace(/\/$/, '') + projectRoot.replace(/\/$/, '') + m[1];
+            }
+            if (cleaned.charAt(0) === '/') return window.location.origin.replace(/\/$/, '') + cleaned;
+            return window.location.origin.replace(/\/$/, '') + projectRoot.replace(/\/$/, '') + '/' + cleaned;
+        } catch (e) {
+            return val;
+        }
+    }
+
     async init() {
         // Check if we already have auth data in localStorage (for persistence across page refreshes)
         const cachedAuth = this.getCachedAuth();
@@ -61,8 +87,7 @@ if (typeof window.SharedAdminAuth === 'undefined') {
             if (typeof window.buildApiUrl === 'function') {
                 authUrl = window.buildApiUrl('auth.php?action=me');
             } else if (window.APP_API_BASE) {
-                authUrl = window.APP_API_BASE;
-                if (authUrl.startsWith('/')) authUrl = window.location.origin.replace(/\/$/, '') + authUrl;
+                authUrl = this.normalizeApiBase(window.APP_API_BASE);
                 authUrl = authUrl.includes('?') ? authUrl + '&action=me' : authUrl + '?action=me';
             } else if (window.APP_API_FOLDER) {
                 authUrl = (window.APP_API_FOLDER.endsWith('/') ? window.APP_API_FOLDER : window.APP_API_FOLDER + '/') + 'auth.php?action=me';
@@ -136,8 +161,7 @@ if (typeof window.SharedAdminAuth === 'undefined') {
             if (typeof window.buildApiUrl === 'function') {
                 signoutUrl = window.buildApiUrl('auth.php?action=signout');
             } else if (window.APP_API_BASE) {
-                signoutUrl = window.APP_API_BASE;
-                if (signoutUrl.startsWith('/')) signoutUrl = window.location.origin.replace(/\/$/, '') + signoutUrl;
+                signoutUrl = this.normalizeApiBase(window.APP_API_BASE);
                 signoutUrl = signoutUrl.includes('?') ? signoutUrl + '&action=signout' : signoutUrl + '?action=signout';
             } else if (window.APP_API_FOLDER) {
                 signoutUrl = (window.APP_API_FOLDER.endsWith('/') ? window.APP_API_FOLDER : window.APP_API_FOLDER + '/') + 'auth.php?action=signout';

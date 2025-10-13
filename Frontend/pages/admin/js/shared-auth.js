@@ -9,6 +9,50 @@ if (typeof window.SharedAdminAuth === 'undefined') {
         this.init();
     }
 
+    // Normalize API base values coming from different scripts/hosting setups.
+    // Converts malformed values like '/Frontend/Backend/api/auth.php' into
+    // an absolute URL pointing at the expected project backend (fallback to
+    // '/doctor-appoinment' when project root can't be inferred).
+    normalizeApiBase(val) {
+        try {
+            if (!val) return val;
+            // If already absolute, return as-is
+            if (/^https?:\/\//i.test(val)) return val;
+
+            // Compute a sensible project root. If the current path contains
+            // '/Frontend', use the prefix before it. Otherwise fall back to
+            // the repo folder name '/doctor-appoinment'.
+            var pathname = window.location.pathname || '';
+            var idx = pathname.indexOf('/Frontend');
+            var projectRoot = '';
+            if (idx !== -1) projectRoot = pathname.substring(0, idx);
+            if (!projectRoot) projectRoot = '/doctor-appoinment';
+
+            // Some older scripts may set values like '/Frontend/Backend/api/auth.php'
+            // or '/Backend/api/auth.php'. Normalize both to: origin + projectRoot + '/Backend/api/...'
+            var cleaned = val;
+            // If it begins with '/Frontend/Backend', drop the leading '/Frontend' part
+            cleaned = cleaned.replace(/^\/Frontend\//i, '/');
+            // Ensure it starts with '/Backend' (or '/'), then build absolute URL
+            if (cleaned.charAt(0) !== '/') cleaned = '/' + cleaned;
+            // If cleaned now starts with '/Backend', prefix projectRoot
+            if (/^\/Backend\//i.test(cleaned)) {
+                return window.location.origin.replace(/\/$/, '') + projectRoot.replace(/\/$/, '') + cleaned;
+            }
+            // Fallback: if cleaned contains '/Backend/api', build around that
+            var m = cleaned.match(/(\/Backend\/api\/.*)$/i);
+            if (m && m[1]) {
+                return window.location.origin.replace(/\/$/, '') + projectRoot.replace(/\/$/, '') + m[1];
+            }
+            // As a last resort, if it already starts with '/', make it absolute using origin
+            if (cleaned.charAt(0) === '/') return window.location.origin.replace(/\/$/, '') + cleaned;
+            // Otherwise append to projectRoot
+            return window.location.origin.replace(/\/$/, '') + projectRoot.replace(/\/$/, '') + '/' + cleaned;
+        } catch (e) {
+            return val;
+        }
+    }
+
     async init() {
         // Check if we already have auth data in localStorage (for persistence across page refreshes)
         const cachedAuth = this.getCachedAuth();
@@ -62,11 +106,8 @@ if (typeof window.SharedAdminAuth === 'undefined') {
             if (typeof window.buildApiUrl === 'function') {
                 authUrl = window.buildApiUrl('auth.php?action=me');
             } else if (window.APP_API_BASE) {
-                // Ensure APP_API_BASE is absolute (prefix origin if it starts with a single '/').
-                authUrl = window.APP_API_BASE;
-                if (authUrl.startsWith('/')) {
-                    authUrl = window.location.origin.replace(/\/$/, '') + authUrl;
-                }
+                // Normalize APP_API_BASE to an absolute URL to avoid host/path mistakes
+                authUrl = this.normalizeApiBase(window.APP_API_BASE);
                 // If APP_API_BASE already contains query string, avoid duplicating '?'
                 authUrl = authUrl.includes('?') ? authUrl + '&action=me' : authUrl + '?action=me';
             } else if (window.APP_API_FOLDER) {
@@ -141,8 +182,7 @@ if (typeof window.SharedAdminAuth === 'undefined') {
             if (typeof window.buildApiUrl === 'function') {
                 signoutUrl = window.buildApiUrl('auth.php?action=signout');
             } else if (window.APP_API_BASE) {
-                signoutUrl = window.APP_API_BASE;
-                if (signoutUrl.startsWith('/')) signoutUrl = window.location.origin.replace(/\/$/, '') + signoutUrl;
+                signoutUrl = this.normalizeApiBase(window.APP_API_BASE);
                 signoutUrl = signoutUrl.includes('?') ? signoutUrl + '&action=signout' : signoutUrl + '?action=signout';
             } else if (window.APP_API_FOLDER) {
                 signoutUrl = (window.APP_API_FOLDER.endsWith('/') ? window.APP_API_FOLDER : window.APP_API_FOLDER + '/') + 'auth.php?action=signout';

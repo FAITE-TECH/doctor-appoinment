@@ -57,7 +57,8 @@
             statusDiv.innerHTML = '<p>Checking authentication...</p>';
             
             try {
-                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'))), {
+                const _norm = (v)=>{ try{ if(!v) return v; if(/^https?:\/\//i.test(v)) return v; if(v.startsWith('/')) return window.location.origin.replace(/\/$/,'')+v; return v;}catch(e){return v}};
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('auth.php?action=me') : (_norm(window.APP_API_BASE) || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=me' : 'https://spchospital.com/Backend/api/auth.php?action=me'))), {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -101,7 +102,7 @@
             const password = document.getElementById('testPassword').value;
             
             try {
-                const response = await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signin' : 'https://spchospital.com/Backend/api/auth.php?action=signin'))), {
+                const response = await fetch((window.buildApiUrl ? window.buildApiUrl('auth.php?action=signin') : (_norm(window.APP_API_BASE) || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signin' : 'https://spchospital.com/Backend/api/auth.php?action=signin'))), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -126,7 +127,7 @@
         // Logout
         async function logout() {
             try {
-                await fetch((window.APP_API_BASE || (window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'))), {
+                await fetch((window.buildApiUrl ? window.buildApiUrl('auth.php?action=signout') : (_norm(window.APP_API_BASE) || (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'auth.php?action=signout' : 'https://spchospital.com/Backend/api/auth.php?action=signout'))), {
                     method: 'POST',
                     credentials: 'include'
                 });
