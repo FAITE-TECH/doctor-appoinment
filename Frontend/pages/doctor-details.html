@@ -154,37 +154,56 @@
       function safeBuildUploadUrl(pathOrName, folder) {
         if (!pathOrName) return '';
 
-        var str = String(pathOrName);
+        var str = String(pathOrName).trim();
+        var origin = window.location.origin || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
 
-        // If looks like a full absolute URL, try to detect malformed host like 'uploads'
+        // If it's a full URL, return it (but fix malformed host 'uploads' -> origin + pathname)
         if (/^https?:\/\//i.test(str)) {
           try {
             var u = new URL(str);
-            if (u.hostname === 'uploads') {
-              // Rebuild using current origin + pathname
-              var origin = window.location.origin || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
+            if (u.hostname && u.hostname.toLowerCase() === 'uploads') {
+              // e.g. 'https://uploads/departments/..' -> convert to origin + pathname
               return origin.replace(/\/$/, '') + u.pathname;
             }
             return str; // well-formed
           } catch (e) {
-            // fallthrough to treat as path
+            // If parsing failed, strip protocol and continue
             str = str.replace(/^https?:\/\//i, '');
           }
         }
 
-        // If cross-platform builder is available, prefer it (it already handles many edge cases)
+        // Normalize leading slashes
+        var cleaned = str.replace(/^\/+/, '');
+
+        // If value already contains 'uploads/<folder>/' somewhere, take the last occurrence
+        if (folder && cleaned.indexOf('uploads/' + folder + '/') !== -1) {
+          var idx = cleaned.lastIndexOf('uploads/' + folder + '/');
+          var tail = cleaned.substring(idx); // from uploads/<folder>/...
+          return origin.replace(/\/$/, '') + '/' + tail.replace(/^\/+/, '');
+        }
+
+        // If value already starts with 'uploads/' take that as the path
+        if (cleaned.indexOf('uploads/') === 0) {
+          return origin.replace(/\/$/, '') + '/' + cleaned;
+        }
+
+        // If value already starts with the folder (e.g., 'doctors/filename'), build /uploads/<folder>/...
+        if (folder && cleaned.indexOf(folder + '/') === 0) {
+          return origin.replace(/\/$/, '') + '/uploads/' + cleaned;
+        }
+
+        // Use buildUploadUrl if present; ensure we don't prefix folder twice
         if (typeof window.buildUploadUrl === 'function') {
           try {
-            var candidate = (folder && !str.startsWith(folder) ? folder + '/' + str : str);
+            var candidate = (folder && !cleaned.startsWith(folder + '/')) ? folder + '/' + cleaned : cleaned;
             return window.buildUploadUrl(candidate);
           } catch (e) {
             // fallthrough to manual
           }
         }
 
-        // Manual fallback: normalize and build absolute URL against production host
-        var cleaned = str.replace(/^\/+/, '');
-        var base = 'https://spchospital.com/uploads/';
+        // Manual fallback: production uploads base
+        var base = origin.replace(/\/$/, '') + '/uploads/';
         return folder ? (base + folder + '/' + cleaned) : (base + cleaned);
       }
 
