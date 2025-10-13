@@ -103,14 +103,25 @@
       let departments = [];
       let currentDepartment = null;
 
+      // Safe helper to build API URLs. Prefer window.buildApiUrl when available,
+      // otherwise fall back to APP_API_FOLDER or a production URL.
+      function apiUrl(endpoint) {
+        try {
+          if (typeof window.buildApiUrl === 'function') return window.buildApiUrl(endpoint);
+          var ep = endpoint || '';
+          if (ep.startsWith('/')) ep = ep.substring(1);
+          var folder = window.APP_API_FOLDER || 'https://spchospital.com/Backend/api/';
+          if (!folder.endsWith('/')) folder = folder + '/';
+          return folder + ep;
+        } catch (e) {
+          return 'https://spchospital.com/Backend/api/' + (endpoint || '');
+        }
+      }
+
       // Fetch departments from API
       async function fetchDepartments() {
         try {
-          const response = await fetch(
-            window.buildApiUrl
-              ? window.buildApiUrl('departments.php?action=public')
-              : (window.APP_API_FOLDER ? window.APP_API_FOLDER + 'departments.php?action=public' : 'https://spchospital.com/Backend/api/departments.php?action=public')
-          );
+          const response = await fetch(apiUrl('departments.php?action=public'), { credentials: 'include' });
           const data = await response.json();
           
           if (data.status === 'success') {
@@ -147,14 +158,9 @@
         currentDepartment = departments.find((d) => parseInt(d.id) === departmentId);
 
         if (currentDepartment) {
-          // Use the image from database or fallback to default
-            let departmentImage = currentDepartment.image_path ? (window.buildUploadUrl ? window.buildUploadUrl(`departments/${currentDepartment.image_path}`) : 'https://spchospital.com/uploads/departments/' + currentDepartment.image_path) : "https://spchospital.com/Frontend/public/assets/nephrology.jpg";
-          // Handle image path properly
-          if (currentDepartment.image_path && !currentDepartment.image_path.startsWith('http') && !currentDepartment.image_path.startsWith('/')) {
-            departmentImage = window.buildUploadUrl ? window.buildUploadUrl(`departments/${currentDepartment.image_path}`) : 'https://spchospital.com/uploads/departments/' + currentDepartment.image_path;
-          } else if (currentDepartment.image_path && currentDepartment.image_path.startsWith('/')) {
-            departmentImage = currentDepartment.image_path;
-          }
+          // Use the image from database or fallback to default. Normalize the
+          // path to avoid malformed URLs (missing host or duplicated segments).
+          const departmentImage = buildDepartmentImageUrl(currentDepartment.image_path) || "https://spchospital.com/Frontend/public/assets/nephrology.jpg";
           
           const departmentName = currentDepartment.name || "Department";
           const departmentDescription = currentDepartment.description || "Specialized medical department providing quality healthcare services.";
@@ -194,6 +200,33 @@
         }
       }
 
+      // Helper to build department image URL. Accepts filename, relative path,
+      // or absolute URL and returns a normalized URL.
+      function buildDepartmentImageUrl(imagePath) {
+        if (!imagePath) return null;
+        const imgPath = String(imagePath || '');
+        if (imgPath.startsWith('http')) return imgPath;
+
+        // If it already contains the uploads path, normalize and ensure origin
+        if (imgPath.indexOf('/uploads/departments/') !== -1) {
+          const cleaned = imgPath.replace(/\/\/+/, '/');
+          if (cleaned.startsWith('/')) return window.location.origin + cleaned;
+          return window.location.origin + '/' + cleaned;
+        }
+
+        if (imgPath.startsWith('/')) return window.location.origin + imgPath;
+
+        // Use buildUploadUrl if present
+        const imgName = imgPath.split('/').pop();
+        if (!imgName) return null;
+        if (typeof window.buildUploadUrl === 'function') {
+          return window.buildUploadUrl('departments/' + imgName);
+        }
+
+        const basePath = window.location.pathname.includes('/doctor-appoinment') ? window.location.pathname.split('/doctor-appoinment')[0] + '/doctor-appoinment' : '';
+        return window.location.origin + basePath + '/uploads/departments/' + imgName;
+      }
+
       function renderRelatedDepartments() {
         const departmentContainer = document.getElementById("departmentContainer");
         if (!departmentContainer) return;
@@ -213,12 +246,7 @@
 
         departmentContainer.innerHTML = displayDepartments
           .map((department) => {
-            let departmentImage = department.image_path || "../public/assets/nephrology.jpg";
-            if (department.image_path && !department.image_path.startsWith('http') && !department.image_path.startsWith('/')) {
-              departmentImage = window.buildUploadUrl ? window.buildUploadUrl(`departments/${department.image_path}`) : 'https://spchospital.com/uploads/departments/' + department.image_path;
-            } else if (department.image_path && department.image_path.startsWith('/')) {
-              departmentImage = department.image_path;
-            }
+            const departmentImage = buildDepartmentImageUrl(department.image_path) || "../public/assets/nephrology.jpg";
 
             return `
               <div class="bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col">
