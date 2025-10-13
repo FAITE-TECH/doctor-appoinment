@@ -28,11 +28,30 @@ set_exception_handler(function($ex) {
     if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
     $logFile = $logDir . 'admin_errors.log';
     $msg = "[EXCEPTION] " . date('c') . " - " . $ex->getMessage() . " in " . $ex->getFile() . ":" . $ex->getLine() . "\n" . $ex->getTraceAsString() . "\n";
+    // Attempt to write to project logs (may fail due to permissions) and
+    // also write to a safe system temp file so we can always inspect
     @file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+    $tempLog = sys_get_temp_dir() . '/doctor_admin_exceptions.log';
+    @file_put_contents($tempLog, $msg, FILE_APPEND | LOCK_EX);
+    // Also send to PHP error log
+    error_log($msg);
+
     if (!headers_sent()) {
         header('Content-Type: application/json');
         http_response_code(500);
-        echo json_encode(['error' => 'Unhandled exception occurred. Check server logs.']);
+        // Provide more detail when running on local/dev hosts to aid debugging.
+        $server_name = $_SERVER['SERVER_NAME'] ?? ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        if (in_array($server_name, ['localhost', '127.0.0.1', '::1'])) {
+            echo json_encode([
+                'error' => 'Unhandled exception occurred. Check server logs.',
+                'message' => $ex->getMessage(),
+                'file' => $ex->getFile(),
+                'line' => $ex->getLine(),
+                'trace' => $ex->getTraceAsString()
+            ]);
+        } else {
+            echo json_encode(['error' => 'Unhandled exception occurred. Check server logs.']);
+        }
     }
     exit(1);
 });
@@ -244,6 +263,13 @@ if ($method === 'GET' && $action === 'get_doctors') getTableData('doctors', 'id'
 // Enhanced add doctor to support both JSON and multipart (with image)
 if ($method === 'POST' && $action === 'add_doctor') {
     checkAdminAuth();
+
+    // DEBUG: write request summary so remote 500s can be diagnosed.
+    $debugDir = __DIR__ . '/../logs/';
+    if (!is_dir($debugDir)) @mkdir($debugDir, 0755, true);
+    $debugFile = $debugDir . 'admin_debug.log';
+    $dbg = "[ADD_DOCTOR_ENTRY] " . date('c') . " - POST keys: " . json_encode(array_keys($_POST)) . ", FILE keys: " . json_encode(array_keys($_FILES)) . "\n";
+    @file_put_contents($debugFile, $dbg, FILE_APPEND | LOCK_EX);
 
     // Helper: ensure column exists
     $ensureColumn = function($table, $column, $definition) {
