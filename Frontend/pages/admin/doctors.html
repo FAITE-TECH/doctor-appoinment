@@ -6,6 +6,37 @@
     <title>Doctors Management - SPC Hospital Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://spchospital.com/Frontend/public/css/styles.css">
+    <!-- Small local fixes: remove mobile/browser focus/tap highlight and unwanted outline on sidebar links -->
+    <style>
+        /* Remove the blue tap highlight on iOS/Android when tapping links */
+        html, body, a, button {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Sidebar link focus/active fixes to avoid extra blue bars/gaps while keeping visual active state */
+        nav a:focus,
+        nav a:active,
+        nav a:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background-image: none !important;
+            border-color: transparent !important;
+        }
+
+        /* If Tailwind or browser adds an inner highlight, force background only, no extra borders */
+        nav a[aria-current],
+        nav a.active,
+        nav a.bg-blue-100 {
+            /* preserve the intended background color but remove any surrounding stroke/outline */
+            box-shadow: none !important;
+            outline: none !important;
+            border: none !important;
+        }
+
+        /* For safari/ios, sometimes form controls get an inner focus ring -- remove it for sidebar anchors */
+        nav a::-moz-focus-inner { border: 0; }
+    </style>
 </head>
 <body class="bg-gray-100">
     <!-- Admin Navigation -->
