@@ -148,24 +148,12 @@
                 </div>
             </div>
 
-            <!-- Services List -->
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="servicesTableBody" class="bg-white divide-y divide-gray-200">
-                            <!-- Services will be loaded here -->
-                        </tbody>
-                    </table>
+            <!-- Services Cards Grid (replaces table) -->
+            <div class="rounded-lg overflow-hidden">
+                <div class="p-4">
+                    <div id="servicesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="col-span-full text-center text-gray-500">Loading...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -261,39 +249,64 @@
         }
 
         function showAuthMessage() {
-            const tbody = document.getElementById('servicesTableBody');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="px-6 py-4 text-center">
-                        <div class="text-center py-12">
-                            <div class="text-gray-500 mb-2">Authentication required to view services</div>
-                            <a href="login.html" class="text-blue-600 hover:text-blue-800 underline">Click here to login</a>
-                        </div>
-                    </td>
-                </tr>
+            const container = document.getElementById('servicesContainer');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="col-span-full text-center py-8">
+                    <div class="text-gray-500 mb-2">Authentication required to view services</div>
+                    <a href="login.html" class="text-blue-600 hover:text-blue-800 underline">Click here to login</a>
+                </div>
             `;
         }
 
-        // Display services in table
-        function displayServices() {
-            const tbody = document.getElementById('servicesTableBody');
-            tbody.innerHTML = '';
+        // Build a usable image URL for service images (mirrors doctors/events helpers)
+        function buildServiceImageUrl(imagePath) {
+            if (!imagePath) return null;
+            const imgPath = String(imagePath || '');
+            if (imgPath.startsWith('http')) return imgPath;
+            if (imgPath.startsWith('/')) return window.location.origin + imgPath;
 
-            services.forEach(service => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${service.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${service.name}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">${service.description || 'No description'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Rs ${parseFloat(service.price).toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(service.created_at).toLocaleDateString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="editService(${service.id})" class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                        <button onclick="deleteService(${service.id})" class="text-red-600 hover:text-red-900">Delete</button>
-                    </td>
+            const imgName = imgPath.split('/').pop();
+            if (!imgName) return null;
+            if (typeof window.buildUploadUrl === 'function') {
+                return window.buildUploadUrl('services/' + imgName);
+            }
+            const basePath = window.location.pathname.includes('/doctor-appoinment') ? window.location.pathname.split('/doctor-appoinment')[0] + '/doctor-appoinment' : '';
+            return window.location.origin + basePath + '/uploads/services/' + imgName;
+        }
+
+        // Display services as responsive cards (mobile-first)
+        function displayServices() {
+            const container = document.getElementById('servicesContainer');
+            if (!container) return;
+
+            if (!services || services.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No services found</div>';
+                return;
+            }
+
+            container.innerHTML = services.map(service => {
+                const assetPlaceholder = (typeof window.buildAssetUrl === 'function') ? window.buildAssetUrl('assets/service-placeholder.png') : (window.location.origin + '/Frontend/public/assets/service-placeholder.png');
+                let img = buildServiceImageUrl(service.image_path) || assetPlaceholder;
+
+                return `
+                    <div class="bg-transparent border border-gray-200/50 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col">
+                        <div class="h-44 w-full bg-gray-100 overflow-hidden flex items-center justify-center">
+                            <img src="${img}" alt="${service.name}" class="object-cover w-full h-full" onerror="this.onerror=null;this.src='${assetPlaceholder}';" />
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col relative pb-12">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-1">${service.name}</h3>
+                            <p class="text-sm text-gray-600 mb-2">${service.description || ''}</p>
+                            <div class="text-sm text-gray-500 mb-2">Rs ${parseFloat(service.price || 0).toFixed(2)}</div>
+
+                            <div class="absolute bottom-3 right-3 flex gap-2">
+                                <button class="text-blue-600 hover:text-blue-900 px-2 py-1 rounded" onclick="editService(${service.id})">Edit</button>
+                                <button class="text-red-600 hover:text-red-900 px-2 py-1 rounded" onclick="deleteService(${service.id})">Delete</button>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                tbody.appendChild(row);
-            });
+            }).join('');
         }
 
         // Show modal for adding/editing

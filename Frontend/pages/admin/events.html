@@ -276,12 +276,15 @@
                         </button>
                     </div>
                 </form>
-                <!-- Inline upload progress shown here while uploading -->
+                <!-- Inline upload progress will be shown directly under the buttons, left-aligned -->
                 <div id="modalUploadProgress" class="hidden mt-4">
-                    <div id="modalUploadProgressBarBg" class="w-full bg-gray-200 h-3 rounded overflow-hidden">
+                    <div class="flex items-center gap-3">
+                        <div class="text-sm text-gray-700 font-medium">Uploading</div>
+                        <div id="modalUploadProgressPercent" class="text-sm text-gray-700">0%</div>
+                    </div>
+                    <div id="modalUploadProgressBarBg" class="mt-2 w-full bg-gray-200 h-3 rounded overflow-hidden">
                         <div id="modalUploadProgressBar" class="h-full bg-blue-600 w-0"></div>
                     </div>
-                    <div class="mt-2 text-sm text-gray-700">Uploading: <span id="modalUploadProgressPercent">0%</span></div>
                 </div>
             </div>
         </div>
@@ -631,11 +634,12 @@
                 if (evt.lengthComputable) {
                     const percentComplete = Math.round((evt.loaded / evt.total) * 100);
                     if (progressBar) progressBar.style.width = percentComplete + '%';
+                    // write percent into the moved percent element
                     if (progressPercent) progressPercent.textContent = percentComplete + '%';
                 }
             });
 
-            // When the upload stream completes (client finished sending), show 100% and 'Processing…'
+            // When the upload stream completes (client finished sending), show 100% and update text to Processing…
             xhr.upload.addEventListener('loadend', () => {
                 if (progressBar) progressBar.style.width = '100%';
                 if (progressPercent) progressPercent.textContent = 'Processing…';
