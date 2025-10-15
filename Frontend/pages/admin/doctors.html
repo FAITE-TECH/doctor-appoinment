@@ -160,16 +160,16 @@
                 <h3 id="doctorModalTitle" class="text-lg font-semibold">Add Doctor</h3>
                 <button id="closeAddDoctorModal" class="text-gray-500 hover:text-gray-700">✕</button>
             </div>
-            <form id="addDoctorForm" enctype="multipart/form-data" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" name="name" placeholder="Full Name" required class="px-3 py-2 border rounded">
-                <input type="email" name="email" placeholder="Email" required class="px-3 py-2 border rounded">
-                <input type="text" name="specialization" placeholder="Specialization" required class="px-3 py-2 border rounded">
-                <input type="text" name="phone" id="doctorPhone" placeholder="Phone (10 digits)" maxlength="10" inputmode="numeric" class="px-3 py-2 border rounded">
-                <select name="department_id" class="px-3 py-2 border rounded">
-                    <option value="">Select Department (Optional)</option>
+            <form id="addDoctorForm" enctype="multipart/form-data" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4" autocomplete="off">
+                <input type="text" name="name" placeholder="Full Name" required autocomplete="off" class="px-3 py-2 border rounded">
+                <input type="email" name="email" placeholder="Email" required autocomplete="off" class="px-3 py-2 border rounded">
+                <input type="text" name="specialization" placeholder="Specialization" required autocomplete="off" class="px-3 py-2 border rounded">
+                <input type="text" name="phone" id="doctorPhone" placeholder="Phone (10 digits)" maxlength="10" inputmode="numeric" autocomplete="off" class="px-3 py-2 border rounded">
+                <select name="department_id" autocomplete="off" class="px-3 py-2 border rounded">
+                    <option value="">Select Department</option>
                 </select>
-                <input type="text" name="description" placeholder="Description" class="px-3 py-2 border rounded md:col-span-2">
-                <input type="file" name="image" accept="image/*" class="px-3 py-2 border rounded md:col-span-2">
+                <input type="text" name="description" placeholder="Description" autocomplete="off" class="px-3 py-2 border rounded md:col-span-2">
+                <input type="file" name="image" accept="image/*" autocomplete="off" class="px-3 py-2 border rounded md:col-span-2">
                 <div class="text-xs text-gray-500 md:col-span-2">Leave image empty to keep the current photo when editing.</div>
                 <div class="md:col-span-2 flex justify-end gap-3">
                     <button type="button" id="cancelAddDoctor" class="px-4 py-2 rounded border">Cancel</button>
@@ -241,7 +241,7 @@
                 if (!select) return;
                 
                 // Clear existing options except the first one
-                select.innerHTML = '<option value="">Select Department (Optional)</option>';
+                select.innerHTML = '<option value="">Select Department</option>';
                 
                 // Add department options
                 this.departments.forEach(dept => {
@@ -408,6 +408,34 @@
 
                 const openModal = () => {
                     if (modal) {
+                        // Ensure the form is cleared and we are not editing an existing doctor
+                        if (form) {
+                            form.reset();
+                            // clear any file input explicitly
+                            const fileInput = form.querySelector('input[type="file"][name="image"]');
+                            if (fileInput) fileInput.value = '';
+                            // Remove name attributes temporarily to prevent browser autofill suggestions
+                            Array.from(form.querySelectorAll('input, textarea, select')).forEach(el => {
+                                if (el.name) {
+                                    el.dataset.origName = el.name;
+                                    el.removeAttribute('name');
+                                }
+                                // also ensure browsers' autocomplete hints are off
+                                try { el.setAttribute('autocomplete', 'off'); } catch (e) {}
+                            });
+                            // Make department required for Add flow
+                            const deptForAdd = form.querySelector('select[name="department_id"]') || form.querySelector('select');
+                            if (deptForAdd) {
+                                // set required so the add flow will enforce department selection
+                                deptForAdd.required = true;
+                            }
+                        }
+                        this.editingDoctorId = null;
+                        const titleEl = document.getElementById('doctorModalTitle');
+                        if (titleEl) titleEl.textContent = 'Add Doctor';
+                        // Hide/reset any upload UI/state
+                        try { this.setUploading(false); } catch (e) { /* ignore if unavailable */ }
+
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
                     }
@@ -419,6 +447,18 @@
                     }
                     this.editingDoctorId = null;
                     document.getElementById('doctorModalTitle').textContent = 'Add Doctor';
+                    // ensure department required flag is cleared when closing
+                    if (form) {
+                        const dept = form.querySelector('select[name="department_id"]') || form.querySelector('select');
+                        if (dept) dept.required = false;
+                        // Restore any temporarily-removed name attributes so future edit actions work
+                        Array.from(form.querySelectorAll('[data-orig-name]')).forEach(el => {
+                            try {
+                                if (!el.name) el.name = el.dataset.origName;
+                                delete el.dataset.origName;
+                            } catch (e) {}
+                        });
+                    }
                     form.reset();
                 };
 
@@ -428,7 +468,21 @@
 
                 if (form) {
                     form.addEventListener('submit', async (e) => {
+                        // Restore name attributes so FormData includes the correct fields
+                        Array.from(form.querySelectorAll('[data-orig-name]')).forEach(el => {
+                            if (!el.name) el.name = el.dataset.origName;
+                        });
+
                         e.preventDefault();
+                        // When creating a new doctor (not editing), ensure a department is selected
+                        if (!this.editingDoctorId) {
+                            const dept = form.querySelector('select[name="department_id"]') || form.querySelector('select');
+                            if (dept && (!dept.value || dept.value === '')) {
+                                alert('Please select a department. Department is required when creating a doctor.');
+                                if (dept) dept.focus();
+                                return;
+                            }
+                        }
                         // Validate phone before submitting: only if provided it must be exactly 10 digits
                         const phoneInput = form.querySelector('input[name="phone"]');
                         const phoneVal = phoneInput ? phoneInput.value : '';
@@ -596,6 +650,10 @@
                 this.editingDoctorId = id;
                 if (title) title.textContent = 'Edit Doctor';
                 if (form) {
+                    // Restore any name attributes that may have been removed by Add flow
+                    Array.from(form.querySelectorAll('[data-orig-name]')).forEach(el => {
+                        if (!el.name) el.name = el.dataset.origName;
+                    });
                     form.querySelector('input[name="name"]').value = doctor.name || '';
                     form.querySelector('input[name="email"]').value = doctor.email || '';
                     form.querySelector('input[name="specialization"]').value = doctor.specialization || '';
