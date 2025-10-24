@@ -150,13 +150,22 @@
           // Normalize image path: extract the filename to avoid duplicate '/uploads/services' segments
           let serviceImage = "https://spchospital.com/Frontend/public/assets/eyecare.jpg";
           if (currentService.image_path) {
-            const imgName = String(currentService.image_path).split('/').pop();
-            if (imgName && !imgName.startsWith('http')) {
-              serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${imgName}`) : 'https://spchospital.com/uploads/services/' + imgName;
-            } else if (String(currentService.image_path).startsWith('http')) {
-              serviceImage = currentService.image_path;
-            } else if (String(currentService.image_path).startsWith('/')) {
-              serviceImage = currentService.image_path;
+            const rawPath = String(currentService.image_path || '');
+            const imgName = rawPath.split('/').pop();
+            if (typeof window.buildUploadUrl === 'function') {
+              // Always route through buildUploadUrl to normalize prod/local and strip project folder if needed
+              if (/^https?:\/\//i.test(rawPath) || rawPath.startsWith('/')) {
+                serviceImage = window.buildUploadUrl(rawPath);
+              } else if (imgName) {
+                serviceImage = window.buildUploadUrl(`services/${imgName}`);
+              }
+            } else {
+              // Fallbacks without helper
+              if (/^https?:\/\//i.test(rawPath)) {
+                serviceImage = rawPath.replace(/\/doctor-appoinment\//, '/');
+              } else if (imgName) {
+                serviceImage = 'https://spchospital.com/uploads/services/' + imgName;
+              }
             }
           }
           
@@ -233,13 +242,20 @@
             // Normalize related service image path
             let serviceImage = "../public/assets/eyecare.jpg";
             if (service.image_path) {
-              const imgName = String(service.image_path).split('/').pop();
-              if (imgName && !imgName.startsWith('http')) {
-                serviceImage = window.buildUploadUrl ? window.buildUploadUrl(`services/${imgName}`) : 'https://spchospital.com/uploads/services/' + imgName;
-              } else if (String(service.image_path).startsWith('http')) {
-                serviceImage = service.image_path;
-              } else if (String(service.image_path).startsWith('/')) {
-                serviceImage = service.image_path;
+              const rawPath = String(service.image_path || '');
+              const imgName = rawPath.split('/').pop();
+              if (typeof window.buildUploadUrl === 'function') {
+                if (/^https?:\/\//i.test(rawPath) || rawPath.startsWith('/')) {
+                  serviceImage = window.buildUploadUrl(rawPath);
+                } else if (imgName) {
+                  serviceImage = window.buildUploadUrl(`services/${imgName}`);
+                }
+              } else {
+                if (/^https?:\/\//i.test(rawPath)) {
+                  serviceImage = rawPath.replace(/\/doctor-appoinment\//, '/');
+                } else if (imgName) {
+                  serviceImage = 'https://spchospital.com/uploads/services/' + imgName;
+                }
               }
             }
 

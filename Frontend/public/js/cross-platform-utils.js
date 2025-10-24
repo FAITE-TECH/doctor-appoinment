@@ -186,6 +186,7 @@
   function buildUploadUrl(uploadPath) {
     var basePath = getBasePath();
     var cleanPath = normalizePath(uploadPath);
+    var host = window.location.hostname || '';
     
     // Remove leading slash from path if present
     if (cleanPath.charAt(0) === '/') {
@@ -197,6 +198,15 @@
     if (/^https?:\/\//i.test(uploadPath)) {
       try {
         var urlObj = new URL(uploadPath);
+        // If we're on production and the absolute URL mistakenly includes the
+        // project folder (e.g. '/doctor-appoinment/uploads/...'), strip it.
+        if (host.indexOf('spchospital.com') !== -1 &&
+            /^\/doctor-appoinment\/uploads\//.test(urlObj.pathname)) {
+          var originFix = window.location.origin || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
+          var corrected = originFix.replace(/\/$/, '') + urlObj.pathname.replace(/^\/doctor-appoinment\//, '/');
+          console.warn('[buildUploadUrl] corrected absolute URL path for production:', uploadPath, '=>', corrected);
+          return corrected;
+        }
         // If hostname is 'uploads' (or 'uploads' + port), treat this as a malformed
         // absolute URL created by joining protocol + path. Rebuild using current origin.
         if (urlObj.hostname === 'uploads') {
@@ -227,6 +237,11 @@
     // 'uploads/doctors/...'), treat it as a full web path and return a
     // normalized, absolute URL to avoid duplicating the uploads prefix.
     if (cleanPath.indexOf('uploads/') !== -1) {
+      // On production, ensure we do NOT keep the project folder prefix
+      if (host.indexOf('spchospital.com') !== -1) {
+        cleanPath = cleanPath.replace(/^doctor-appoinment\//, '');
+        cleanPath = cleanPath.replace(/^\/doctor-appoinment\//, '/');
+      }
       // Ensure leading slash for absolute path
       var absPath = cleanPath.charAt(0) === '/' ? cleanPath : '/' + cleanPath;
       // Use window.location.origin so this works both in local and prod
@@ -250,7 +265,7 @@
     // CRITICAL: Check hostname FIRST to determine if we're on production or local
     // Production (spchospital.com): uploads are at root level (no /doctor-appoinment/)
     // Local development: uploads are under /doctor-appoinment/
-    var host = window.location.hostname || '';
+  // host already computed above
     var normalizedBase;
     
     if (host.indexOf('spchospital.com') !== -1) {
