@@ -247,11 +247,20 @@
     }
 
     // Ensure basePath is usable; if empty, use origin + project root
-    var normalizedBase = basePath || '';
-    // If basePath is empty, construct using current origin and assume project at '/doctor-appoinment'
-    if (!normalizedBase) {
-      normalizedBase = window.location.origin + '/doctor-appoinment';
+    // CRITICAL: Check hostname FIRST to determine if we're on production or local
+    // Production (spchospital.com): uploads are at root level (no /doctor-appoinment/)
+    // Local development: uploads are under /doctor-appoinment/
+    var host = window.location.hostname || '';
+    var normalizedBase;
+    
+    if (host.indexOf('spchospital.com') !== -1) {
+      // Production: ALWAYS use root level for uploads, ignore basePath
+      normalizedBase = window.location.origin;
+    } else {
+      // Local development: use basePath if available, or construct it
+      normalizedBase = basePath || (window.location.origin + '/doctor-appoinment');
     }
+    
     // Ensure no duplicate slashes while concatenating
     var res = normalizedBase.replace(/\/$/, '') + '/uploads/' + cleanPath.replace(/^\//, '');
     if (cleanPath.indexOf('uploads') !== -1 || cleanPath.indexOf('doctors') !== -1) {
