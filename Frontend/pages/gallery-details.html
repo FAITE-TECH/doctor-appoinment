@@ -147,7 +147,26 @@
         currentGalleryItem = galleryItems.find((item) => parseInt(item.id) === galleryId);
 
         if (currentGalleryItem) {
-          const imagePath = (window.buildUploadUrl ? window.buildUploadUrl(`gallery/${currentGalleryItem.image_path}`) : 'https://spchospital.com/uploads/gallery/' + currentGalleryItem.image_path);
+          // Normalize gallery image path robustly across prod/local
+          let imagePath = 'https://spchospital.com/Frontend/public/assets/eyecare.jpg';
+          if (currentGalleryItem.image_path) {
+            const rawPath = String(currentGalleryItem.image_path || '');
+            const imgName = rawPath.split('/').pop();
+            if (typeof window.buildUploadUrl === 'function') {
+              if (/^https?:\/\//i.test(rawPath) || rawPath.startsWith('/')) {
+                imagePath = window.buildUploadUrl(rawPath);
+              } else if (imgName) {
+                imagePath = window.buildUploadUrl(`gallery/${imgName}`);
+              }
+            } else {
+              // Fallbacks without helper
+              if (/^https?:\/\//i.test(rawPath)) {
+                imagePath = rawPath.replace(/\/doctor-appoinment\//, '/');
+              } else if (imgName) {
+                imagePath = 'https://spchospital.com/uploads/gallery/' + imgName;
+              }
+            }
+          }
           const title = currentGalleryItem.title || "Gallery Image";
           const description = currentGalleryItem.description || "Beautiful image from our gallery.";
           const createdDate = new Date(currentGalleryItem.created_at).toLocaleDateString();
@@ -213,7 +232,25 @@
 
         galleryContainer.innerHTML = displayItems
           .map((item) => {
-            const imagePath = `../../uploads/gallery/${item.image_path}`;
+            // Normalize related gallery image path
+            let imagePath = '../public/assets/eyecare.jpg';
+            if (item.image_path) {
+              const rawPath = String(item.image_path || '');
+              const imgName = rawPath.split('/').pop();
+              if (typeof window.buildUploadUrl === 'function') {
+                if (/^https?:\/\//i.test(rawPath) || rawPath.startsWith('/')) {
+                  imagePath = window.buildUploadUrl(rawPath);
+                } else if (imgName) {
+                  imagePath = window.buildUploadUrl(`gallery/${imgName}`);
+                }
+              } else {
+                if (/^https?:\/\//i.test(rawPath)) {
+                  imagePath = rawPath.replace(/\/doctor-appoinment\//, '/');
+                } else if (imgName) {
+                  imagePath = 'https://spchospital.com/uploads/gallery/' + imgName;
+                }
+              }
+            }
             const title = item.title || "Gallery Image";
             const description = item.description || "Beautiful image from our gallery.";
             const createdDate = new Date(item.created_at).toLocaleDateString();
