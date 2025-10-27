@@ -215,13 +215,14 @@
 
   // Handle sign out functionality
   function initSignOut() {
-    const signoutBtn = document.getElementById('signoutBtn');
-    if (signoutBtn) {
+    const ids = ['signoutBtn', 'signoutBtnMobile'];
+    ids.forEach(function(id){
+      const btn = document.getElementById(id);
+      if (!btn) return;
       // Remove any existing event listeners to avoid duplicates
-      signoutBtn.replaceWith(signoutBtn.cloneNode(true));
-      const newSignoutBtn = document.getElementById('signoutBtn');
-      
-      newSignoutBtn.addEventListener('click', async function() {
+      const clone = btn.cloneNode(true);
+      btn.parentNode.replaceChild(clone, btn);
+      clone.addEventListener('click', async function() {
         try {
           // Use global APP_API_BASE when available (already includes auth.php)
           const signoutEndpoint = (window.APP_API_BASE || apiBase) + '?action=signout';
@@ -231,7 +232,7 @@
         }
         window.location.href = './index.html';
       });
-    }
+    });
   }
 
   // Initialize navigation when DOM is loaded

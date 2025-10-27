@@ -23,6 +23,18 @@
       </div>
     </nav>
 
+    <!-- Right-side Auth Controls -->
+    <div class="hidden lg:flex items-center space-x-3">
+      <!-- Guest links -->
+      <a href="signin.html" data-auth="guest" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-600 rounded-md transition">Sign In</a>
+
+      <!-- User info and actions -->
+      <span data-auth="user" class="hidden text-sm text-gray-700">Signed in as <span id="nav-user-email" class="font-medium"></span></span>
+      <a href="my-messages.html" data-auth="user" class="hidden px-3 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-600 rounded-md transition">My Messages</a>
+      <a href="admin/index.html" id="adminLink" data-auth="admin" class="hidden px-3 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-purple-600 rounded-md transition">Admin Dashboard</a>
+      <button id="signoutBtn" data-auth="user" class="hidden px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-red-600 rounded-md transition">Sign Out</button>
+    </div>
+
     <!-- Mobile Menu Toggle -->
     <button id="mobileMenuToggle" class="lg:hidden text-2xl focus:outline-none p-2 hover:bg-gray-100 rounded-md transition-colors duration-200">
       <i class="fas fa-bars"></i>
@@ -44,6 +56,13 @@
           <a href="gallery.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="gallery">Gallery</a>
           <a href="events.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="events">Events</a>
           <a href="contact.html" class="w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium" data-nav="contact">Contact</a>
+          <div class="pt-2 border-t border-gray-100 mt-2"></div>
+          <!-- Guest auth links (mobile) -->
+          <a href="signin.html" data-auth="guest" class="w-full text-center py-3 px-6 text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-semibold">Sign In</a>
+          <!-- User links (mobile) -->
+          <a href="my-messages.html" data-auth="user" class="hidden w-full text-center py-3 px-6 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 font-medium">My Messages</a>
+          <a href="admin/index.html" id="adminLink" data-auth="admin" class="hidden w-full text-center py-3 px-6 hover:text-purple-700 hover:bg-purple-50 rounded-md transition-colors duration-200 font-medium">Admin Dashboard</a>
+          <button id="signoutBtnMobile" data-auth="user" class="hidden w-full text-center py-3 px-6 text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200 font-semibold">Sign Out</button>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@
 <body class="bg-gray-100">
   <div id="header"></div>
   <script>
-  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
+  fetch('shared-nav.html?v=' + Date.now())
       .then((res) => res.text())
       .then((data) => {
         document.getElementById("header").innerHTML = data;
@@ -111,23 +111,15 @@
                 </button>
               </form>
 
-              <p class="mt-5 text-base font-normal text-center text-gray-900 font-pj" id="signupSection">
-                Don't have an account?
-                <a
-                  href="signup.html"
-                  class="font-bold rounded hover:underline focus:outline-none focus:ring-1 focus:ring-gray-900 focus:ring-offset-2"
-                >
-                  Sign Up for Free
-                </a>
-              </p>
+              <!-- Signup removed: accounts are provisioned by admin -->
             </div>
           </div>
         </div>
       </div>
     </section>
 
-  <script src="https://spchospital.com/Frontend/public/js/config.js"></script>
-  <script src="https://spchospital.com/Frontend/public/js/script.js"></script>
+  <script src="../public/js/config.js"></script>
+  <script src="../public/js/script.js"></script>
       <script src="shared-nav.js"></script>
       <script>
         // Check if this is an admin redirect
