@@ -6,6 +6,8 @@
                 <a href="./index.html" class="text-xl font-bold">🏥 SPC Hospital Admin</a>
             </div>
             <div class="flex items-center space-x-4">
+                <!-- Mobile menu toggle (visible on small screens) -->
+                <button id="mobileMenuToggle" class="md:hidden text-2xl focus:outline-none p-2 hover:bg-gray-700 rounded-md transition-colors" aria-label="Toggle menu" aria-expanded="false">☰</button>
                 <span id="admin-user-info" class="text-sm"></span>
                 <a href="../index.html" class="bg-gray-600 hover:bg-gray-700 px-3 py-2 rounded text-sm">Back to Site</a>
                 <button id="adminLogoutBtn" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-sm">Logout</button>
@@ -16,7 +18,7 @@
 
 <div class="flex flex-col md:flex-row">
     <!-- Sidebar -->
-    <div class="w-full md:w-64 bg-white shadow-lg min-h-0 md:min-h-screen">
+    <div id="adminSidebar" class="w-full md:w-64 bg-white shadow-lg min-h-0 md:min-h-screen hidden md:block">
         <div class="p-4">
             <nav class="space-y-2">
                 <a href="./index.html" class="flex items-center px-4 py-2 text-gray-700 bg-blue-100 rounded-lg">
