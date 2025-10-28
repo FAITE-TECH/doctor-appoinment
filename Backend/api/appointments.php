@@ -50,6 +50,11 @@ if ($method === 'POST' && $action === 'book') {
         json_response(['error' => 'Invalid email format'], 400);
     }
     
+    // Validate phone: exactly 10 digits, numbers only
+    if (!preg_match('/^\d{10}$/', $patient_phone)) {
+        json_response(['error' => 'Invalid phone number. Phone must be exactly 10 digits (numbers only).'], 422);
+    }
+
     // Validate date format and ensure it's not in the past
     $appointment_datetime = DateTime::createFromFormat('Y-m-d H:i', $appointment_date . ' ' . $appointment_time);
     if (!$appointment_datetime) {
@@ -332,13 +337,48 @@ switch ($method) {
             if (!in_array($status, $valid_statuses)) {
                 json_response(['error' => 'Invalid status'], 400);
             }
-            
+
+            // Guard: If confirming, require a valid 10-digit phone for the patient
+            $userRow = null;
+            if ($status === 'confirmed') {
+                $stmtCheck = $conn->prepare('SELECT u.id AS user_id, u.email, u.phone FROM appointments a JOIN users u ON a.user_id = u.id WHERE a.id = ?');
+                if (!$stmtCheck) {
+                    json_response(['error' => 'Database error while validating phone'], 500);
+                }
+                $stmtCheck->bind_param('i', $id);
+                $stmtCheck->execute();
+                $resCheck = $stmtCheck->get_result();
+                $userRow = $resCheck ? $resCheck->fetch_assoc() : null;
+                $stmtCheck->close();
+
+                $phoneVal = trim($userRow['phone'] ?? '');
+                if (!$userRow || !preg_match('/^\d{10}$/', $phoneVal)) {
+                    json_response(['error' => 'Cannot confirm appointment: patient phone is missing or invalid. It must be exactly 10 digits.'], 422);
+                }
+            }
+
+            // Proceed to update status now that validation has passed
             $stmt = $conn->prepare('UPDATE appointments SET status = ? WHERE id = ?');
             $stmt->bind_param('si', $status, $id);
-            
+
             if ($stmt->execute()) {
                 $stmt->close();
-                json_response(['message' => 'Appointment status updated successfully']);
+
+                $account_updated = false;
+                if ($status === 'confirmed' && $userRow) {
+                    $phonePwd = trim($userRow['phone']);
+                    $hashed = password_hash($phonePwd, PASSWORD_DEFAULT);
+                    $stmt3 = $conn->prepare('UPDATE users SET password = ? WHERE id = ?');
+                    if ($stmt3) {
+                        $stmt3->bind_param('si', $hashed, $userRow['user_id']);
+                        if ($stmt3->execute()) {
+                            $account_updated = true;
+                        }
+                        $stmt3->close();
+                    }
+                }
+
+                json_response(['message' => 'Appointment status updated successfully', 'account_updated' => $account_updated]);
             } else {
                 $stmt->close();
                 json_response(['error' => 'Failed to update appointment status'], 500);

@@ -31,9 +31,7 @@ if ($method === 'POST' && $action === 'signup') {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         json_response(['error' => 'Invalid email'], 422);
     }
-    if (strlen($password) < 6) {
-        json_response(['error' => 'Password must be at least 6 characters'], 422);
-    }
+    // Previous password length validation removed to allow phone-number passwords
 
     // Check if email already exists
     $stmt = $GLOBALS['conn']->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
