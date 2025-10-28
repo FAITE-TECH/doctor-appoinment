@@ -284,3 +284,31 @@
                 transform: translateY(0);
             }
         } */
+
+/* Admin navbar spacing and overflow safety (works even if Tailwind is unavailable) */
+.admin-topbar-right {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  gap: 0.5rem; /* fallback when Tailwind gap utilities are not present */
+  white-space: nowrap; /* keep items on one line */
+  overflow-x: auto; /* allow horizontal scroll instead of overlap */
+}
+
+/* Truncate long admin user names/emails safely */
+#admin-user-info {
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+  #admin-user-info { max-width: 16rem; }
+}
