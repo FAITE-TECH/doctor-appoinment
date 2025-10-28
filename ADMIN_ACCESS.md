@@ -8,10 +8,10 @@
 
 ### **How to Access Admin Panel**
 
-#### **Option 1: Direct Admin Login**
-1. Go to: `http://localhost/doctor-appoinment/Frontend/pages/admin/login.html`
-2. Enter the credentials above
-3. You'll be redirected to the admin dashboard
+#### **Option 1: Direct Sign In**
+1. Go to: `http://localhost/doctor-appoinment/Frontend/pages/signin.html`
+2. Enter the admin credentials above
+3. You'll be redirected to the admin dashboard if your account has the admin role
 
 #### **Option 2: Through Main Site**
 1. Go to: `http://localhost/doctor-appoinment/Frontend/pages/index.html`

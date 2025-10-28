@@ -142,8 +142,8 @@ doctor-appoinment/
 
 ## Admin login redirect notes
 
-- Server-side admin auth include (`Backend/includes/admin_auth.php`) redirects unauthenticated users to `/doctor-appoinment/Frontend/pages/admin/login.html` to avoid wrong relative redirects.
-- Frontend admin scripts (`Frontend/pages/admin/js/shared-auth.js` and `Frontend/pages/admin/js/admin.js`) were updated so logout actions navigate to `login.html` (admin login) instead of the public `signin.html`.
+- Server-side admin auth include (`Backend/includes/admin_auth.php`) redirects unauthenticated users to the common sign-in page at `/doctor-appoinment/Frontend/pages/signin.html`.
+- Frontend admin scripts (`Frontend/pages/admin/js/shared-auth.js` and `Frontend/pages/admin/js/admin.js`) now navigate to the common sign-in page (`../signin.html`) after logout or when authentication is required.
 
 1. **Test the admin interface** by logging in and adding sample data
 2. **Verify image uploads** work correctly in the browser

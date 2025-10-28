@@ -6,8 +6,8 @@ include('session_config.php');
 // Check if user is authenticated and is admin
 function checkAdminAuth() {
     if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-        // Redirect to admin login page if not admin. Use absolute path to avoid issues.
-        header('Location: /doctor-appoinment/Frontend/pages/admin/login.html');
+        // Redirect to common sign-in page if not admin. Use absolute path to avoid issues.
+        header('Location: /doctor-appoinment/Frontend/pages/signin.html');
         exit();
     }
     
