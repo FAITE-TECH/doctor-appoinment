@@ -135,7 +135,8 @@
       // Some browsers do not execute <script> tags that are injected via
       // innerHTML, so we also dynamically load the `shared-nav.js` script
       // after insertion to ensure the navigation initializer is available.
-      fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
+      // Load shared nav locally to work on localhost without CORS issues
+      fetch('shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById("header").innerHTML = data;
