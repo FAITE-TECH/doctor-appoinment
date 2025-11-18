@@ -31,7 +31,7 @@
       // runs. Scripts inside injected HTML do not reliably execute, so we
       // dynamically load `shared-nav.js` after insertion and call the
       // exposed initializer when available.
-      fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
+      fetch('shared-nav.html?v=' + Date.now())
         .then((res) => res.text())
         .then((data) => {
           document.getElementById('header').innerHTML = data;

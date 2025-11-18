@@ -135,36 +135,93 @@
       // Some browsers do not execute <script> tags that are injected via
       // innerHTML, so we also dynamically load the `shared-nav.js` script
       // after insertion to ensure the navigation initializer is available.
-      // Load shared nav locally to work on localhost without CORS issues
-      fetch('shared-nav.html?v=' + Date.now())
-        .then((res) => res.text())
-        .then((data) => {
-          document.getElementById("header").innerHTML = data;
+      
+      function loadNavigation() {
+        // Load shared nav locally to work on localhost without CORS issues
+        fetch('shared-nav.html?v=' + Date.now())
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error('Failed to fetch navigation: ' + res.status);
+            }
+            return res.text();
+          })
+          .then((data) => {
+            document.getElementById("header").innerHTML = data;
 
-          // Ensure the navigation script is loaded. Avoid adding duplicate
-          // script tags if it's already present on the page.
-          var existing = document.querySelector('script[src="shared-nav.js"]');
-          if (!existing) {
-            var s = document.createElement('script');
-            s.src = 'shared-nav.js';
-            s.onload = function() {
+            // Ensure the navigation script is loaded. Avoid adding duplicate
+            // script tags if it's already present on the page.
+            var existing = document.querySelector('script[src="shared-nav.js"]');
+            if (!existing) {
+              var s = document.createElement('script');
+              s.src = 'shared-nav.js';
+              s.onload = function() {
+                console.log('Navigation script loaded successfully');
+                if (window.initNavigationAfterLoad) {
+                  window.initNavigationAfterLoad();
+                }
+              };
+              s.onerror = function(e) {
+                console.error('Failed to load shared-nav.js', e);
+                // Fallback navigation
+                createFallbackNav();
+              };
+              document.head.appendChild(s);
+            } else {
+              // If the script is already loaded, call the initializer directly.
               if (window.initNavigationAfterLoad) {
                 window.initNavigationAfterLoad();
               }
-            };
-            s.onerror = function(e) {
-              console.error('Failed to load shared-nav.js', e);
-            };
-            document.head.appendChild(s);
-          } else {
-            // If the script is already loaded, call the initializer directly.
-            if (window.initNavigationAfterLoad) {
-              window.initNavigationAfterLoad();
             }
-          }
-        }).catch(function(e) {
-          console.error('Failed to load shared-nav.html', e);
-        });
+          })
+          .catch(function(e) {
+            console.error('Failed to load shared-nav.html', e);
+            // Create fallback navigation
+            createFallbackNav();
+          });
+      }
+
+      function createFallbackNav() {
+        console.log('Creating fallback navigation');
+        var header = document.getElementById("header");
+        if (header) {
+          header.innerHTML = `
+            <header class="bg-white shadow-md fixed inset-x-0 top-0 w-screen z-[100]">
+              <div class="w-full max-w-7xl mx-auto flex items-center justify-between px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
+                <a href="index.html" class="flex items-center space-x-2 sm:space-x-3">
+                  <img src="../public/assets/logo.png" alt="SPC Hospital Logo" class="h-8 sm:h-10 lg:h-12 w-auto" />
+                  <div class="flex flex-col">
+                    <span class="text-sm sm:text-lg lg:text-xl font-bold text-blue-600 leading-tight">SPC Hospital</span>
+                    <span class="text-xs text-gray-500 leading-tight hidden sm:block">Speciality Primary Care</span>
+                  </div>
+                </a>
+                <nav class="hidden lg:flex items-center space-x-8 font-medium text-gray-600">
+                  <a href="home.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2 text-blue-600 font-semibold">Home</a>
+                  <a href="doctors.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2">Doctors</a>
+                  <a href="departments.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2">Departments</a>
+                  <a href="services.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2">Services</a>
+                  <a href="gallery.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2">Gallery</a>
+                  <a href="events.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2">Events</a>
+                  <a href="contact.html" class="hover:text-blue-600 transition-colors duration-200 px-3 py-2">Contact</a>
+                </nav>
+                <div class="hidden lg:flex items-center space-x-3">
+                  <a href="signin.html" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-600 rounded-md transition">Sign In</a>
+                </div>
+                <button class="lg:hidden text-2xl focus:outline-none p-2 hover:bg-gray-100 rounded-md transition-colors duration-200">
+                  <i class="fas fa-bars"></i>
+                </button>
+              </div>
+            </header>
+            <div class="pt-[60px] sm:pt-[68px] lg:pt-[76px]"></div>
+          `;
+        }
+      }
+
+      // Wait for DOM to be ready before loading navigation
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadNavigation);
+      } else {
+        loadNavigation();
+      }
     </script>
     <!-- Hero Image -->
     <div

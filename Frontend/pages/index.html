@@ -33,7 +33,7 @@
 <body class="bg-gray-100">
   <div id="header"></div>
   <script>
-  fetch('https://spchospital.com/Frontend/pages/shared-nav.html?v=' + Date.now())
+  fetch('shared-nav.html?v=' + Date.now())
       .then((res) => res.text())
       .then((data) => {
         document.getElementById("header").innerHTML = data;
